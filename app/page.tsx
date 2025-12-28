@@ -45,9 +45,26 @@ export default function Home() {
                   Pre-Flight <br className="hidden sm:inline" /> <span className="text-zinc-500 decoration-zinc-300 underline underline-offset-8">Validator</span> for Research.
                 </h1>
                 <p className="mx-auto max-w-[700px] text-zinc-500 md:text-xl/relaxed lg:text-2xl/relaxed font-serif leading-normal">
-                  A multi-agent governance system for academic claims.
-                  Ensure <strong>Logical & Methodological Robustness</strong> before you submit.
+                  Upload your abstract. Argus extracts your core claims, attacks them with six adversarial agents, and tells you which are ready, which need revision, and which would trigger a desk reject.
                 </p>
+
+                <div className="mt-12 w-full max-w-4xl mx-auto border-t border-zinc-100 pt-8">
+                  <p className="text-xs font-sans font-bold text-zinc-400 uppercase tracking-widest text-center mb-6">Built for</p>
+                  <div className="grid md:grid-cols-3 gap-6 text-center font-sans">
+                    <div>
+                      <h3 className="font-bold text-zinc-900 text-sm">PhD & Masters Students</h3>
+                      <p className="text-zinc-500 text-sm mt-1">Preparing thesis defenses</p>
+                    </div>
+                    <div>
+                      <h3 className="font-bold text-zinc-900 text-sm">Researchers</h3>
+                      <p className="text-zinc-500 text-sm mt-1">Submitting to peer-reviewed journals</p>
+                    </div>
+                    <div>
+                      <h3 className="font-bold text-zinc-900 text-sm">Grant Writers</h3>
+                      <p className="text-zinc-500 text-sm mt-1">Wanting core claims stress-tested</p>
+                    </div>
+                  </div>
+                </div>
               </div>
 
               <div className="flex flex-col items-center gap-6">
@@ -74,6 +91,11 @@ export default function Home() {
                     </DialogContent>
                   </Dialog>
                 </div>
+
+                <p className="text-xs text-zinc-400 mt-4 font-sans">
+                  One audit per manuscript. No subscription. No lock‑in. <br className="hidden sm:inline" />
+                  Use Argus when a submission really matters.
+                </p>
 
                 <div className="mt-6">
                   <Link href="/argus_audit_manuscript.pdf" target="_blank" className="inline-flex items-center gap-2 text-sm font-sans font-medium text-zinc-500 hover:text-zinc-900 border-b border-zinc-300 hover:border-zinc-900 pb-0.5 transition-colors">
@@ -144,26 +166,61 @@ export default function Home() {
               </div>
 
               {/* Visual Representation of the Process */}
-              <div className="relative">
-                <div className="absolute inset-0 bg-zinc-100 rounded-2xl rotate-3 transform transition-transform duration-500 group-hover:rotate-6"></div>
-                <div className="relative bg-zinc-900 rounded-2xl p-8 shadow-2xl text-white overflow-hidden group hover:-translate-y-2 transition-transform duration-500">
-                  {/* Code/Terminal aesthetic */}
-                  <div className="font-mono text-xs space-y-4 opacity-90">
-                    <div className="flex items-center gap-2 border-b border-zinc-800 pb-4 mb-4">
-                      <div className="w-3 h-3 rounded-full bg-red-500"></div>
-                      <div className="w-3 h-3 rounded-full bg-yellow-500"></div>
-                      <div className="w-3 h-3 rounded-full bg-green-500"></div>
-                      <span className="ml-2 text-zinc-500">argus_kernel — -zsh — 80x24</span>
+              {/* Visual Representation of the Process - v4 Audit Cards */}
+              <div className="bg-zinc-50 p-6 rounded-2xl border border-zinc-200">
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-sm font-bold font-sans text-zinc-900 uppercase tracking-wider">Audit v4 Output</h3>
+                  <span className="text-xs text-zinc-400 font-mono">ID: 219A-F</span>
+                </div>
+                <div className="space-y-3 font-sans">
+                  {/* Card 1 */}
+                  <div className="bg-white rounded-lg border-l-4 border-l-green-500 shadow-sm p-4 border border-zinc-100">
+                    <div className="flex justify-between items-start mb-1">
+                      <span className="text-[10px] font-bold text-green-700 bg-green-50 px-1.5 py-0.5 rounded uppercase tracking-wide">Accepted</span>
+                      <span className="text-[10px] text-zinc-400 font-mono">C1</span>
                     </div>
-                    <p className="text-green-400">➜  ~ initializing audit_session</p>
-                    <p className="text-zinc-400">[INFO] Loading 6 agents into ephemeral memory...</p>
-                    <p className="text-zinc-400">[INFO] Parsing claim 14B: "Attention is all you need..."</p>
-                    <div className="pl-4 border-l-2 border-zinc-600 my-4">
-                      <p className="text-zinc-300">Agent: Reviewer_1 active.</p>
-                      <p>Analysis: Counter-example identified regarding recurrent neural network limits in infinite context tasks.</p>
+                    <p className="text-sm font-medium text-zinc-900 leading-snug">Carbon reduction 6–18% with &lt;5% cost, volatile regions</p>
+                    <p className="text-xs text-zinc-500 mt-1">Specific quantitative bounds provided.</p>
+                  </div>
+
+                  {/* Card 2 */}
+                  <div className="bg-white rounded-lg border-l-4 border-l-green-500 shadow-sm p-4 border border-zinc-100">
+                    <div className="flex justify-between items-start mb-1">
+                      <span className="text-[10px] font-bold text-green-700 bg-green-50 px-1.5 py-0.5 rounded uppercase tracking-wide">Accepted</span>
+                      <span className="text-[10px] text-zinc-400 font-mono">C2</span>
                     </div>
-                    <p className="text-zinc-400">[INFO] Classification: <span className="text-yellow-400">Contextual Variation</span></p>
-                    <p><span className="animate-pulse">_</span></p>
+                    <p className="text-sm font-medium text-zinc-900 leading-snug">Trade-off ranges for cost vs emissions</p>
+                    <p className="text-xs text-zinc-500 mt-1">Clear pareto frontier analysis.</p>
+                  </div>
+
+                  {/* Card 3 */}
+                  <div className="bg-white rounded-lg border-l-4 border-l-orange-500 shadow-sm p-4 border border-zinc-100">
+                    <div className="flex justify-between items-start mb-1">
+                      <span className="text-[10px] font-bold text-orange-700 bg-orange-50 px-1.5 py-0.5 rounded uppercase tracking-wide">Revise</span>
+                      <span className="text-[10px] text-zinc-400 font-mono">C3</span>
+                    </div>
+                    <p className="text-sm font-medium text-zinc-900 leading-snug">"Depends on volatility and flexibility"</p>
+                    <p className="text-xs text-zinc-500 mt-1">Too vague. Define threshold conditions.</p>
+                  </div>
+
+                  {/* Card 4 */}
+                  <div className="bg-white rounded-lg border-l-4 border-l-orange-500 shadow-sm p-4 border border-zinc-100">
+                    <div className="flex justify-between items-start mb-1">
+                      <span className="text-[10px] font-bold text-orange-700 bg-orange-50 px-1.5 py-0.5 rounded uppercase tracking-wide">Revise</span>
+                      <span className="text-[10px] text-zinc-400 font-mono">C4</span>
+                    </div>
+                    <p className="text-sm font-medium text-zinc-900 leading-snug">ILP "optimizes trade-offs"</p>
+                    <p className="text-xs text-zinc-500 mt-1">Clarify optimality gap/guarantees.</p>
+                  </div>
+
+                  {/* Card 5 */}
+                  <div className="bg-white rounded-lg border-l-4 border-l-green-500 shadow-sm p-4 border border-zinc-100">
+                    <div className="flex justify-between items-start mb-1">
+                      <span className="text-[10px] font-bold text-green-700 bg-green-50 px-1.5 py-0.5 rounded uppercase tracking-wide">Accepted</span>
+                      <span className="text-[10px] text-zinc-400 font-mono">C5</span>
+                    </div>
+                    <p className="text-sm font-medium text-zinc-900 leading-snug">Governance crucial, but hedged on priorities</p>
+                    <p className="text-xs text-zinc-500 mt-1">Adequate nuance for qualitative claim.</p>
                   </div>
                 </div>
               </div>
@@ -248,6 +305,6 @@ export default function Home() {
       </main>
 
       <Footer />
-    </div>
+    </div >
   )
 }
