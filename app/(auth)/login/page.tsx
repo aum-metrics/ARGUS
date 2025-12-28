@@ -1,5 +1,6 @@
 "use client"
 
+import { cn, getURL } from "@/lib/utils"
 import { useState } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
@@ -39,7 +40,7 @@ export default function LoginPage() {
                 email,
                 password,
                 options: {
-                    emailRedirectTo: `${location.origin}/auth/callback`,
+                    emailRedirectTo: `${getURL()}auth/callback`,
                 },
             })
 
