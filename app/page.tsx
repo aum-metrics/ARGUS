@@ -2,6 +2,7 @@ import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { ShieldCheck, Scale, ScrollText, Lock, ArrowRight, BookOpen, XCircle, AlertTriangle } from "lucide-react"
 import { Footer } from "@/components/Footer"
+import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog"
 
 export default function Home() {
   return (
@@ -56,11 +57,22 @@ export default function Home() {
                       Initialize Audit <ArrowRight className="ml-2 h-5 w-5" />
                     </Button>
                   </Link>
-                  <Link href="/Demo.mov" target="_blank" className="w-full sm:w-auto">
-                    <Button size="lg" variant="outline" className="w-full sm:w-auto border-zinc-200 text-zinc-700 hover:bg-zinc-50 hover:text-black hover:border-zinc-300 px-8 h-14 rounded-full text-base font-medium">
-                      Watch Demo
-                    </Button>
-                  </Link>
+                  <Dialog>
+                    <DialogTrigger asChild>
+                      <Button size="lg" variant="outline" className="w-full sm:w-auto border-zinc-200 text-zinc-700 hover:bg-zinc-50 hover:text-black hover:border-zinc-300 px-8 h-14 rounded-full text-base font-medium">
+                        Watch Demo
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent className="sm:max-w-5xl p-0 bg-black border-zinc-800">
+                      <video
+                        src="/Demo.mov"
+                        controls
+                        className="w-full h-auto max-h-[80vh] rounded-lg"
+                      >
+                        Your browser does not support the video tag.
+                      </video>
+                    </DialogContent>
+                  </Dialog>
                 </div>
 
                 <div className="mt-6">
