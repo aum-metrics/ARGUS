@@ -64,7 +64,23 @@ export default function ArgusDashboard() {
 
                 const hasRemainingCredits = (credits || 0) > usage;
 
-                if (hasRemainingCredits) {
+                // Allow access if:
+                // 1. They have unused credits (Start New Audit)
+                // 2. OR the current local session is one of the ones that already consumed a credit (Resume)
+                // Note: We need the current session ID from local storage to know if we are 'resuming'
+
+                let currentSessionId = null;
+                if (typeof window !== 'undefined') {
+                    const saved = localStorage.getItem("argus_session");
+                    if (saved) {
+                        const parsed = JSON.parse(saved);
+                        currentSessionId = parsed.id;
+                    }
+                }
+
+                const isCurrentSessionPaid = currentSessionId && usedSessions.has(currentSessionId);
+
+                if (hasRemainingCredits || isCurrentSessionPaid) {
                     setSession(prev => {
                         // If session exists, upgrade it
                         if (prev) return { ...prev, paymentStatus: 'PAID' };
@@ -72,6 +88,8 @@ export default function ArgusDashboard() {
                         // If no session exists yet (race condition or first load), create one that is PAID
                         // This handles the "Manual Grant" case for a fresh user
                         const newKey = createSession();
+                        // If we are "resuming" a used session, ideally we should load THAT session data,
+                        // but here we are just handling the permission state.
                         return { ...newKey, paymentStatus: 'PAID' };
                     })
                 }
