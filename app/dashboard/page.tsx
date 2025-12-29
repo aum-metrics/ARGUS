@@ -39,6 +39,36 @@ export default function ArgusDashboard() {
             const { data: { user } } = await supabase.auth.getUser()
             if (user) {
                 setUserEmail(user.email || "Research Account")
+
+                // 1b. BACKEND ACCESS CHECK (Enable manual provisioning)
+                const { data: transactions } = await supabase
+                    .from('transactions')
+                    .select('status')
+                    .eq('user_id', user.id)
+                    .eq('status', 'success')
+                    .limit(1);
+
+                if (transactions && transactions.length > 0) {
+                    console.log("[System] Access granted via Supabase Transaction Record.");
+                    // Force update session if strictly needed, or just let the session logic handle it?
+                    // The session is loaded AFTER this in step 2.
+                    // We need a way to ensuring this 'PAID' status persists into the loaded session.
+                    // Cleanest way: We'll set a temporary flag or update the session state if it exists.
+                }
+
+                // If check passes, we modify the session setter logic below or useEffect.
+                // Refactor: Let's do it right here.
+                if (transactions && transactions.length > 0) {
+                    setSession(prev => {
+                        // If session exists, upgrade it
+                        if (prev) return { ...prev, paymentStatus: 'PAID' };
+
+                        // If no session exists yet (race condition or first load), create one that is PAID
+                        // This handles the "Manual Grant" case for a fresh user
+                        const newKey = createSession();
+                        return { ...newKey, paymentStatus: 'PAID' };
+                    })
+                }
             }
         }
         checkUser()
