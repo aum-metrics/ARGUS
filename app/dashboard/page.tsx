@@ -40,25 +40,31 @@ export default function ArgusDashboard() {
             if (user) {
                 setUserEmail(user.email || "Research Account")
 
-                // 1b. BACKEND ACCESS CHECK (Enable manual provisioning)
-                const { data: transactions } = await supabase
+                // 1b. BACKEND ACCESS CHECK (Consumable Credits)
+                // Credits: Number of successful payments
+                const { count: credits } = await supabase
                     .from('transactions')
-                    .select('status')
+                    .select('*', { count: 'exact', head: true })
                     .eq('user_id', user.id)
-                    .eq('status', 'success')
-                    .limit(1);
+                    .eq('status', 'success');
 
-                if (transactions && transactions.length > 0) {
-                    console.log("[System] Access granted via Supabase Transaction Record.");
-                    // Force update session if strictly needed, or just let the session logic handle it?
-                    // The session is loaded AFTER this in step 2.
-                    // We need a way to ensuring this 'PAID' status persists into the loaded session.
-                    // Cleanest way: We'll set a temporary flag or update the session state if it exists.
-                }
+                // Usage: Number of unique sessions where 'THESIS_CONSTRUCTOR' (Extraction) was run
+                // Note: We need to count *distinct* session_ids to avoid double counting retries within same session.
+                const { data: usageLogs } = await supabase
+                    .from('audit_logs')
+                    .select('session_id')
+                    .eq('user_id', user.id)
+                    .eq('action', 'THESIS_CONSTRUCTOR');
 
-                // If check passes, we modify the session setter logic below or useEffect.
-                // Refactor: Let's do it right here.
-                if (transactions && transactions.length > 0) {
+                // Set of unique session IDs that have consumed a credit
+                const usedSessions = new Set(usageLogs?.map(l => l.session_id));
+                const usage = usedSessions.size;
+
+                console.log(`[System] Credits: ${credits}, Usage: ${usage}`);
+
+                const hasRemainingCredits = (credits || 0) > usage;
+
+                if (hasRemainingCredits) {
                     setSession(prev => {
                         // If session exists, upgrade it
                         if (prev) return { ...prev, paymentStatus: 'PAID' };
