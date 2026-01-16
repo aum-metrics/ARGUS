@@ -76,42 +76,82 @@ export default function EnterprisePage() {
                     </div>
                 </section>
 
-                {/* PRICING TABLE (Enterprise) */}
+                {/* INSTITUTIONAL TIERS - SIMPLIFIED */}
                 <section className="py-24 bg-white">
                     <div className="container px-4 md:px-6">
                         <div className="text-center mb-16">
-                            <h2 className="text-3xl font-bold mb-4 font-serif text-zinc-900">Institutional Tiers</h2>
-                            <p className="text-zinc-500 font-sans">Designed for high-volume research environments.</p>
+                            <h2 className="text-4xl font-bold mb-4 text-zinc-900">Institutional Tiers</h2>
+                            <p className="text-xl text-zinc-600 max-w-2xl mx-auto">
+                                Designed for high-volume research environments.
+                            </p>
                         </div>
 
                         <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
-                            {/* DEPARTMENT TIER */}
-                            <div className="p-8 border border-zinc-200 rounded-2xl bg-white hover:shadow-lg transition-shadow">
-                                <h3 className="text-xl font-bold mb-2 font-serif text-zinc-900">Department License</h3>
-                                <div className="text-4xl font-bold mb-6 text-zinc-900">$299.99<span className="text-base font-normal text-zinc-500 font-sans">/mo</span></div>
-                                <ul className="space-y-3 mb-8 text-sm text-zinc-600 font-sans">
-                                    <li className="flex items-center gap-2"><CheckCircle2 className="h-4 w-4 text-green-600" /> Up to 10 Researcher Seats</li>
-                                    <li className="flex items-center gap-2"><CheckCircle2 className="h-4 w-4 text-green-600" /> 15 Full Audits / Month</li>
-                                    <li className="flex items-center gap-2"><CheckCircle2 className="h-4 w-4 text-green-600" /> Priority Compute Queue</li>
-                                    <li className="flex items-center gap-2"><CheckCircle2 className="h-4 w-4 text-green-600" /> Branded Reports</li>
+                            {/* Department License */}
+                            <div className="border-2 border-zinc-200 rounded-2xl p-8 bg-white hover:border-zinc-300 transition-all">
+                                <h3 className="text-2xl font-bold mb-2">Department License</h3>
+                                <div className="flex items-baseline gap-2 mb-6">
+                                    <span className="text-5xl font-bold">$299.99</span>
+                                    <span className="text-zinc-500">/mo</span>
+                                </div>
+                                <ul className="space-y-3 mb-8">
+                                    <li className="flex items-start gap-2">
+                                        <CheckCircle2 className="h-5 w-5 text-green-600 shrink-0 mt-0.5" />
+                                        <span>Up to 10 Researcher Seats</span>
+                                    </li>
+                                    <li className="flex items-start gap-2">
+                                        <CheckCircle2 className="h-5 w-5 text-green-600 shrink-0 mt-0.5" />
+                                        <span>15 Full Audits / Month</span>
+                                    </li>
+                                    <li className="flex items-start gap-2">
+                                        <CheckCircle2 className="h-5 w-5 text-green-600 shrink-0 mt-0.5" />
+                                        <span>Priority Compute Queue</span>
+                                    </li>
+                                    <li className="flex items-start gap-2">
+                                        <CheckCircle2 className="h-5 w-5 text-green-600 shrink-0 mt-0.5" />
+                                        <span>Branded Reports</span>
+                                    </li>
                                 </ul>
-                                <Button className="w-full bg-zinc-900 text-white hover:bg-zinc-800 h-12">Start Trial</Button>
+                                <Link href="/login" className="block">
+                                    <Button className="w-full bg-zinc-900 text-white hover:bg-zinc-800 h-12">
+                                        Start Trial
+                                    </Button>
+                                </Link>
                             </div>
 
-                            {/* UNIVERSITY TIER */}
-                            <div className="p-8 border border-zinc-200 rounded-2xl bg-zinc-50 relative hover:border-zinc-300 transition-colors">
-                                <div className="absolute top-0 right-0 bg-zinc-900 text-white text-xs font-bold px-3 py-1 rounded-bl-lg rounded-tr-lg font-sans uppercase">
-                                    Most Popular
+                            {/* University License */}
+                            <div className="border-2 border-zinc-900 rounded-2xl p-8 bg-zinc-50 relative">
+                                <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-zinc-900 text-white px-4 py-1 rounded-full text-sm font-bold">
+                                    MOST POPULAR
                                 </div>
-                                <h3 className="text-xl font-bold mb-2 font-serif text-zinc-900">University License</h3>
-                                <div className="text-4xl font-bold mb-6 text-zinc-900">$999.99<span className="text-base font-normal text-zinc-500 font-sans">/mo</span></div>
-                                <ul className="space-y-3 mb-8 text-sm text-zinc-600 font-sans">
-                                    <li className="flex items-center gap-2"><CheckCircle2 className="h-4 w-4 text-zinc-900" /> Unlimited Seats (SSO)</li>
-                                    <li className="flex items-center gap-2"><CheckCircle2 className="h-4 w-4 text-zinc-900" /> 60 Full Audits / Month</li>
-                                    <li className="flex items-center gap-2"><CheckCircle2 className="h-4 w-4 text-zinc-900" /> Custom Agent Configurations</li>
-                                    <li className="flex items-center gap-2"><CheckCircle2 className="h-4 w-4 text-zinc-900" /> Dedicated Account Manager</li>
+                                <h3 className="text-2xl font-bold mb-2">University License</h3>
+                                <div className="flex items-baseline gap-2 mb-6">
+                                    <span className="text-5xl font-bold">$999.99</span>
+                                    <span className="text-zinc-500">/mo</span>
+                                </div>
+                                <ul className="space-y-3 mb-8">
+                                    <li className="flex items-start gap-2">
+                                        <CheckCircle2 className="h-5 w-5 text-green-600 shrink-0 mt-0.5" />
+                                        <span>Unlimited Seats (SSO)</span>
+                                    </li>
+                                    <li className="flex items-start gap-2">
+                                        <CheckCircle2 className="h-5 w-5 text-green-600 shrink-0 mt-0.5" />
+                                        <span>60 Full Audits / Month</span>
+                                    </li>
+                                    <li className="flex items-start gap-2">
+                                        <CheckCircle2 className="h-5 w-5 text-green-600 shrink-0 mt-0.5" />
+                                        <span>Custom Agent Configurations</span>
+                                    </li>
+                                    <li className="flex items-start gap-2">
+                                        <CheckCircle2 className="h-5 w-5 text-green-600 shrink-0 mt-0.5" />
+                                        <span>Dedicated Account Manager</span>
+                                    </li>
                                 </ul>
-                                <Button variant="outline" className="w-full border-zinc-300 text-zinc-900 hover:bg-zinc-100 h-12">Contact Sales</Button>
+                                <Link href="/login" className="block">
+                                    <Button className="w-full bg-zinc-900 text-white hover:bg-zinc-800 h-12">
+                                        Create Organization Account
+                                    </Button>
+                                </Link>
                             </div>
                         </div>
                     </div>
