@@ -1,3 +1,6 @@
+/**
+ * Author: Sambath Kumar Natarajan
+ */
 export type GovernanceRole =
     | 'THESIS_CONSTRUCTOR'
     | 'THESIS_DESTROYER'

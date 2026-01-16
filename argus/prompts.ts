@@ -1,3 +1,6 @@
+/**
+ * Author: Sambath Kumar Natarajan
+ */
 import { GovernanceRole } from "./governance";
 
 /**

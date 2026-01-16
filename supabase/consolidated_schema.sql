@@ -1,3 +1,6 @@
+--
+-- Author: Sambath Kumar Natarajan
+--
 -- CONSOLIDATED ARGUS SCHEMA (V2.2 - Explicit Reset)
 -- Includes: Profiles, Audit Logs, Transactions, Organizations, Sessions, Storage
 -- WARNING: THIS WILL WIPE DATA TO ENSURE CONSISTENCY.

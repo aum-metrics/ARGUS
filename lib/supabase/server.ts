@@ -1,3 +1,6 @@
+/**
+ * Author: Sambath Kumar Natarajan
+ */
 import { createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
 

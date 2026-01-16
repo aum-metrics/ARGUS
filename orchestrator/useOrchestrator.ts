@@ -1,3 +1,6 @@
+/**
+ * Author: Sambath Kumar Natarajan
+ */
 import { ModelAdapter } from '@/lib/adapters/types';
 import { useState, useCallback } from 'react';
 import { CONSTITUTION, PhaseId } from './constitution';

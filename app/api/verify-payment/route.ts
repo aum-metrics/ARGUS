@@ -1,3 +1,6 @@
+/**
+ * Author: Sambath Kumar Natarajan
+ */
 import { NextRequest, NextResponse } from "next/server";
 import crypto from "crypto";
 import { createClient } from '@supabase/supabase-js';

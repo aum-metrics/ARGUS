@@ -1,3 +1,6 @@
+/**
+ * Author: Sambath Kumar Natarajan
+ */
 "use client"
 
 import { useState } from 'react';
@@ -218,7 +221,8 @@ export function useGovernance() {
             addLog(`[ORCHESTRATOR] Launching 6-Layer Adversarial Swarm...`);
 
             const attackPrompt = getRolePrompt('THESIS_DESTROYER', `CLAIM: "${claim.statement}"`);
-            const methodPrompt = getRolePrompt('METHODOLOGY_PROSECUTOR', `CLAIM: "${claim.statement}"\nFULL CONTEXT: ${currentSession.data.originalText.substring(0, 5000)}...`); // Give more context
+            const methodPrompt = getRolePrompt('METHODOLOGY_PROSECUTOR', `CLAIM: "${claim.statement}"
+FULL CONTEXT: ${currentSession.data.originalText.substring(0, 5000)}...`); // Give more context
             const litPrompt = getRolePrompt('LITERATURE_ADVERSARY', `CLAIM: "${claim.statement}"`);
             const formPrompt = getRolePrompt('FORMALISM_AUDITOR', `CLAIM: "${claim.statement}"`);
 

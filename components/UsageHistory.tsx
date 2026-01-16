@@ -1,3 +1,6 @@
+/**
+ * Author: Sambath Kumar Natarajan
+ */
 "use client";
 
 import React, { useEffect, useState } from 'react';
@@ -96,7 +99,8 @@ export function UsageHistory() {
         const csvContent = [
             headers.join(','),
             ...rows.map(row => row.map(cell => `"${cell}"`).join(','))
-        ].join('\n');
+        ].join('
+');
 
         // Download
         const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });

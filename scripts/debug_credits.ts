@@ -1,3 +1,6 @@
+/**
+ * Author: Sambath Kumar Natarajan
+ */
 #!/usr/bin/env tsx
 
 /**
@@ -17,7 +20,8 @@ const supabase = createClient(
 
 async function debugCredits() {
     console.log('🔍 Credit System Debug');
-    console.log('================================\n');
+    console.log('================================
+');
 
     // 1. Find user
     const { data: { users }, error: usersError } = await supabase.auth.admin.listUsers();
@@ -29,7 +33,8 @@ async function debugCredits() {
     }
 
     console.log(`✅ User found: ${user.id}`);
-    console.log(`   Email: ${user.email}\n`);
+    console.log(`   Email: ${user.email}
+`);
 
     // 2. Check profile
     const { data: profile, error: profileError } = await supabase
@@ -43,7 +48,8 @@ async function debugCredits() {
     } else {
         console.log('📋 Profile:');
         console.log(`   Trial used: ${profile.is_trial_used}`);
-        console.log(`   Org ID: ${profile.org_id || 'None'}\n`);
+        console.log(`   Org ID: ${profile.org_id || 'None'}
+`);
     }
 
     // 3. Check organization
@@ -61,7 +67,8 @@ async function debugCredits() {
             console.log(`   Name: ${org.name}`);
             console.log(`   Credits Balance: ${org.credits_balance}`);
             console.log(`   Credits Total: ${org.credits_total}`);
-            console.log(`   Status: ${org.subscription_status}\n`);
+            console.log(`   Status: ${org.subscription_status}
+`);
         }
     }
 
@@ -81,7 +88,8 @@ async function debugCredits() {
         .eq('user_id', user.id)
         .eq('action', 'THESIS_CONSTRUCTOR');
 
-    console.log(`📊 Usage (THESIS_CONSTRUCTOR calls): ${usage || 0}\n`);
+    console.log(`📊 Usage (THESIS_CONSTRUCTOR calls): ${usage || 0}
+`);
 
     // 6. Calculate total
     let orgCredits = 0;
@@ -106,7 +114,8 @@ async function debugCredits() {
     console.log(`   Used: ${usage || 0}`);
     console.log(`   Remaining: ${totalCredits - (usage || 0)}`);
     console.log(`   Has Credits: ${hasRemainingCredits ? '✅ YES' : '❌ NO'}`);
-    console.log('================================\n');
+    console.log('================================
+');
 
     // 7. Check active session
     const { data: sessions } = await supabase
@@ -121,9 +130,11 @@ async function debugCredits() {
         console.log(`   ID: ${sessions[0].id}`);
         console.log(`   Payment Status: ${sessions[0].data.paymentStatus}`);
         console.log(`   Created: ${sessions[0].created_at}`);
-        console.log(`   Updated: ${sessions[0].updated_at}\n`);
+        console.log(`   Updated: ${sessions[0].updated_at}
+`);
     } else {
-        console.log('💾 No active sessions\n');
+        console.log('💾 No active sessions
+');
     }
 }
 

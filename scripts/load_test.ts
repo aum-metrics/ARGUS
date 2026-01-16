@@ -1,3 +1,6 @@
+/**
+ * Author: Sambath Kumar Natarajan
+ */
 
 /**
  * ARGUS SCALE TEST
@@ -59,7 +62,8 @@ async function runLoadTest() {
     const totalTime = Date.now() - start;
     const avgLat = results.latencies.reduce((a, b) => a + b, 0) / results.latencies.length;
 
-    console.log("\n>>> LOAD TEST RESULTS <<<");
+    console.log("
+>>> LOAD TEST RESULTS <<<");
     console.log(`Total Requests: ${CONCURRENCY}`);
     console.log(`Success: ${results.success}`);
     console.log(`Failed: ${results.failed}`);

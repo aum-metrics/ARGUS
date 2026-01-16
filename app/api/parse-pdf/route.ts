@@ -1,3 +1,6 @@
+/**
+ * Author: Sambath Kumar Natarajan
+ */
 
 import { NextRequest, NextResponse } from 'next/server';
 
@@ -140,7 +143,11 @@ export async function POST(req: NextRequest) {
         }
 
         // Basic Cleanup
-        const cleanText = text.replace(/\n\s*\n/g, '\n\n').trim();
+        const cleanText = text.replace(/
+\s*
+/g, '
+
+').trim();
 
         return NextResponse.json({
             text: cleanText,

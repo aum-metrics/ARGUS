@@ -1,3 +1,6 @@
+/**
+ * Author: Sambath Kumar Natarajan
+ */
 "use client";
 
 import React, { useEffect, useState } from 'react';
@@ -89,7 +92,7 @@ export function LiveTicker() {
                 .animate-scroll {
                     animation: scroll 40s linear infinite;
                 }
-                .hover\\:pause:hover {
+                .hover\:pause:hover {
                     animation-play-state: paused;
                 }
                 @keyframes scroll {

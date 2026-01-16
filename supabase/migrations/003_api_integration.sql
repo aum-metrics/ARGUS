@@ -1,3 +1,6 @@
+--
+-- Author: Sambath Kumar Natarajan
+--
 -- API Keys Table (Enterprise Integration)
 create table public.api_keys (
   id uuid default gen_random_uuid() primary key,

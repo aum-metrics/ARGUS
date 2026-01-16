@@ -1,3 +1,6 @@
+/**
+ * Author: Sambath Kumar Natarajan
+ */
 
 import { jsPDF } from "jspdf";
 import fs from "fs";

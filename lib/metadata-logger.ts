@@ -1,3 +1,6 @@
+/**
+ * Author: Sambath Kumar Natarajan
+ */
 import { createClient } from '@/lib/supabase/client';
 
 interface MetadataLog {

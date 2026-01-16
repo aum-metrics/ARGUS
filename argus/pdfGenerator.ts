@@ -1,3 +1,6 @@
+/**
+ * Author: Sambath Kumar Natarajan
+ */
 import { jsPDF } from "jspdf";
 import { ArgusSession } from "@/argus/session";
 

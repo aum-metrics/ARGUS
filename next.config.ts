@@ -1,3 +1,6 @@
+/**
+ * Author: Sambath Kumar Natarajan
+ */
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {

@@ -1,3 +1,6 @@
+/**
+ * Author: Sambath Kumar Natarajan
+ */
 export const CONSTITUTION = {
   identity: {
     systemName: "Antigravity Research Fabric",

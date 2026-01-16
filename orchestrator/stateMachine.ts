@@ -1,3 +1,6 @@
+/**
+ * Author: Sambath Kumar Natarajan
+ */
 import { CONSTITUTION, PhaseId } from './constitution';
 
 export interface ModelOutput {

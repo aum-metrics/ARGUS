@@ -1,3 +1,6 @@
+/**
+ * Author: Sambath Kumar Natarajan
+ */
 import { createBrowserClient } from '@supabase/ssr'
 
 export function createClient() {

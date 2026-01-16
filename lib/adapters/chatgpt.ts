@@ -1,3 +1,6 @@
+/**
+ * Author: Sambath Kumar Natarajan
+ */
 import { ModelAdapter, ModelResponse } from './types';
 
 export class ChatGPTAdapter implements ModelAdapter {
@@ -26,7 +29,8 @@ export class ChatGPTAdapter implements ModelAdapter {
     async validate(content: string, criteria: string[]): Promise<{ valid: boolean; issues: string[] }> {
         const validationPrompt = `
         Validate the following content against these criteria:
-        ${criteria.map(c => `- ${c}`).join('\n')}
+        ${criteria.map(c => `- ${c}`).join('
+')}
         
         Content:
         "${content}"

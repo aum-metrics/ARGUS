@@ -1,3 +1,6 @@
+/**
+ * Author: Sambath Kumar Natarajan
+ */
 import { ModelAdapter, ModelResponse } from './types';
 
 export class GeminiAdapter implements ModelAdapter {
@@ -25,7 +28,8 @@ export class GeminiAdapter implements ModelAdapter {
     async validate(content: string, criteria: string[]): Promise<{ valid: boolean; issues: string[] }> {
         const validationPrompt = `
         As the Formal Adjudicator, check the following content against these rules:
-        ${criteria.map(c => `- ${c}`).join('\n')}
+        ${criteria.map(c => `- ${c}`).join('
+')}
         
         Content:
         "${content}"

@@ -1,3 +1,6 @@
+--
+-- Author: Sambath Kumar Natarajan
+--
 -- MIGRATION: 001_sessions_and_storage.sql
 -- Goal: Enable real-time persistence and file storage
 

@@ -1,3 +1,6 @@
+/**
+ * Author: Sambath Kumar Natarajan
+ */
 export default function AuthLayout({
     children,
 }: {

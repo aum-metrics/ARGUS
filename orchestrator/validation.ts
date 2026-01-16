@@ -1,3 +1,6 @@
+/**
+ * Author: Sambath Kumar Natarajan
+ */
 import { PhaseId, CONSTITUTION } from './constitution';
 import { ModelOutput } from './stateMachine';
 import { ModelAdapter } from '@/lib/adapters/types';
@@ -48,7 +51,8 @@ Critique the following output from ${primaryOutput.model} for Phase ${phase}:
 ${primaryOutput.content}
 
 Audit for:
-${CONSTITUTION.roles[challengerAdapter.role].responsibilities.join('\n')}
+${CONSTITUTION.roles[challengerAdapter.role].responsibilities.join('
+')}
 
 Provide your critique in the following format:
 VERDICT: [PASS/FAIL]

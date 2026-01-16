@@ -1,3 +1,6 @@
+/**
+ * Author: Sambath Kumar Natarajan
+ */
 import Link from "next/link"
 import { ShieldCheck, Check, Fingerprint, Book, Gavel, FileSearch } from "lucide-react"
 import { Footer } from "@/components/Footer"

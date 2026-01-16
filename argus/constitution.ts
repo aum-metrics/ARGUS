@@ -1,3 +1,6 @@
+/**
+ * Author: Sambath Kumar Natarajan
+ */
 export const ARGUS_CONSTITUTION = {
     identity: {
         name: "ARGUS",

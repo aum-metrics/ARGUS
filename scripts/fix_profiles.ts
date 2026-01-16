@@ -1,3 +1,6 @@
+/**
+ * Author: Sambath Kumar Natarajan
+ */
 #!/usr/bin/env tsx
 
 /**
@@ -17,7 +20,8 @@ const supabase = createClient(
 
 async function fixProfiles() {
     console.log('🔧 Fixing Profile Duplication');
-    console.log('================================\n');
+    console.log('================================
+');
 
     // 1. Find user
     const { data: { users } } = await supabase.auth.admin.listUsers();
@@ -28,7 +32,8 @@ async function fixProfiles() {
         return;
     }
 
-    console.log(`✅ User: ${user.email} (${user.id})\n`);
+    console.log(`✅ User: ${user.email} (${user.id})
+`);
 
     // 2. Check for duplicate profiles
     const { data: profiles, error } = await supabase
@@ -44,7 +49,8 @@ async function fixProfiles() {
     console.log(`📋 Found ${profiles?.length || 0} profile(s)`);
 
     if (!profiles || profiles.length === 0) {
-        console.log('\n🆕 Creating new profile...');
+        console.log('
+🆕 Creating new profile...');
 
         // Get org
         const { data: org } = await supabase
@@ -73,19 +79,22 @@ async function fixProfiles() {
             console.log('✅ Profile created');
         }
     } else if (profiles.length > 1) {
-        console.log('\n⚠️  Multiple profiles detected! Keeping first, deleting rest...');
+        console.log('
+⚠️  Multiple profiles detected! Keeping first, deleting rest...');
 
         const keepProfile = profiles[0];
         const deleteIds = profiles.slice(1).map(p => p.id);
 
         // This won't work because id is the same - the issue is different
         // Let me check what's actually happening
-        console.log('\nProfile details:');
+        console.log('
+Profile details:');
         profiles.forEach((p, i) => {
             console.log(`  ${i + 1}. ID: ${p.id}, Org: ${p.org_id}, Email: ${p.email}`);
         });
     } else {
-        console.log('\n✅ Single profile found:');
+        console.log('
+✅ Single profile found:');
         const p = profiles[0];
         console.log(`   Email: ${p.email}`);
         console.log(`   Org ID: ${p.org_id}`);
@@ -100,13 +109,16 @@ async function fixProfiles() {
                 .single();
 
             if (org) {
-                console.log(`\n🏢 Organization: ${org.name}`);
+                console.log(`
+🏢 Organization: ${org.name}`);
                 console.log(`   Credits: ${org.credits_balance}/${org.credits_total}`);
             }
         }
     }
 
-    console.log('\n================================\n');
+    console.log('
+================================
+');
 }
 
 fixProfiles().catch(console.error);

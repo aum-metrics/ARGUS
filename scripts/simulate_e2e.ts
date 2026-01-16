@@ -1,3 +1,6 @@
+/**
+ * Author: Sambath Kumar Natarajan
+ */
 
 import { type GovernanceRole } from '../argus/governance';
 
@@ -29,7 +32,8 @@ async function runSimulation() {
 
     // 1. Submit Paper (Constructor)
     const topic = "Artificial General Intelligence centralization risks";
-    console.log(`\n[Step 1] Submitting Topic: "${topic}"`);
+    console.log(`
+[Step 1] Submitting Topic: "${topic}"`);
 
     // We need to bypass the adapter and call the API directly or mock the fetch
     // Since we are running in a script, we can hit localhost:3000 if it's running
@@ -63,14 +67,17 @@ async function runSimulation() {
 
     if (!constructorOutput) {
         console.log("⚠️  Server/API not reachable or configured. Using Mock Simulation to demonstrate Logic Flow.");
-        constructorOutput = "CLAIM: AGI will inevitably centralize power due to compute scaling laws.\nASSUMPTIONS: Compute costs will rise, Efficiency requires centralization.";
+        constructorOutput = "CLAIM: AGI will inevitably centralize power due to compute scaling laws.
+ASSUMPTIONS: Compute costs will rise, Efficiency requires centralization.";
     }
 
-    console.log(`[Result] Constructor: ${constructorOutput.replace(/\n/g, ' ')}`);
+    console.log(`[Result] Constructor: ${constructorOutput.replace(/
+/g, ' ')}`);
     claim = "AGI will inevitably centralize power due to compute scaling laws.";
 
     // 2. Attack (Destroyer)
-    console.log(`\n[Step 2] Triggering Adversary: THESIS_DESTROYER`);
+    console.log(`
+[Step 2] Triggering Adversary: THESIS_DESTROYER`);
     let destroyerOutput = await callAgent(getRolePrompt('THESIS_DESTROYER', claim));
     if (!destroyerOutput) {
         destroyerOutput = "The claim assumes hardware efficiency won't plateau. Distributed training techniques (Swipe, DiLoCo) counter this.";
@@ -78,14 +85,18 @@ async function runSimulation() {
     console.log(`[Result] Destroyer: ${destroyerOutput}`);
 
     // 3. Verdict
-    console.log(`\n[Step 3] Final Verdict`);
-    let verdictOutput = await callAgent(getRolePrompt('JOURNAL_REVIEWER_SIMULATOR', `Claim: ${claim}\nAttack: ${destroyerOutput}`));
+    console.log(`
+[Step 3] Final Verdict`);
+    let verdictOutput = await callAgent(getRolePrompt('JOURNAL_REVIEWER_SIMULATOR', `Claim: ${claim}
+Attack: ${destroyerOutput}`));
     if (!verdictOutput) {
-        verdictOutput = "VERDICT: REJECT\nFAILURE_TAGS: Technological Determinism Fallacy, Ignores Distributed Computing";
+        verdictOutput = "VERDICT: REJECT
+FAILURE_TAGS: Technological Determinism Fallacy, Ignores Distributed Computing";
     }
     console.log(`[Result] Verdict: ${verdictOutput}`);
 
-    console.log("\n>>> SIMULATION COMPLETE. VISUALIZATION NODES GENERATED: 3 (Claim, Destroyer, Verdict)");
+    console.log("
+>>> SIMULATION COMPLETE. VISUALIZATION NODES GENERATED: 3 (Claim, Destroyer, Verdict)");
 }
 
 runSimulation();

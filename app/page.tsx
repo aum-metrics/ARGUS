@@ -1,3 +1,6 @@
+/**
+ * Author: Sambath Kumar Natarajan
+ */
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { ShieldCheck, Scale, ScrollText, Lock, ArrowRight, BookOpen, PlayCircle } from "lucide-react"

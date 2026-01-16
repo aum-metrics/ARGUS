@@ -1,3 +1,6 @@
+/**
+ * Author: Sambath Kumar Natarajan
+ */
 import Link from "next/link"
 import { ShieldCheck, ArrowLeft, Lock, FileX, Trash2 } from "lucide-react"
 import { Footer } from "@/components/Footer"

@@ -1,3 +1,6 @@
+/**
+ * Author: Sambath Kumar Natarajan
+ */
 import { ModelAdapter, ModelResponse } from './types';
 
 export class PerplexityAdapter implements ModelAdapter {
@@ -33,7 +36,8 @@ export class PerplexityAdapter implements ModelAdapter {
         const validationPrompt = `
         Audit the following text for factual accuracy and citation validity.
         Criteria:
-        ${criteria.map(c => `- ${c}`).join('\n')}
+        ${criteria.map(c => `- ${c}`).join('
+')}
         
         Text:
         "${content}"

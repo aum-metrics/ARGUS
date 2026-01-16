@@ -1,3 +1,6 @@
+/**
+ * Author: Sambath Kumar Natarajan
+ */
 "use client"
 
 import { useState, useRef, useEffect } from "react"

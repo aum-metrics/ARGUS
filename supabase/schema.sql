@@ -1,3 +1,6 @@
+--
+-- Author: Sambath Kumar Natarajan
+--
 
 -- 1. PROFILES TABLE
 -- Syncs with auth.users to store application-specific user data

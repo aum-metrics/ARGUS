@@ -1,3 +1,6 @@
+/**
+ * Author: Sambath Kumar Natarajan
+ */
 import type { Metadata } from "next";
 import { Analytics } from "@vercel/analytics/react";
 import { Playfair_Display, Inter } from "next/font/google"; // Premium Academic/SaaS Pairing

@@ -1,3 +1,6 @@
+/**
+ * Author: Sambath Kumar Natarajan
+ */
 import { Metadata } from 'next';
 import Link from 'next/link';
 import { ArrowLeft, ShieldCheck, Quote } from 'lucide-react';

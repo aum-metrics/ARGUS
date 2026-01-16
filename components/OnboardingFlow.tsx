@@ -1,3 +1,6 @@
+/**
+ * Author: Sambath Kumar Natarajan
+ */
 "use client";
 
 import { useState, useEffect } from 'react';
@@ -34,7 +37,10 @@ export function OnboardingFlow({ onComplete }: OnboardingProps) {
         {
             icon: Zap,
             title: "How It Works",
-            description: "1. Upload your paper or paste text\n2. We extract key claims\n3. Our adversarial AI audits each claim\n4. Get a detailed readiness report",
+            description: "1. Upload your paper or paste text
+2. We extract key claims
+3. Our adversarial AI audits each claim
+4. Get a detailed readiness report",
             color: "text-purple-600 bg-purple-50"
         },
         {

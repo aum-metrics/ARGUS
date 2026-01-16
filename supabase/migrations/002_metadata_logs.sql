@@ -1,3 +1,6 @@
+--
+-- Author: Sambath Kumar Natarajan
+--
 -- Metadata Logging Table (Data Asset - No PII)
 -- This table stores aggregated research failure trends without storing actual paper content
 -- Purpose: Build "Pulse of Science" dataset for potential acquisition value

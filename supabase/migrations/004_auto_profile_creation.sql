@@ -1,3 +1,6 @@
+--
+-- Author: Sambath Kumar Natarajan
+--
 -- Auto Profile Creation Trigger
 -- Automatically creates a profile when a new user signs up
 
