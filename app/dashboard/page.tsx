@@ -511,8 +511,7 @@ export default function ArgusDashboard() {
                                             <div className="bg-white border-b border-zinc-200 p-2 px-4 flex justify-between items-center">
                                                 <div className="flex gap-4 text-[10px] font-mono text-zinc-400 uppercase">
                                                     <span>Characters: {paperInput.length}</span>
-                                                    <span>Lines: {paperInput.split('
-').length}</span>
+                                                    <span>Lines: {paperInput.split('\n').length}</span>
                                                 </div>
                                                 <span className="text-[10px] text-zinc-300 italic">Auto-focus enabled</span>
                                             </div>

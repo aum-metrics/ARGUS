@@ -99,8 +99,7 @@ export function UsageHistory() {
         const csvContent = [
             headers.join(','),
             ...rows.map(row => row.map(cell => `"${cell}"`).join(','))
-        ].join('
-');
+        ].join('\n');
 
         // Download
         const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
