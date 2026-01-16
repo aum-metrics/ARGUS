@@ -127,8 +127,8 @@ export const generateManuscriptPDF = (session: ArgusSession) => {
         doc.setTextColor(0);
 
         // Governance Logs for this claim
-        if (claim.logs && claim.logs.length > 0) {
-            claim.logs.forEach(log => {
+        if (claim.governanceLog && claim.governanceLog.length > 0) {
+            claim.governanceLog.forEach((log: any) => {
                 if (y > pageHeight - 30) {
                     doc.addPage();
                     y = margin;
