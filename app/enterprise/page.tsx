@@ -94,7 +94,7 @@ export default function EnterprisePage() {
                             <div className="border-2 border-zinc-200 rounded-2xl p-8 bg-white hover:border-zinc-300 transition-all">
                                 <h3 className="text-2xl font-bold mb-2">Department License</h3>
                                 <div className="flex items-baseline gap-2 mb-6">
-                                    <span className="text-5xl font-bold">$299.99</span>
+                                    <span className="text-5xl font-bold">$249.99</span>
                                     <span className="text-zinc-500">/mo</span>
                                 </div>
                                 <ul className="space-y-3 mb-8">
@@ -104,15 +104,15 @@ export default function EnterprisePage() {
                                     </li>
                                     <li className="flex items-start gap-2">
                                         <CheckCircle2 className="h-5 w-5 text-green-600 shrink-0 mt-0.5" />
-                                        <span>15 Full Audits / Month</span>
+                                        <span>20 Full Audits / Month</span>
+                                    </li>
+                                    <li className="flex items-start gap-2">
+                                        <CheckCircle2 className="h-5 w-5 text-green-600 shrink-0 mt-0.5" />
+                                        <span>$12.50 per audit (17% savings)</span>
                                     </li>
                                     <li className="flex items-start gap-2">
                                         <CheckCircle2 className="h-5 w-5 text-green-600 shrink-0 mt-0.5" />
                                         <span>Priority Compute Queue</span>
-                                    </li>
-                                    <li className="flex items-start gap-2">
-                                        <CheckCircle2 className="h-5 w-5 text-green-600 shrink-0 mt-0.5" />
-                                        <span>Branded Reports</span>
                                     </li>
                                 </ul>
                                 <Link href="/login" className="block">
@@ -129,7 +129,7 @@ export default function EnterprisePage() {
                                 </div>
                                 <h3 className="text-2xl font-bold mb-2">University License</h3>
                                 <div className="flex items-baseline gap-2 mb-6">
-                                    <span className="text-5xl font-bold">$999.99</span>
+                                    <span className="text-5xl font-bold">$499.99</span>
                                     <span className="text-zinc-500">/mo</span>
                                 </div>
                                 <ul className="space-y-3 mb-8">
@@ -139,7 +139,11 @@ export default function EnterprisePage() {
                                     </li>
                                     <li className="flex items-start gap-2">
                                         <CheckCircle2 className="h-5 w-5 text-green-600 shrink-0 mt-0.5" />
-                                        <span>60 Full Audits / Month</span>
+                                        <span>50 Full Audits / Month</span>
+                                    </li>
+                                    <li className="flex items-start gap-2">
+                                        <CheckCircle2 className="h-5 w-5 text-green-600 shrink-0 mt-0.5" />
+                                        <span>$10 per audit (33% savings)</span>
                                     </li>
                                     <li className="flex items-start gap-2">
                                         <CheckCircle2 className="h-5 w-5 text-green-600 shrink-0 mt-0.5" />
@@ -161,6 +165,6 @@ export default function EnterprisePage() {
                 </section>
             </main>
             <Footer />
-        </div>
+        </div >
     )
 }

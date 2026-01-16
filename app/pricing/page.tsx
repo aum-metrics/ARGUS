@@ -34,10 +34,10 @@ export default function PricingPage() {
                             <div className="text-center mb-8">
                                 <h3 className="text-lg font-bold uppercase tracking-wider text-zinc-500 mb-2">Full Adversarial Audit</h3>
                                 <div className="flex items-baseline justify-center gap-1">
-                                    <span className="text-4xl font-extrabold text-zinc-900">$24.99</span>
-                                    <span className="text-zinc-500">/session</span>
+                                    <span className="text-4xl font-extrabold text-zinc-900">$14.99</span>
+                                    <span className="text-zinc-500">/audit</span>
                                 </div>
-                                <p className="text-zinc-500 mt-2 font-mono text-sm">Includes compute-heavy multi-pass governance.</p>
+                                <p className="text-zinc-500 mt-2 font-mono text-sm">One complete adversarial audit session.</p>
                             </div>
 
                             <ul className="space-y-4 mb-8">
