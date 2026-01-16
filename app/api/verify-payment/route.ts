@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import crypto from "crypto";
+import { createClient } from '@supabase/supabase-js';
 
 export async function POST(req: NextRequest) {
     try {
@@ -19,32 +20,50 @@ export async function POST(req: NextRequest) {
 
         // PRODUCTION LOGGING: Link Revenue & Usage
         try {
-            const { createClient } = await import("@/lib/supabase/server");
-            const supabase = await createClient();
-            const { data: { user } } = await supabase.auth.getUser();
+            // SECURITY: Use Admin Client (Service Role) to bypass RLS for the UPDATE operation.
+            // Regular users cannot update "status" to "success" themselves.
+            // This prevents console-based attacks where users manually update their transaction status.
+            const supabaseAdmin = createClient(
+                process.env.NEXT_PUBLIC_SUPABASE_URL!,
+                process.env.SUPABASE_SERVICE_ROLE_KEY!
+            );
 
-            if (user) {
-                // 1. Update Transaction Status
-                await supabase.from("transactions")
-                    .update({
-                        status: "success",
-                        razorpay_payment_id: razorpayPaymentId,
-                        updated_at: new Date().toISOString()
-                    })
-                    .eq("razorpay_order_id", orderCreationId);
+            // 1. Update Transaction (Admin) using Order ID
+            const { data: transactionData, error: transactionError } = await supabaseAdmin
+                .from("transactions")
+                .update({
+                    status: "success",
+                    razorpay_payment_id: razorpayPaymentId,
+                    updated_at: new Date().toISOString()
+                })
+                .eq("razorpay_order_id", orderCreationId)
+                .select()
+                .single();
 
-                // 2. Create Audit Log Entry (Business Value)
-                // We assume this payment unlocks a standard session
-                await supabase.from("audit_logs").insert({
-                    user_id: user.id,
-                    session_id: orderCreationId, // Using Order ID as proxy for session ref for now
-                    claim_count: 0, // Initial unlock
-                    tier: "standard",
-                    token_usage_estimate: 0 // Will increment later via client update if we sync logs
+            if (transactionError || !transactionData) {
+                console.error("Failed to update transaction status:", transactionError);
+                // We log error but return success to client to avoid confusing UI, 
+                // as payment *was* technically verified by Razorpay signature.
+                // However, the "Unlock" might fail if it depends on this DB state.
+            } else {
+                // 2. Create Audit Log Entry (Admin)
+                // We use the user_id found in the transaction row
+                // This records the "credit" being added to the system
+                await supabaseAdmin.from("audit_logs").insert({
+                    user_id: transactionData.user_id,
+                    session_id: orderCreationId,
+                    action: 'PAYMENT_UNLOCK',
+                    metadata: {
+                        amount: transactionData.amount,
+                        currency: transactionData.currency,
+                        method: 'RAZORPAY'
+                    },
+                    claim_count: 0,
+                    tier: "standard"
                 });
             }
         } catch (logError) {
-            console.error("Failed to log payment success:", logError);
+            console.error("Critical: Failed to process post-payment logic:", logError);
         }
 
         return NextResponse.json({

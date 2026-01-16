@@ -1,23 +1,12 @@
 import Link from "next/link"
 import { ShieldCheck, ArrowLeft, Lock, FileX, Trash2 } from "lucide-react"
 import { Footer } from "@/components/Footer"
+import { Header } from "@/components/Header"
 
 export default function PrivacyPage() {
     return (
         <div className="flex flex-col min-h-screen bg-white text-zinc-900 font-serif selection:bg-zinc-100 selection:text-zinc-900">
-            <header className="px-6 h-16 flex items-center justify-between border-b border-zinc-200 sticky top-0 bg-white z-50">
-                <div className="flex items-center gap-2">
-                    <Link href="/">
-                        <div className="flex items-center gap-2 cursor-pointer">
-                            <img src="/logo.jpg" alt="ARGUS" className="h-10 w-auto" />
-                        </div>
-                    </Link>
-                </div>
-                <nav className="flex gap-4 font-sans text-sm font-medium text-zinc-600">
-                    <Link href="/" className="hover:text-black">Home</Link>
-                    <Link href="/login" className="bg-zinc-900 text-white px-4 py-2 rounded hover:bg-zinc-700 transition-colors">Login</Link>
-                </nav>
-            </header>
+            <Header />
 
             <main className="flex-1 py-16 md:py-24">
                 <div className="container px-4 md:px-6 max-w-3xl mx-auto space-y-12">

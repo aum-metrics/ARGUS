@@ -9,17 +9,81 @@ interface ArgusPaymentProps {
     disabled?: boolean;
 }
 
+declare global {
+    interface Window {
+        Razorpay: any;
+    }
+}
+
+/**
+ * Production Razorpay Integration
+ * Loads Razorpay SDK and initiates payment
+ */
 export function ArgusPaymentButton({ onSuccess, disabled }: ArgusPaymentProps) {
     const handlePayment = async () => {
-        // Simulate payment delay
-        const audio = new Audio("https://codeskulptor-demos.commondatastorage.googleapis.com/pang/pop.mp3");
-        audio.volume = 0.2;
-        audio.play().catch(() => { });
+        try {
+            // Load Razorpay SDK if not already loaded
+            if (!window.Razorpay) {
+                const script = document.createElement('script');
+                script.src = 'https://checkout.razorpay.com/v1/checkout.js';
+                script.async = true;
+                document.body.appendChild(script);
 
-        setTimeout(() => {
-            const mockPaymentId = `pay_${Math.random().toString(36).substring(7)}`;
-            onSuccess(mockPaymentId);
-        }, 800);
+                await new Promise((resolve, reject) => {
+                    script.onload = resolve;
+                    script.onerror = reject;
+                });
+            }
+
+            // Create Razorpay order via backend
+            const orderResponse = await fetch('/api/create-razorpay-order', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    amount: ARGUS_CONSTITUTION.pricing.amount,
+                    currency: 'INR'
+                })
+            });
+
+            if (!orderResponse.ok) {
+                throw new Error('Failed to create order');
+            }
+
+            const { order_id, amount } = await orderResponse.json();
+
+            // Initialize Razorpay checkout
+            const options = {
+                key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID!,
+                amount: amount,
+                currency: 'INR',
+                name: 'ARGUS Governance',
+                description: 'Research Audit Credit',
+                order_id: order_id,
+                handler: function (response: any) {
+                    // Payment successful
+                    onSuccess(response.razorpay_payment_id);
+                },
+                prefill: {
+                    name: '',
+                    email: '',
+                },
+                theme: {
+                    color: '#18181b' // zinc-900
+                },
+                modal: {
+                    ondismiss: function () {
+                        console.log('[Payment] User closed payment modal');
+                    }
+                }
+            };
+
+            const razorpay = new window.Razorpay(options);
+            razorpay.open();
+
+        } catch (error) {
+            console.error('[Payment] Error:', error);
+            alert('Payment initialization failed. Please try again.');
+        }
     };
 
     return (

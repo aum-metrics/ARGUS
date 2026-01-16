@@ -6,7 +6,11 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "next lint",
+    "health-check": "node scripts/health_check.js",
+    "setup-test-user": "tsx scripts/setup_test_user.ts",
+    "deploy": "bash scripts/deploy_production.sh",
+    "verify-production": "tsx scripts/verify_production.ts"
   },
   "dependencies": {
     "@google/generative-ai": "^0.24.1",
@@ -30,16 +34,19 @@
     "lucide-react": "^0.562.0",
     "next": "16.1.1",
     "openai": "^6.15.0",
+    "pdf-parse": "^2.4.5",
     "razorpay": "^2.9.6",
     "react": "19.2.3",
     "react-dom": "19.2.3",
     "react-razorpay": "^3.0.1",
     "tailwind-merge": "^3.4.0",
+    "tsx": "^4.21.0",
     "uuid": "^13.0.0"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
+    "@types/pdf-parse": "^1.1.5",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "eslint": "^9",

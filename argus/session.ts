@@ -7,7 +7,29 @@ export interface ArgusSession {
     documentId?: string;
     paymentStatus: 'UNPAID' | 'PAID';
     data: {
-        textHash?: string; // SHA-256 of the original text
+        // [NEW] Context for Institutional Reporting
+        context: {
+            candidateName?: string;
+            degree?: string; // "PhD", "Masters"
+            targetJournal?: string; // "Nature", "ICLR"
+            orgId?: string;
+            originalFilename?: string; // [NEW] Audit Requirement
+        };
+
+        // [NEW] Enhanced Actionable Output
+        report?: {
+            readinessScore: number; // 0-100
+            verdict: 'PUBLISHABLE' | 'REVISE_MAJOR' | 'REJECT';
+            executiveSummary: string;
+            actionItems: {
+                id: string;
+                priority: 'HIGH' | 'MED' | 'LOW';
+                layer: string; // e.g. "Methodology"
+                suggestion: string;
+                status: 'OPEN' | 'FIXED';
+            }[];
+        };
+
         claims: {
             id: string;
             statement: string;
@@ -15,12 +37,15 @@ export interface ArgusSession {
             status: 'PENDING' | 'ACCEPTED' | 'REJECTED' | 'REVISE';
             governanceLog: any[];
             noveltyClassification: string[];
+            visualEvidence?: string[]; // Base64 images supporting this claim
             governanceMeta?: {
                 auditedAt: string;
                 modelUsed: string;
                 tokenEstimate: number;
             };
         }[];
+        textHash?: string; // SHA-256 of the full text content
+        originalText: string;
         equations: any[];
         diagrams: any[];
         drafts: any[];
@@ -42,7 +67,10 @@ export function createSession(): ArgusSession {
         expiresAt,
         paymentStatus: 'UNPAID',
         data: {
+            context: {},
+            report: undefined,
             claims: [],
+            originalText: "", // Initialize
             equations: [],
             diagrams: [],
             drafts: [],

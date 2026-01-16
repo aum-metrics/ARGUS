@@ -3,22 +3,12 @@ import { Button } from "@/components/ui/button"
 import { ShieldCheck, Check } from "lucide-react"
 import { Footer } from "@/components/Footer"
 
+import { Header } from "@/components/Header"
+
 export default function PricingPage() {
     return (
         <div className="flex flex-col min-h-screen bg-white text-zinc-900 font-serif">
-            <header className="px-6 h-16 flex items-center justify-between border-b border-zinc-200">
-                <div className="flex items-center gap-2">
-                    <Link href="/">
-                        <div className="flex items-center gap-2 cursor-pointer">
-                            <img src="/logo.jpg" alt="ARGUS" className="h-10 w-auto" />
-                        </div>
-                    </Link>
-                </div>
-                <nav className="flex gap-4 font-sans text-sm font-medium text-zinc-600">
-                    <Link href="/" className="hover:text-black">Home</Link>
-                    <Link href="/login" className="bg-zinc-900 text-white px-4 py-2 rounded hover:bg-zinc-700 transition-colors">Login</Link>
-                </nav>
-            </header>
+            <Header />
 
             <main className="flex-1 py-24 bg-zinc-50">
                 <div className="container px-4 md:px-6">
@@ -33,18 +23,18 @@ export default function PricingPage() {
 
                     <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
 
-                        {/* FULL GOVERNANCE TIER */}
-                        <div className="border border-zinc-200 rounded-lg p-8 bg-white shadow-sm hover:shadow-md transition-shadow relative">
-                            <div className="absolute top-0 right-0 bg-zinc-100 text-zinc-600 text-xs font-bold px-3 py-1 rounded-bl-lg rounded-tr-lg border-l border-b border-zinc-200">
-                                MANAGED COMPUTE
+                        {/* CENTERED SINGLE TIER */}
+                        <div className="border border-zinc-200 rounded-lg p-8 bg-white shadow-lg relative col-span-2 max-w-lg mx-auto w-full">
+                            <div className="absolute top-0 right-0 bg-zinc-900 text-white text-xs font-bold px-3 py-1 rounded-bl-lg rounded-tr-lg">
+                                ENTERPRISE GRADE
                             </div>
                             <div className="text-center mb-8">
                                 <h3 className="text-lg font-bold uppercase tracking-wider text-zinc-500 mb-2">Full Adversarial Audit</h3>
                                 <div className="flex items-baseline justify-center gap-1">
-                                    <span className="text-4xl font-extrabold text-zinc-900">₹2,499</span>
+                                    <span className="text-4xl font-extrabold text-zinc-900">$24.99</span>
                                     <span className="text-zinc-500">/session</span>
                                 </div>
-                                <p className="text-xs text-zinc-500 mt-2 font-mono">Includes compute-heavy multi-pass governance ($24.99 USD)</p>
+                                <p className="text-zinc-500 mt-2 font-mono text-sm">Includes compute-heavy multi-pass governance.</p>
                             </div>
 
                             <ul className="space-y-4 mb-8">
@@ -62,7 +52,7 @@ export default function PricingPage() {
                                 </li>
                                 <li className="flex items-start gap-3 text-zinc-700 text-sm">
                                     <Check className="h-5 w-5 text-green-600 shrink-0" />
-                                    <span>PDF Audit Report</span>
+                                    <span>PDF Audit Report & Viral Certificate</span>
                                 </li>
                             </ul>
 
@@ -73,53 +63,38 @@ export default function PricingPage() {
                             </Link>
                         </div>
 
-                        {/* BYOK TIER */}
-                        <div className="border border-zinc-200 rounded-lg p-8 bg-zinc-50 hover:bg-white hover:shadow-md transition-all">
-                            <div className="text-center mb-8">
-                                <h3 className="text-lg font-bold uppercase tracking-wider text-zinc-500 mb-2">BYO-Key</h3>
-                                <div className="flex items-baseline justify-center gap-1">
-                                    <span className="text-4xl font-extrabold text-zinc-900">₹799</span>
-                                    <span className="text-zinc-500">/session</span>
+                    </div>
+
+                    {/* INSTITUTIONAL SECTION */}
+                    <div className="max-w-4xl mx-auto mt-16 mb-20 text-center">
+                        <div className="bg-zinc-900 rounded-2xl p-8 md:p-12 text-zinc-50 shadow-xl relative overflow-hidden">
+                            <div className="absolute top-0 right-0 w-64 h-64 bg-zinc-800 rounded-full blur-3xl -mr-32 -mt-32 opacity-50"></div>
+                            <div className="relative z-10">
+                                <h3 className="text-2xl font-bold font-serif mb-4">Are you a Department Head or Lab Director?</h3>
+                                <p className="text-zinc-400 max-w-2xl mx-auto mb-8 font-sans">
+                                    Equip your entire research cohort with ARGUS. Standardize pre-submission rigor, reduce desk rejections, and track output quality with our unified dashboard.
+                                </p>
+                                <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                                    <Link href="/enterprise">
+                                        <Button className="bg-white text-zinc-950 hover:bg-zinc-200 h-12 px-8 font-bold">
+                                            View Institutional Tiers
+                                        </Button>
+                                    </Link>
+                                    <Link href="/contact">
+                                        <Button variant="outline" className="border-zinc-700 text-zinc-300 hover:text-white hover:bg-zinc-800 h-12 px-8">
+                                            Book Demo
+                                        </Button>
+                                    </Link>
                                 </div>
-                                <p className="text-xs text-zinc-400 mt-2 font-mono">Platform Fee Only ($7.99 USD)</p>
                             </div>
-
-                            <ul className="space-y-4 mb-8">
-                                <li className="flex items-start gap-3 text-zinc-700 text-sm">
-                                    <Check className="h-5 w-5 text-zinc-400 shrink-0" />
-                                    <span><strong>Unlimited Operations</strong> (Billed to you directly)</span>
-                                </li>
-                                <li className="flex items-start gap-3 text-zinc-700 text-sm">
-                                    <Check className="h-5 w-5 text-zinc-400 shrink-0" />
-                                    <span>Use your own OpenAI/Gemini Keys</span>
-                                </li>
-                                <li className="flex items-start gap-3 text-zinc-700 text-sm">
-                                    <ShieldCheck className="h-5 w-5 text-zinc-400 shrink-0" />
-                                    <span className="text-xs text-zinc-500 leading-tight">
-                                        <strong>Privacy Guarantee:</strong> Keys are never stored. They exist only in-session and are destroyed on logout.
-                                    </span>
-                                </li>
-                                <li className="flex items-start gap-3 text-zinc-700 text-sm">
-                                    <Check className="h-5 w-5 text-green-600 shrink-0" />
-                                    <span>PDF Audit Report</span>
-                                </li>
-                            </ul>
-
-                            <Link href="/dashboard/settings">
-                                <Button variant="outline" className="w-full border-zinc-300 hover:bg-zinc-100 h-12">
-                                    Run with Your Own Keys
-                                </Button>
-                            </Link>
                         </div>
-
                     </div>
 
                     <div className="max-w-3xl mx-auto mt-12 space-y-8">
                         <div className="text-center space-y-4">
-                            <h3 className="text-xl font-bold font-serif">Why the difference?</h3>
+                            <h3 className="text-xl font-bold font-serif">Why only one tier?</h3>
                             <p className="text-zinc-600">
-                                <strong>Standard Mode</strong> includes the cost of the high-reasoning inference required to run multi-pass adversarial governance.
-                                <strong> BYOK Mode</strong> allows you to pay those providers directly, so we charge only a small protocol fee for the interface and orchestration.
+                                ARGUS requires <strong>managed, high-reasoning compute clusters</strong> to perform its adversarial audit. We bundle this cost directly into the session fee to ensure consistent, secure performance without you needing to manage API keys.
                             </p>
                         </div>
 

@@ -25,12 +25,6 @@ export function useGovernance() {
         setLogs(prev => [...prev, message]);
     };
 
-    // Helper to get keys
-    const getKeys = () => {
-        if (typeof window === 'undefined') return {};
-        return JSON.parse(localStorage.getItem("model_keys") || "{}");
-    };
-
     // Helper: Compute SHA-256 Hash
     const computeHash = async (text: string) => {
         const msgBuffer = new TextEncoder().encode(text);
@@ -97,43 +91,66 @@ export function useGovernance() {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    keys: getKeys(), // Pass BYOK Keys
+                    keys: undefined, // Managed Compute (Server-Side Key)
                     role: 'THESIS_CONSTRUCTOR',
                     sessionId: currentSession.id,
+                    filename: currentSession.data.context.originalFilename, // [NEW] Pass Filename for Audit Log
                     images: images, // Pass Images Arary
                     prompt: getRolePrompt('THESIS_CONSTRUCTOR', `
-                        TASK: Synthesize the core *arguments* and *hypotheses* from the text below.
+                        TASK: Synthesize the core *arguments* and *hypotheses* from the provided content.
+                        
+                        Attempt to extract claims from ANY text provided below OR from the visual inputs (charts/graphs/tables) attached to this request.
+                        
+                        IMAGE INDEX REFERENCE:
+                        The images attached are indexed from 0 to ${images.length - 1}.
                         
                         IMPORTANT RULES:
                         1. Do NOT just extract sentences. Merge related points into strong, standalone assertions.
-                        2. If images are present (charts/graphs), incorporate their implications into the relevant textual claim.
-                        3. Focus on *causal* claims ("X leads to Y") and *normative* claims ("We should do X").
-                        4. Aim for 5-8 high-quality, distinct theses rather than 20+ granular sentences.
+                        2. If images are present (charts/graphs/tables), incorporate their implications into the relevant textual claim.
+                        3. For each claim, if it is supported by one or more of the attached images, include the indices of those images in a "evidenceIndices" array.
+                        4. Focus on *causal* claims ("X leads to Y") and *normative* claims ("We should do X").
+                        5. Aim for 5-8 high-quality, distinct theses rather than 20+ granular sentences.
                         
-                        OUTPUT: JSON array of objects { "id": "C1", "statement": "..." }
+                        OUTPUT: JSON array of objects { "id": "C1", "statement": "...", "evidenceIndices": [number, ...] }
                         
                         TEXT CONTENT:
-                        ${originalText}
+                        ${originalText || "[NO TEXT INPUT - ANALYZE ATTACHED IMAGES]"}
                     `)
                 })
             });
 
-            // Parse response (naive regex for JSON extraction if model wraps it)
-            // Parse response (Handle Code Blocks and Plain JSON)
+            // Parse response (Advanced Repair Logic)
             let text = data.content;
+            let claims = [];
 
-            // Cleanup Markdown Code Blocks
-            if (text.includes("```json")) {
-                text = text.replace(/```json/g, "").replace(/```/g, "");
-            } else if (text.includes("```")) {
-                text = text.replace(/```/g, "");
+            try {
+                // 1. Tidy Markdown
+                if (text.includes("```json")) {
+                    text = text.replace(/```json/g, "").replace(/```/g, "");
+                } else if (text.includes("```")) {
+                    text = text.replace(/```/g, "");
+                }
+
+                // 2. Extract Array
+                const jsonMatch = text.match(/\[[\s\S]*\]/);
+                const jsonString = jsonMatch ? jsonMatch[0] : text;
+
+                claims = JSON.parse(jsonString);
+
+            } catch (jsonErr) {
+                console.error("JSON PARSE ERROR:", jsonErr);
+                console.error("RAW TEXT:", text);
+                addLog(`[SYSTEM_ERROR] Failed to parse AI response. Raw output logged to console.`);
+                // Attempt soft fail if possible or just return empty
             }
 
-            const jsonMatch = text.match(/\[[\s\S]*\]/);
-            const claims = jsonMatch ? JSON.parse(jsonMatch[0]) : [];
-
-            if (claims.length === 0) {
-                addLog(`[DEBUG] Raw Model Output: ${text.substring(0, 500)}`);
+            if (!Array.isArray(claims) || claims.length === 0) {
+                addLog(`[ARGUS_EYE] ⚠️ No claims extracted. The model might have refused the content or failed.`);
+                addLog(`[DEBUG] Raw Model Output: ${text.substring(0, 100)}...`);
+                setIsProcessing(false);
+                setCurrentStep('IDLE');
+                alert("Extraction yielded no results. Please ensure the text contains academic claims.");
+                return;
             }
 
             addLog(`[ARGUS_EYE] Extracted ${claims.length} claims (Text + Visuals).`);
@@ -144,7 +161,8 @@ export function useGovernance() {
                 claimHash: await computeHash(c.statement),
                 status: 'PENDING',
                 noveltyClassification: [],
-                governanceLog: []
+                governanceLog: [],
+                visualEvidence: (c.evidenceIndices || []).map((idx: number) => images[idx]).filter(Boolean)
             })));
 
             const newData = {
@@ -195,36 +213,99 @@ export function useGovernance() {
                 return;
             }
 
-            // 1. The Thesis Destroyer Attacks
-            // We use the actual sophisticated prompt from the system's "Brain"
-            addLog(`[THESIS_DESTROYER] Initiating adversarial attack sequence...`);
+            // 1. The Prosecution Phase (Parallel Execution of Layers 2, 3, 4, 5)
+            // We launch the full adversarial stack against the claim.
+            addLog(`[ORCHESTRATOR] Launching 6-Layer Adversarial Swarm...`);
+
             const attackPrompt = getRolePrompt('THESIS_DESTROYER', `CLAIM: "${claim.statement}"`);
+            const methodPrompt = getRolePrompt('METHODOLOGY_PROSECUTOR', `CLAIM: "${claim.statement}"\nFULL CONTEXT: ${currentSession.data.originalText.substring(0, 5000)}...`); // Give more context
+            const litPrompt = getRolePrompt('LITERATURE_ADVERSARY', `CLAIM: "${claim.statement}"`);
+            const formPrompt = getRolePrompt('FORMALISM_AUDITOR', `CLAIM: "${claim.statement}"`);
 
-            const attackData = await fetchWithRetry('/api/gemini', {
-                method: 'POST',
-                body: JSON.stringify({
-                    keys: getKeys(),
-                    role: 'THESIS_DESTROYER',
-                    sessionId: currentSession.id,
-                    prompt: attackPrompt
+            // Execute Swarm
+            // We use Promise.all to run them concurrently for speed, relying on fetchWithRetry to handle rate limits.
+            const [attackRes, methodRes, litRes, formRes] = await Promise.all([
+                fetchWithRetry('/api/gemini', {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        role: 'THESIS_DESTROYER',
+                        sessionId: currentSession.id,
+                        prompt: attackPrompt,
+                        images: claim.visualEvidence || [] // Pass visual evidence
+                    })
+                }),
+                fetchWithRetry('/api/gemini', {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        role: 'METHODOLOGY_PROSECUTOR',
+                        sessionId: currentSession.id,
+                        prompt: methodPrompt,
+                        images: claim.visualEvidence || [] // Pass visual evidence
+                    })
+                }),
+                fetchWithRetry('/api/gemini', {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        role: 'LITERATURE_ADVERSARY',
+                        sessionId: currentSession.id,
+                        prompt: litPrompt,
+                        images: claim.visualEvidence || [] // Pass visual evidence
+                    })
+                }),
+                fetchWithRetry('/api/gemini', {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        role: 'FORMALISM_AUDITOR',
+                        sessionId: currentSession.id,
+                        prompt: formPrompt,
+                        images: claim.visualEvidence || [] // Pass visual evidence
+                    })
                 })
-            });
+            ]);
 
-            const attackText = attackData.content || "Attack generation failed.";
+            const attackText = attackRes.content || "Logic attack failed.";
+            const methodText = methodRes.content || "Methodology audit inactive.";
+            const litText = litRes.content || "Literature check inactive.";
+            const formText = formRes.content || "Formalism check inactive.";
 
-            // 2. The Reviewer Simulator Judges
-            // We feed the attack *back* into the Reviewer agent for a structured verdict.
-            addLog(`[REVIEWER_SIMULATOR] Analyzing attack impact...`);
+            addLog(`[SWARM] Agents returned data. Synthesizing verdict...`);
+
+            // 2. The Reviewer Simulator Judges (Layer 6 - ENHANCED)
+            // We feed the FULL aggregated prosecution dossier to the Judge.
             const verdictPrompt = getRolePrompt('JOURNAL_REVIEWER_SIMULATOR', `
                 CLAIM: "${claim.statement}"
                 
-                ADVERSARIAL_FINDINGS:
+                *** PROSECUTION DOSSIER ***
+                
+                [LAYER 2: LOGIC & EPISTEMOLOGY]
                 ${attackText}
                 
-                TASK: Render a final verdict based on the adversary's findings.
-                FORMAT: Strict JSON Object
+                [LAYER 3: METHODOLOGY & STATISTICS]
+                ${methodText}
+                
+                [LAYER 4: NOVELTY & PRIOR ART]
+                ${litText}
+                
+                [LAYER 5: FORMALISM & RIGOR]
+                ${formText}
+
+                *** INSTITUTIONAL CONTEXT ***
+                Candidate: ${currentSession.data.context.candidateName || "Anonymous"}
+                Degree: ${currentSession.data.context.degree || "N/A"}
+                Target Journal: ${currentSession.data.context.targetJournal || "General Academic"}
+                
+                ***************************
+                
+                TASK: Act as the Editor-in-Chief. Render a final verdict and a publication readiness score.
+                
+                OUTPUT FORMAT: Strict JSON Object
                 {
-                    "verdict": "ACCEPTED" | "REVISE" | "REJECT",
+                    "readinessScore": number, // 0-100 (where >85 is Publishable)
+                    "verdict": "PUBLISHABLE" | "REVISE_MAJOR" | "REJECT",
+                    "executiveSummary": "Short 2-sentence summary for the Department Head.",
+                    "actionItems": [
+                        { "priority": "HIGH" | "MED", "layer": "Methodology", "suggestion": "Specific fix required..." }
+                    ],
                     "fatal": boolean,
                     "noveltyClassification": ["Tag1", "Tag2"],
                     "reasons": ["Reason 1", "Reason 2"]
@@ -234,7 +315,7 @@ export function useGovernance() {
             const verdictData = await fetchWithRetry('/api/gemini', {
                 method: 'POST',
                 body: JSON.stringify({
-                    keys: getKeys(),
+                    // keys: REMOVED,
                     role: 'JOURNAL_REVIEWER_SIMULATOR',
                     sessionId: currentSession.id,
                     prompt: verdictPrompt
@@ -246,11 +327,20 @@ export function useGovernance() {
             // Robust JSON Parsing
             let verdictJson: any = {};
             try {
-                const jsonMatch = verdictRaw.match(/\{[\s\S]*\}/);
+                // Sanitize Markdown
+                let cleanJson = verdictRaw;
+                if (cleanJson.includes("```json")) {
+                    cleanJson = cleanJson.replace(/```json/g, "").replace(/```/g, "");
+                } else if (cleanJson.includes("```")) {
+                    cleanJson = cleanJson.replace(/```/g, "");
+                }
+
+                const jsonMatch = cleanJson.match(/\{[\s\S]*\}/);
                 verdictJson = jsonMatch ? JSON.parse(jsonMatch[0]) : { verdict: "REJECT", fatal: true, reasons: ["JSON Parse Failure"] };
+
             } catch (e) {
                 console.error("Verdict Parse Error", e);
-                verdictJson = { verdict: "REJECT", fatal: true, reasons: ["JSON Parse Failure"] };
+                verdictJson = { verdict: "REJECT", fatal: true, reasons: ["System Error"] };
             }
 
             // Strict Enum Guard (Prevent Hallucinations)
@@ -275,13 +365,16 @@ export function useGovernance() {
                         governanceLog: [
                             ...c.governanceLog,
                             { role: 'THESIS_DESTROYER', content: attackText },
+                            { role: 'METHODOLOGY_PROSECUTOR', content: methodText },
+                            { role: 'LITERATURE_ADVERSARY', content: litText },
+                            { role: 'FORMALISM_AUDITOR', content: formText },
                             { role: 'JOURNAL_REVIEWER_SIMULATOR', content: verdictRaw } // Store strict JSON output
                         ],
                         noveltyClassification: verdictJson.noveltyClassification || [], // Dynamic Tags
                         governanceMeta: {
                             auditedAt: new Date().toISOString(),
                             modelUsed: 'gemini-2.0-flash-exp', // Or dynamic if we track it
-                            tokenEstimate: TOKEN_COSTS.AUDIT_SINGLE
+                            tokenEstimate: TOKEN_COSTS.AUDIT_SINGLE * 4 // Updated Estimate
                         }
                     };
                 }
@@ -301,7 +394,9 @@ export function useGovernance() {
     return {
         logs,
         isProcessing,
+        setIsProcessing, // Expose for external control (PDF parsing)
         currentStep,
+        setCurrentStep, // Expose for external control
         tokenUsage,
         extractClaims,
         runAdversaryOnClaim

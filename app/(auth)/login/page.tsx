@@ -10,7 +10,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { ShieldCheck, ArrowLeft, Loader2, CheckCircle2 } from "lucide-react"
+import { ArrowLeft, Loader2, CheckCircle2 } from "lucide-react"
 
 export default function LoginPage() {
     const router = useRouter()
@@ -76,29 +76,6 @@ export default function LoginPage() {
         }
     }
 
-    const handleVerifyOtp = async (e: React.FormEvent) => {
-        e.preventDefault()
-        setIsLoading(true)
-        setError(null)
-
-        try {
-            const { error } = await supabase.auth.verifyOtp({
-                email,
-                token: otp,
-                type: 'signup'
-            })
-
-            if (error) throw error
-
-            // After verification, try to sign in or just redirect
-            router.push("/dashboard")
-        } catch (err: any) {
-            setError(err.message)
-        } finally {
-            setIsLoading(false)
-        }
-    }
-
     return (
         <div className="min-h-screen bg-zinc-50 flex flex-col items-center justify-center p-4 font-serif">
             <Link href="/" className="absolute top-8 left-8 text-zinc-500 hover:text-zinc-900 flex items-center gap-2 font-sans text-sm">
@@ -106,12 +83,12 @@ export default function LoginPage() {
             </Link>
 
             <div className="mb-8 flex flex-col items-center gap-2">
-                <img src="/logo.jpg" alt="ARGUS" className="h-20 w-auto" />
+                <img src="/logo.jpg" alt="ARGUS" className="h-24 w-auto drop-shadow-sm rounded-lg" />
             </div>
 
-            <Card className="w-full max-w-md bg-white border-zinc-200 shadow-sm relative overflow-hidden">
+            <Card className="w-full max-w-md bg-white/90 backdrop-blur-xl border-zinc-200/60 shadow-2xl relative overflow-hidden ring-1 ring-zinc-900/5">
                 {isLoading && (
-                    <div className="absolute inset-0 bg-white/50 backdrop-blur-sm z-50 flex items-center justify-center">
+                    <div className="absolute inset-0 bg-white/60 backdrop-blur-sm z-50 flex items-center justify-center">
                         <Loader2 className="h-8 w-8 animate-spin text-zinc-900" />
                     </div>
                 )}
@@ -119,15 +96,15 @@ export default function LoginPage() {
                 <CardHeader>
                     {view === "auth" ? (
                         <>
-                            <CardTitle className="text-2xl font-bold text-center">Welcome Back</CardTitle>
+                            <CardTitle className="text-2xl font-bold text-center font-serif text-zinc-900">Researcher Login</CardTitle>
                             <CardDescription className="text-center font-sans text-zinc-500">
-                                Authentication Required
+                                Secure Access to the Governance Engine
                             </CardDescription>
                         </>
                     ) : (
                         <>
                             <CardTitle className="text-2xl font-bold text-center flex items-center justify-center gap-2">
-                                <CheckCircle2 className="h-6 w-6 text-green-500" /> Verify Email
+                                <CheckCircle2 className="h-6 w-6 text-green-600" /> Verify Identity
                             </CardTitle>
                             <CardDescription className="text-center font-sans text-zinc-500">
                                 Enter the code sent to {email}
@@ -228,6 +205,33 @@ export default function LoginPage() {
                                 <p className="text-xs text-zinc-400">
                                     Click the link in the email to verify your account and sign in automatically.
                                 </p>
+
+                                {/* DEV ONLY: Auto-Confirm */}
+                                {process.env.NODE_ENV === 'development' && (
+                                    <div className="mt-4 pt-4 border-t border-zinc-200">
+                                        <div className="text-[10px] text-amber-600 font-bold uppercase mb-2">Development Mode</div>
+                                        <Button
+                                            variant="secondary"
+                                            size="sm"
+                                            className="w-full text-xs"
+                                            onClick={async () => {
+                                                try {
+                                                    await fetch('/api/dev/verify-user', {
+                                                        method: 'POST',
+                                                        body: JSON.stringify({ email })
+                                                    });
+                                                    alert("DEV BYPASS: Account confirmed! You can now log in.");
+                                                    setView('auth');
+                                                    setActiveTab('signin');
+                                                } catch (e) {
+                                                    alert("Failed to auto-confirm");
+                                                }
+                                            }}
+                                        >
+                                            ⚡ Dev: Force Activate Account
+                                        </Button>
+                                    </div>
+                                )}
                             </div>
 
                             <Button

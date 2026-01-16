@@ -89,27 +89,27 @@ export default function HowItWorksPage() {
                             <div className="pl-14 grid gap-6 md:grid-cols-2">
                                 <div className="p-5 border border-zinc-200 rounded-lg hover:border-zinc-300 transition-colors">
                                     <h3 className="font-bold font-serif text-lg mb-2">1. The Thesis Constructor</h3>
-                                    <p className="text-sm text-zinc-600">Extracts the core logical structure of your argument. It ignores rhetoric to isolate the "atomic claims" you are establishing.</p>
+                                    <p className="text-base text-zinc-600 leading-relaxed">Extracts the core logical structure of your argument. It ignores rhetoric to isolate the "atomic claims" you are establishing.</p>
                                 </div>
                                 <div className="p-5 border border-zinc-200 rounded-lg hover:border-zinc-300 transition-colors">
                                     <h3 className="font-bold font-serif text-lg mb-2">2. The Thesis Critic</h3>
-                                    <p className="text-sm text-zinc-600">A rigorous stress-testing agent. Its goal is to identify counter-examples, logical fallacies, or weak premises in your argument hierarchy.</p>
+                                    <p className="text-base text-zinc-600 leading-relaxed">A rigorous stress-testing agent. Its goal is to identify counter-examples, logical fallacies, or weak premises in your argument hierarchy.</p>
                                 </div>
                                 <div className="p-5 border border-zinc-200 rounded-lg hover:border-zinc-300 transition-colors">
                                     <h3 className="font-bold font-serif text-lg mb-2">3. Methodology Analyst</h3>
-                                    <p className="text-sm text-zinc-600">Evaluates procedural integrity. It checks for potential sampling biases, statistical inconsistencies, or over-claiming of results.</p>
+                                    <p className="text-base text-zinc-600 leading-relaxed">Evaluates procedural integrity. It checks for potential sampling biases, statistical inconsistencies, or over-claiming of results.</p>
                                 </div>
                                 <div className="p-5 border border-zinc-200 rounded-lg hover:border-zinc-300 transition-colors">
                                     <h3 className="font-bold font-serif text-lg mb-2">4. Literature Reviewer</h3>
-                                    <p className="text-sm text-zinc-600">Scans for conceptual proximity in existing literature. It flags claims that may be derivative or insufficiently differentiated from prior art.</p>
+                                    <p className="text-base text-zinc-600 leading-relaxed">Scans for conceptual proximity in existing literature. It flags claims that may be derivative or insufficiently differentiated from prior art.</p>
                                 </div>
                                 <div className="p-5 border border-zinc-200 rounded-lg hover:border-zinc-300 transition-colors">
                                     <h3 className="font-bold font-serif text-lg mb-2">5. Formalism Auditor</h3>
-                                    <p className="text-sm text-zinc-600">Checks technical precision. Are definitions recursive? Do equations balance? It demands mathematical and linguistic rigor.</p>
+                                    <p className="text-base text-zinc-600 leading-relaxed">Checks technical precision. Are definitions recursive? Do equations balance? It demands mathematical and linguistic rigor.</p>
                                 </div>
                                 <div className="p-5 border-l-4 border-zinc-900 bg-zinc-50 rounded-r-lg pl-5">
                                     <h3 className="font-bold font-serif text-lg mb-2">6. The Reviewer Simulator</h3>
-                                    <p className="text-sm text-zinc-600">The Synthesizer. It aggregates the findings from all agents and renders a final verdict: ACCEPT, REVISE, or REJECT.</p>
+                                    <p className="text-base text-zinc-600 leading-relaxed">The Synthesizer. It aggregates the findings from all agents and renders a final verdict: ACCEPT, REVISE, or REJECT.</p>
                                 </div>
                             </div>
                         </section>
@@ -125,13 +125,13 @@ export default function HowItWorksPage() {
 
                             <div className="pl-14 space-y-8">
                                 <div>
-                                    <h3 className="text-lg font-bold font-serif mb-2">Will Argus guarantee my paper gets accepted?</h3>
+                                    <h3 className="text-lg font-bold font-serif mb-2">Will ARGUS guarantee my paper gets accepted?</h3>
                                     <p className="text-zinc-700 leading-relaxed">
                                         No. ARGUS validates your methodology and logical consistency.
                                         It does NOT guarantee acceptance—journals care about novelty, impact, and empirical results too.
                                     </p>
                                     <p className="text-zinc-700 leading-relaxed mt-2">
-                                        However, Argus DOES help you:
+                                        However, ARGUS DOES help you:
                                     </p>
                                     <ul className="list-disc pl-5 mt-2 space-y-1 text-zinc-700">
                                         <li>Identify fatal logical flaws before peer review</li>
@@ -139,12 +139,12 @@ export default function HowItWorksPage() {
                                         <li>Clarify claims so reviewers can't misinterpret</li>
                                     </ul>
                                     <p className="text-zinc-700 leading-relaxed mt-2 font-medium">
-                                        In short: Argus can't make your paper innovative. But it CAN prevent rejection due to careless mistakes or logical inconsistency.
+                                        In short: ARGUS can't make your paper innovative. But it CAN prevent rejection due to careless mistakes or logical inconsistency.
                                     </p>
                                 </div>
 
                                 <div>
-                                    <h3 className="text-lg font-bold font-serif mb-2">What if Argus doesn't find any problems?</h3>
+                                    <h3 className="text-lg font-bold font-serif mb-2">What if ARGUS doesn't find any problems?</h3>
                                     <p className="text-zinc-700 leading-relaxed">
                                         That's good news. It means:
                                     </p>
@@ -154,12 +154,12 @@ export default function HowItWorksPage() {
                                         <li>You're ready for peer review</li>
                                     </ul>
                                     <p className="text-zinc-700 leading-relaxed mt-2">
-                                        Argus isn't a rubber stamp. If it passes your work, you can defend every claim.
+                                        ARGUS isn't a rubber stamp. If it passes your work, you can defend every claim.
                                     </p>
                                 </div>
 
                                 <div>
-                                    <h3 className="text-lg font-bold font-serif mb-2">What if Argus REJECTS all my claims?</h3>
+                                    <h3 className="text-lg font-bold font-serif mb-2">What if ARGUS REJECTS all my claims?</h3>
                                     <p className="text-zinc-700 leading-relaxed">
                                         This happens occasionally with overstated claims. It's actually valuable—better to know before journal submission.
                                     </p>
@@ -167,18 +167,18 @@ export default function HowItWorksPage() {
                                         <strong>Typical path:</strong>
                                     </p>
                                     <ol className="list-decimal pl-5 mt-2 space-y-1 text-zinc-700">
-                                        <li>Run Argus, get REJECTED verdicts</li>
+                                        <li>Run ARGUS, get REJECTED verdicts</li>
                                         <li>Revise claims (narrow scope, add evidence)</li>
-                                        <li>Re-run Argus, get ACCEPTED or REVISE</li>
+                                        <li>Re-run ARGUS, get ACCEPTED or REVISE</li>
                                         <li>Iterate until confidence is high</li>
                                     </ol>
                                     <p className="text-zinc-700 leading-relaxed mt-2 italic">
-                                        We've seen PhD students avoid major revisions by iterating with Argus pre-submission.
+                                        We've seen PhD students avoid major revisions by iterating with ARGUS pre-submission.
                                     </p>
                                 </div>
 
                                 <div>
-                                    <h3 className="text-lg font-bold font-serif mb-2">How many times should I run Argus on my paper?</h3>
+                                    <h3 className="text-lg font-bold font-serif mb-2">How many times should I run ARGUS on my paper?</h3>
                                     <p className="text-zinc-700 leading-relaxed">
                                         We recommend:
                                     </p>
@@ -188,7 +188,7 @@ export default function HowItWorksPage() {
                                         <li><strong>Pre-submission:</strong> 1 final audit (confidence check)</li>
                                     </ul>
                                     <p className="text-zinc-700 leading-relaxed mt-2 text-sm text-zinc-500">
-                                        Total: ~3-4 audits per paper (~₹6K-10K with Standard Mode)
+                                        Total: ~3-4 audits per paper (~$80-120 with Standard Mode)
                                     </p>
                                 </div>
                             </div>

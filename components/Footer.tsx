@@ -8,6 +8,8 @@ export function Footer() {
                     &copy; 2026 ARGUS Governance Protocol. All rights reserved.
                 </p>
                 <nav className="flex gap-4 sm:gap-6 text-xs text-zinc-500 font-sans">
+                    <Link href="/protocol" className="hover:underline hover:text-zinc-900 transition-colors">Protocol</Link>
+                    <Link href="/about" className="hover:underline hover:text-zinc-900 transition-colors">About</Link>
                     <Link href="/terms" className="hover:underline hover:text-zinc-900 transition-colors">Terms</Link>
                     <Link href="/privacy" className="hover:underline hover:text-zinc-900 transition-colors">Privacy</Link>
                     <Link href="/refund-policy" className="hover:underline hover:text-zinc-900 transition-colors">Refunds</Link>

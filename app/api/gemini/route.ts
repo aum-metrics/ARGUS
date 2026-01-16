@@ -15,7 +15,74 @@ export async function POST(req: Request) {
             }, { status: 500 });
         }
 
+
+        // -----------------------------------------------------
+        // 0. SECURITY & QUOTA GATE (Server-Side Enforcement)
+        // -----------------------------------------------------
+        // -----------------------------------------------------
+        // 0. SECURITY & QUOTA GATE (Server-Side Enforcement)
+        // -----------------------------------------------------
+        const { createClient: createServerClient } = await import("@/lib/supabase/server");
+        const { createClient: createSupabaseClient } = await import("@supabase/supabase-js");
+
+        const supabase = await createServerClient();
+        const { data: { user } } = await supabase.auth.getUser();
+
+        // Admin/Service Client for sensitive RPC/DB checks logic
+        const supabaseAdmin = createSupabaseClient(
+            process.env.NEXT_PUBLIC_SUPABASE_URL!,
+            process.env.SUPABASE_SERVICE_ROLE_KEY!
+        );
+
+        if (user && role === 'THESIS_CONSTRUCTOR') {
+            // Only "Charge" on the initial extraction (The heavy lift). 
+            // Follow-up questions (Destroyer/Assistant) are usually free/included in the session cost.
+
+            // 1. Check Profile for Organization
+            const { data: profile } = await supabaseAdmin.from('profiles').select('org_id, is_trial_used').eq('id', user.id).single();
+
+            let authorized = false;
+
+            if (profile?.org_id) {
+                // ENTERPRISE PATH: Atomic Decrement
+                const { data: success, error: rpcError } = await supabaseAdmin.rpc('consume_credit', { p_org_id: profile.org_id });
+                if (success) {
+                    authorized = true;
+                    // console.debug(`[QUOTA] Enterprise Credit Consumed for Org ${profile.org_id}`);
+                } else {
+                    console.error(`[QUOTA] Enterprise Limit Reached for Org ${profile.org_id}`);
+                }
+            } else {
+                // INDIVIDUAL PATH: Balance Check (Ledger Mode)
+                // Credits = Successful Transactions
+                const { count: credits } = await supabaseAdmin.from('transactions').select('*', { count: 'exact', head: true }).eq('user_id', user.id).eq('status', 'success');
+                // Usage = Previous Constructor Calls
+                const { count: usage } = await supabaseAdmin.from('audit_logs').select('*', { count: 'exact', head: true }).eq('user_id', user.id).eq('action', 'THESIS_CONSTRUCTOR');
+
+                // Allow if Credits > Usage OR Trial is newly active (Trial logic injects a dummy transaction, so handled by credits check usually, but let's be safe)
+                // Actually trial logic inserts a transaction with amount 0. So it counts as a credit.
+
+                if ((credits || 0) > (usage || 0)) {
+                    authorized = true;
+                }
+            }
+
+            if (!authorized) {
+                return NextResponse.json({
+                    error: "Quota Exceeded. Please top up your credits or contact your administrator."
+                }, { status: 402 });
+            }
+        }
+
+        // -----------------------------------------------------
+
         const genAI = new GoogleGenerativeAI(apiKey);
+
+        // -----------------------------------------------------
+        // LOGGING (Deferred to end, but updated to include org)
+        // -----------------------------------------------------
+        // Use `supabaseAdmin` for logging in the finally block if needed.
+
 
         // -----------------------------------------------------
         // MODEL ROUTING STRATEGY
@@ -52,7 +119,7 @@ export async function POST(req: Request) {
         const hasImages = Array.isArray(images) && images.length > 0;
 
         if (hasImages) {
-            console.log(`[ROUTER] Images detected. Forcing Vision Model: ${MODELS.VISION}`);
+            // console.debug(`[ROUTER] Images detected. Forcing Vision Model: ${MODELS.VISION}`);
             selectedModel = MODELS.VISION;
         } else {
             // 2. Role-Based Switching (Text Only)
@@ -63,7 +130,7 @@ export async function POST(req: Request) {
                 'DEFAULT': MODELS.FAST
             };
             selectedModel = ROLE_TO_MODEL[role] || MODELS.FAST;
-            console.log(`[ROUTER] Text-only request. Selected Model: ${selectedModel} for Role: ${role}`);
+            // console.debug(`[ROUTER] Text-only request. Selected Model: ${selectedModel} for Role: ${role}`);
         }
 
         const model = genAI.getGenerativeModel({
@@ -84,17 +151,15 @@ export async function POST(req: Request) {
                 // Frontend should ideally pass type, but base64 usually contains headers.
                 // If the string is pure base64 without header, we default to image/png.
                 let data = base64Image;
-                let mimeType = "image/png";
+                let mimeType = "image/png"; // Default fallback
 
-                if (base64Image.includes("data:image/jpeg;base64,")) {
-                    mimeType = "image/jpeg";
-                    data = base64Image.replace("data:image/jpeg;base64,", "");
-                } else if (base64Image.includes("data:image/png;base64,")) {
-                    mimeType = "image/png";
-                    data = base64Image.replace("data:image/png;base64,", "");
-                } else if (base64Image.includes("data:image/webp;base64,")) {
-                    mimeType = "image/webp";
-                    data = base64Image.replace("data:image/webp;base64,", "");
+                // Extract valid mime type from base64 header (e.g. data:image/jpeg;base64,...)
+                const matches = base64Image.match(/^data:([a-zA-Z0-9]+\/[a-zA-Z0-9-.+]+);base64,/);
+
+                if (matches && matches.length > 1) {
+                    mimeType = matches[1];
+                    // Remove the header to get raw data
+                    data = base64Image.replace(matches[0], "");
                 }
 
                 parts.push({
@@ -123,23 +188,44 @@ export async function POST(req: Request) {
                 // Extract clean role from request (already parsed in body)
                 const { sessionId = "UNKNOWN" } = body;
 
+                // Get user profile for org_id
+                const { data: profile } = await supabaseAdmin.from('profiles').select('org_id').eq('id', user.id).single();
+
                 // Compute metadata
+                const { filename } = body; // [NEW] Capture Filename
+
                 const inputSize = prompt.length;
                 const outputSize = text.length;
                 const modelName = selectedModel; // Dynamically routed model
 
                 await supabase.from("audit_logs").insert({
                     user_id: user.id,
+                    org_id: profile?.org_id || null, // [FIX] Include org_id for org-wide tracking
                     session_id: sessionId,
                     action: role, // 'THESIS_CONSTRUCTOR', 'THESIS_DESTROYER', etc.
                     metadata: {
                         input_chars: inputSize,
                         output_chars: outputSize,
-                        model: modelName
+                        model: modelName,
+                        filename: filename || "Unknown" // [NEW] Audit requirement
                     },
                     // We don't increment claim_count here, that's business logic for the client or other triggers
                     // But we log the EVENT.
                 });
+
+                // [NEW] Metadata Logging (Data Asset - NO PII)
+                // Only log on final audit completion (FORMALISM_AUDITOR)
+                if (role === 'FORMALISM_AUDITOR' && body.finalScore !== undefined) {
+                    const { logMetadata, inferField, extractFailureMode } = await import('@/lib/metadata-logger');
+
+                    await logMetadata({
+                        field: inferField(body.context || {}),
+                        failure_mode: extractFailureMode(body.actionItems || []),
+                        score: body.finalScore,
+                        verdict: body.finalScore >= 85 ? 'PUBLISHABLE' : body.finalScore >= 60 ? 'REVISE_MAJOR' : 'REJECT',
+                        org_id: profile?.org_id
+                    });
+                }
             }
         } catch (logError) {
             console.error(">>> LOGGING FAILURE:", logError);

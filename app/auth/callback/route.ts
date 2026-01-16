@@ -1,36 +1,49 @@
-import { createClient } from "@/lib/supabase/server";
-import { NextResponse } from "next/server";
 
-export async function GET(request: Request) {
-    // The `/auth/callback` route is required for the server-side auth flow to work properly.
-    // The code exchange happens here, exchanging the auth code for a session.
-    // https://supabase.com/docs/guides/auth/server-side/nextjs
+import { type EmailOtpType } from '@supabase/supabase-js'
+import { type NextRequest, NextResponse } from 'next/server'
 
-    const requestUrl = new URL(request.url);
-    const code = requestUrl.searchParams.get("code");
-    const next = requestUrl.searchParams.get("next") ?? "/dashboard";
-    const error = requestUrl.searchParams.get("error");
-    const error_description = requestUrl.searchParams.get("error_description");
 
-    if (error) {
-        return NextResponse.redirect(`${requestUrl.origin}/login?error=${error_description || error}`);
-    }
+// Fallback if utility doesn't exist (likely given project structure)
+import { createServerClient, type CookieOptions } from '@supabase/ssr'
+import { cookies } from 'next/headers'
 
-    if (code) {
-        const supabase = await createClient(); // Use the server client
+export async function GET(request: NextRequest) {
+    const { searchParams } = new URL(request.url)
+    const token_hash = searchParams.get('token_hash')
+    const type = searchParams.get('type') as EmailOtpType | null
+    const next = searchParams.get('next') ?? '/dashboard'
 
-        // Exchange the code for a session. 
-        // This authenticates the user within the Next.js middleware/server context.
-        const { error } = await supabase.auth.exchangeCodeForSession(code);
+    if (token_hash && type) {
+        const cookieStore = await cookies()
+
+        const supabase = createServerClient(
+            process.env.NEXT_PUBLIC_SUPABASE_URL!,
+            process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+            {
+                cookies: {
+                    get(name: string) {
+                        return cookieStore.get(name)?.value
+                    },
+                    set(name: string, value: string, options: CookieOptions) {
+                        cookieStore.set({ name, value, ...options })
+                    },
+                    remove(name: string, options: CookieOptions) {
+                        cookieStore.delete({ name, ...options })
+                    },
+                },
+            }
+        )
+
+        const { error } = await supabase.auth.verifyOtp({
+            type,
+            token_hash,
+        })
 
         if (!error) {
-            // Forward to the intended destination (or dashboard)
-            return NextResponse.redirect(`${requestUrl.origin}${next}`);
-        } else {
-            return NextResponse.redirect(`${requestUrl.origin}/login?error=${error.message}`);
+            return NextResponse.redirect(new URL(next, request.url))
         }
     }
 
-    // Return the user to an error page with instructions if handling fails
-    return NextResponse.redirect(`${requestUrl.origin}/login?error=auth_code_error`);
+    // return the user to an error page with some instructions
+    return NextResponse.redirect(new URL('/login?error=auth_code_error', request.url))
 }

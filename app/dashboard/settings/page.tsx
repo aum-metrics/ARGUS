@@ -7,9 +7,10 @@ import { Label } from "@/components/ui/label"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Separator } from "@/components/ui/separator"
 import { Badge } from "@/components/ui/badge"
-import { CheckCircle2, CreditCard, Download, Shield, User } from "lucide-react"
+import { CheckCircle2, CreditCard, Download, Shield, User, History } from "lucide-react"
 import { useState } from "react"
 import Link from "next/link"
+import { UsageHistory } from "@/components/UsageHistory"
 
 export default function SettingsPage() {
     const [keys, setKeys] = useState({
@@ -40,7 +41,9 @@ export default function SettingsPage() {
                 <TabsList className="grid w-full grid-cols-3 mb-8">
                     <TabsTrigger value="general">General & Profile</TabsTrigger>
                     <TabsTrigger value="billing">Billing & Usage</TabsTrigger>
-                    <TabsTrigger value="api">Model Configuration</TabsTrigger>
+                    <TabsTrigger value="usage" className="flex items-center gap-2">
+                        <History className="h-3 w-3" /> Audit Log
+                    </TabsTrigger>
                 </TabsList>
 
                 {/* GENERAL TAB */}
@@ -54,16 +57,16 @@ export default function SettingsPage() {
                             <div className="grid grid-cols-2 gap-4">
                                 <div className="space-y-2">
                                     <Label>Full Name</Label>
-                                    <Input defaultValue="Dr. Arjun Mehta" />
+                                    <Input placeholder="Researcher Name" />
                                 </div>
                                 <div className="space-y-2">
                                     <Label>Academic Institution</Label>
-                                    <Input defaultValue="Indian Institute of Science (IISc)" />
+                                    <Input placeholder="Institution Name" />
                                 </div>
                             </div>
                             <div className="space-y-2">
                                 <Label>Email Address</Label>
-                                <Input defaultValue="arjun.mehta@iisc.ac.in" disabled className="bg-zinc-100" />
+                                <Input placeholder="email@institution.edu" disabled className="bg-zinc-100" />
                             </div>
                         </CardContent>
                         <CardFooter>
@@ -104,8 +107,8 @@ export default function SettingsPage() {
                                         <CreditCard className="h-5 w-5 text-zinc-600" />
                                     </div>
                                     <div>
-                                        <p className="font-bold text-sm">Visa ending in 4242</p>
-                                        <p className="text-xs text-zinc-500">Expires 12/28</p>
+                                        <p className="font-bold text-sm">No saved card</p>
+                                        <p className="text-xs text-zinc-500">--/--</p>
                                     </div>
                                 </div>
                                 <Button variant="ghost" size="sm">Edit</Button>
@@ -128,22 +131,7 @@ export default function SettingsPage() {
                                         </thead>
                                         <tbody className="divide-y divide-zinc-100">
                                             <tr>
-                                                <td className="px-4 py-3">Dec 28, 2025</td>
-                                                <td className="px-4 py-3 font-mono text-xs">INV-001-9X2</td>
-                                                <td className="px-4 py-3 truncate max-w-[200px]">Analysis of RLHF in LLMs...</td>
-                                                <td className="px-4 py-3 text-right font-bold">₹499.00</td>
-                                                <td className="px-4 py-3 text-center">
-                                                    <Button variant="ghost" size="icon" className="h-6 w-6"><Download className="h-3 w-3" /></Button>
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td className="px-4 py-3">Dec 20, 2025</td>
-                                                <td className="px-4 py-3 font-mono text-xs">INV-001-8B4</td>
-                                                <td className="px-4 py-3 truncate max-w-[200px]">Transformer Complexity...</td>
-                                                <td className="px-4 py-3 text-right font-bold">₹499.00</td>
-                                                <td className="px-4 py-3 text-center">
-                                                    <Button variant="ghost" size="icon" className="h-6 w-6"><Download className="h-3 w-3" /></Button>
-                                                </td>
+                                                <td colSpan={5} className="px-4 py-8 text-center text-zinc-400 italic">No transaction history found.</td>
                                             </tr>
                                         </tbody>
                                     </table>
@@ -153,44 +141,20 @@ export default function SettingsPage() {
                     </Card>
                 </TabsContent>
 
-                {/* API SETTINGS TAB */}
-                <TabsContent value="api" className="space-y-6">
+                {/* USAGE TAB */}
+                <TabsContent value="usage" className="space-y-6">
                     <Card>
                         <CardHeader>
-                            <CardTitle>Bring Your Own Key (BYOK)</CardTitle>
-                            <CardDescription>
-                                Optional: Provide your own API keys for higher rate limits and privacy control.
-                            </CardDescription>
+                            <CardTitle>Usage Audit</CardTitle>
+                            <CardDescription>Transparent ledger of all your interactions with the ARGUS system.</CardDescription>
                         </CardHeader>
-                        <CardContent className="space-y-4">
-                            <div className="p-3 bg-amber-50 border border-amber-200 rounded text-amber-800 text-xs flex items-center gap-2">
-                                <Shield className="h-4 w-4" />
-                                <b>Note:</b> Keys are stored in your browser's local storage only.
-                            </div>
-                            <div className="space-y-2">
-                                <Label>Google Gemini API Key</Label>
-                                <Input
-                                    type="password"
-                                    placeholder="AIza..."
-                                    value={keys.gemini}
-                                    onChange={(e) => setKeys({ ...keys, gemini: e.target.value })}
-                                />
-                            </div>
-                            <div className="space-y-2">
-                                <Label>OpenAI API Key</Label>
-                                <Input
-                                    type="password"
-                                    placeholder="sk-..."
-                                    value={keys.chatgpt}
-                                    onChange={(e) => setKeys({ ...keys, chatgpt: e.target.value })}
-                                />
-                            </div>
+                        <CardContent>
+                            <UsageHistory />
                         </CardContent>
-                        <CardFooter>
-                            <Button onClick={handleSave}>Save Configuration</Button>
-                        </CardFooter>
                     </Card>
                 </TabsContent>
+
+
             </Tabs>
         </div>
     )

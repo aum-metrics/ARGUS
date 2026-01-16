@@ -4,7 +4,7 @@ import Razorpay from "razorpay";
 export async function POST(req: NextRequest) {
     try {
         const body = await req.json();
-        const { amount, currency = "INR" } = body;
+        const { amount, currency = "USD" } = body;
 
         // Initialize Razorpay
         // NOTE: These MUST be in process.env or it will fail

@@ -14,6 +14,7 @@ create table public.profiles (
   -- We don't store "Audits" (content), but we can store "Lifetime Audit Count" for billing history
   lifetime_audits_count integer default 0,
   tier text default 'standard', -- 'standard' | 'researcher' | 'enterprise'
+  is_trial_used boolean default false, -- Tracks if "Free Trial" has been claimed
   
   updated_at timestamp with time zone,
 
@@ -122,3 +123,42 @@ create policy "Users view own transactions" on transactions for select using (au
 
 -- Allow Insert
 create policy "Users can insert own logs" on audit_logs for insert with check (auth.uid() = user_id);
+create policy "Users can insert own transactions" on transactions for insert with check (auth.uid() = user_id);
+
+-- 7. ORGANIZATIONS (Multi-Tenancy)
+-- Support for Departments and Universities
+create table public.organizations (
+  id uuid default gen_random_uuid() primary key,
+  name text not null, -- e.g. "MIT - CompSci"
+  domain text, -- e.g. "mit.edu" for auto-association
+  tier text default 'DEPARTMENT', -- 'DEPARTMENT' ($299), 'ENTERPRISE' ($999)
+  credits_balance integer default 0, -- Shared credit pool
+  created_at timestamp with time zone default now()
+);
+
+alter table public.organizations enable row level security;
+
+-- Policies for Organizations
+-- 1. Admins can view their own org
+-- 2. Members can view basic org stats (balance)
+
+-- 8. SCHEMA UPDATES FOR PIVOT
+-- Add columns to existing tables if they don't exist (Idempotent-ish style for keeping this file as single source)
+
+-- Update PROFILES with Org links
+do $$
+begin
+  if not exists (select 1 from information_schema.columns where table_name = 'profiles' and column_name = 'org_id') then
+    alter table public.profiles add column org_id uuid references public.organizations(id);
+    alter table public.profiles add column role text default 'RESEARCHER'; -- 'ADMIN', 'RESEARCHER', 'STUDENT'
+  end if;
+end $$;
+
+-- Update TRANSACTIONS with Metadata (Candidate Info, Journal Target)
+do $$
+begin
+  if not exists (select 1 from information_schema.columns where table_name = 'transactions' and column_name = 'metadata') then
+    alter table public.transactions add column metadata jsonb default '{}'::jsonb;
+    alter table public.transactions add column report_summary jsonb default '{}'::jsonb;
+  end if;
+end $$;

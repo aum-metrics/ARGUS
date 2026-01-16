@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { Analytics } from "@vercel/analytics/react";
 import { Playfair_Display, Inter } from "next/font/google"; // Premium Academic/SaaS Pairing
 import "./globals.css";
+import { SupportChat } from "@/components/SupportChat";
+import { ErrorBoundary } from "@/components/ErrorBoundary";
 
 const playfair = Playfair_Display({
   variable: "--font-serif",
@@ -20,6 +22,11 @@ export const metadata: Metadata = {
   description: "Automated adversarial audit for academic claims. Validating rigorous research through multi-agent stress testing.",
   keywords: ["Academic", "SaaS", "Research", "Governance", "Review", "Thesis", "Audit", "Adversarial", "AI"],
   authors: [{ name: "Argus Governance" }],
+  icons: {
+    icon: "/Favicon.jpg",
+    shortcut: "/Favicon.jpg",
+    apple: "/Favicon.jpg",
+  },
 };
 
 export const viewport = {
@@ -35,9 +42,13 @@ export default function RootLayout({
   return (
     <html lang="en" className="light">
       <body
+        suppressHydrationWarning
         className={`${playfair.variable} ${inter.variable} antialiased bg-white text-zinc-900 font-sans`}
       >
-        {children}
+        <ErrorBoundary>
+          {children}
+        </ErrorBoundary>
+        <SupportChat />
         <Analytics />
       </body>
     </html>

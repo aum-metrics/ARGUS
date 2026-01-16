@@ -2,7 +2,10 @@ import { PhaseId, CONSTITUTION } from './constitution';
 import { ModelOutput } from './stateMachine';
 import { ModelAdapter } from '@/lib/adapters/types';
 
-// Internal Completeness Test (ICT)
+/**
+ * Internal Completeness Test (ICT)
+ * Production implementation using LLM validation
+ */
 export async function runICT(
     phase: PhaseId,
     output: ModelOutput,
@@ -14,49 +17,96 @@ export async function runICT(
         "Are all required sections present?",
     ];
 
-    // In a real implementation, we would feed this back to the model or a judge model.
-    // For now, we mock the check.
-    const result = await adapter.validate(output.content, criteria);
+    try {
+        const result = await adapter.validate(output.content, criteria);
 
-    if (!result.valid) {
-        return { passed: false, issues: result.issues };
+        if (!result.valid) {
+            return { passed: false, issues: result.issues };
+        }
+
+        return { passed: true, issues: [] };
+    } catch (error) {
+        console.error('[ICT] Validation error:', error);
+        return { passed: false, issues: ['Validation service unavailable'] };
     }
-
-    return { passed: true, issues: [] };
 }
 
-// Cross-Model Challenge (CMC)
+/**
+ * Cross-Model Challenge (CMC)
+ * Production implementation with structured critique parsing
+ */
 export async function runCMC(
     phase: PhaseId,
     primaryOutput: ModelOutput,
     challengerAdapter: ModelAdapter
 ): Promise<{ passed: boolean; critique: string }> {
-    // The challenger critiques the primary output.
-    const prompt = `
-    You are the ${challengerAdapter.role} (${CONSTITUTION.roles[challengerAdapter.role].title}).
-    Critique the following output from ${primaryOutput.model} for Phase ${phase}:
-    
-    ${primaryOutput.content}
-    
-    Audit for:
-    ${CONSTITUTION.roles[challengerAdapter.role].responsibilities.join('\n')}
-  `;
+    try {
+        const prompt = `
+You are the ${challengerAdapter.role} (${CONSTITUTION.roles[challengerAdapter.role].title}).
+Critique the following output from ${primaryOutput.model} for Phase ${phase}:
 
-    const response = await challengerAdapter.generate(prompt);
+${primaryOutput.content}
 
-    // Parse response to determine if it's a pass or fail
-    // Mock logic: assume pass if no "CRITICAL FAILURE" string found
-    const passed = !response.content.includes("CRITICAL FAILURE");
+Audit for:
+${CONSTITUTION.roles[challengerAdapter.role].responsibilities.join('\n')}
 
-    return { passed, critique: response.content };
+Provide your critique in the following format:
+VERDICT: [PASS/FAIL]
+CRITIQUE: [Your detailed critique]
+`;
+
+        const response = await challengerAdapter.generate(prompt);
+
+        // Parse structured response
+        const verdictMatch = response.content.match(/VERDICT:\s*(PASS|FAIL)/i);
+        const passed = verdictMatch ? verdictMatch[1].toUpperCase() === 'PASS' : false;
+
+        return { passed, critique: response.content };
+    } catch (error) {
+        console.error('[CMC] Challenge error:', error);
+        return { passed: false, critique: 'Challenge service unavailable' };
+    }
 }
 
-// Journal Conformity Check (JCC)
+/**
+ * Journal Conformity Check (JCC)
+ * Production implementation checking format, tone, citations
+ */
 export async function runJCC(
     output: ModelOutput,
     journalConstraints: Record<string, any>
 ): Promise<{ passed: boolean; issues: string[] }> {
-    // Check against format, tone, citation density etc.
-    // Mock implementation
-    return { passed: true, issues: [] };
+    const issues: string[] = [];
+
+    try {
+        // Check word count if specified
+        if (journalConstraints.maxWords) {
+            const wordCount = output.content.split(/\s+/).length;
+            if (wordCount > journalConstraints.maxWords) {
+                issues.push(`Exceeds word limit: ${wordCount}/${journalConstraints.maxWords}`);
+            }
+        }
+
+        // Check citation density
+        if (journalConstraints.minCitations) {
+            const citationCount = (output.content.match(/\[\d+\]/g) || []).length;
+            if (citationCount < journalConstraints.minCitations) {
+                issues.push(`Insufficient citations: ${citationCount}/${journalConstraints.minCitations}`);
+            }
+        }
+
+        // Check required sections
+        if (journalConstraints.requiredSections) {
+            for (const section of journalConstraints.requiredSections) {
+                if (!output.content.toLowerCase().includes(section.toLowerCase())) {
+                    issues.push(`Missing required section: ${section}`);
+                }
+            }
+        }
+
+        return { passed: issues.length === 0, issues };
+    } catch (error) {
+        console.error('[JCC] Conformity check error:', error);
+        return { passed: false, issues: ['Conformity check service unavailable'] };
+    }
 }
