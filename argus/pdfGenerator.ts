@@ -118,7 +118,7 @@ export const generateManuscriptPDF = (session: ArgusSession) => {
         y += 5;
 
         // Verdict for this claim
-        const claimVerdict = claim.verdict || "PENDING";
+        const claimVerdict = claim.status || "PENDING";
         doc.setFont("helvetica", "bold");
         doc.setFontSize(9);
         doc.setTextColor(claimVerdict === "ACCEPTED" ? 0 : 200, claimVerdict === "ACCEPTED" ? 100 : 0, 0);
