@@ -101,16 +101,32 @@ export function UsageHistory() {
             ...rows.map(row => row.map(cell => `"${cell}"`).join(','))
         ].join('\n');
 
-        // Download
-        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-        const link = document.createElement('a');
-        const url = URL.createObjectURL(blob);
-        link.setAttribute('href', url);
-        link.setAttribute('download', `argus_audit_history_${new Date().toISOString().split('T')[0]}.csv`);
-        link.style.visibility = 'hidden';
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
+        // NUCLEAR OPTION: Server-Side Proxy for CSV
+        const base64 = btoa(unescape(encodeURIComponent(csvContent)));
+        const filename = `argus_audit_history_${new Date().toISOString().split('T')[0]}.csv`;
+
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = '/api/download-proxy';
+        form.style.display = 'none';
+
+        const nameInput = document.createElement('input');
+        nameInput.name = 'filename';
+        nameInput.value = filename;
+        form.appendChild(nameInput);
+
+        const dataInput = document.createElement('textarea'); // Textarea for large content
+        dataInput.name = 'fileData';
+        dataInput.value = base64;
+        form.appendChild(dataInput);
+
+        document.body.appendChild(form);
+        try {
+            form.submit();
+        } catch (e) {
+            alert("Export Failed: " + e);
+        }
+        document.body.removeChild(form);
     }
 
     if (loading) return <div className="p-8 flex justify-center"><Loader2 className="animate-spin text-zinc-400" /></div>;

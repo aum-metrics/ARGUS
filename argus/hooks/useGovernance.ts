@@ -71,10 +71,38 @@ export function useGovernance() {
     // This is the "Compiler" parsing phase.
     const extractClaims = async (originalText: string, images: string[], currentSession: ArgusSession, onUpdate: (data: any) => void) => {
         setIsProcessing(true);
-        setCurrentStep('SCANNING');
-        addLog(`[ARGUS_EYE] Scanning document structure (${originalText.length} chars, ${images.length} images)...`);
+        setCurrentStep('QUEUING'); // Status Update for UI
+        addLog(`[SYSTEM] Requesting compute slot...`);
+
+        let ticketId: string | null = null;
 
         try {
+            // ------------------------------------------
+            // 0. QUEUE SYSTEM (The "Bouncer")
+            // ------------------------------------------
+            const queueRes = await fetch('/api/queue', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ action: 'RESERVE', userId: currentSession.id })
+            });
+
+            if (queueRes.status === 429) {
+                const busyData = await queueRes.json();
+                addLog(`[SYSTEM] ⚠️ High Traffic. Queue Position: ${busyData.queuePosition}`);
+                alert("System is currently at max capacity. Please try again in 30 seconds.");
+                setIsProcessing(false);
+                setCurrentStep('IDLE');
+                return;
+            }
+
+            const ticketData = await queueRes.json();
+            ticketId = ticketData.ticketId;
+            addLog(`[SYSTEM] Slot Secured. Ticket: ${ticketId?.substring(0, 6)}...`);
+            // ------------------------------------------
+
+            setCurrentStep('SCANNING');
+            addLog(`[ARGUS_EYE] Scanning document structure (${originalText.length} chars, ${images.length} images)...`);
+
             // 0. Compute Hash & Check Cache (Composite Hash)
             const combinedContent = originalText + images.join('');
             const newHash = await computeHash(combinedContent);
@@ -83,6 +111,11 @@ export function useGovernance() {
                 addLog(`[ARGUS_EYE] No changes detected. Using cached audit headers.`);
                 setIsProcessing(false);
                 setCurrentStep('IDLE');
+                // Release ticket immediately if cached
+                fetch('/api/queue', {
+                    method: 'POST',
+                    body: JSON.stringify({ action: 'RELEASE', ticketId })
+                });
                 return;
             }
 
@@ -179,6 +212,14 @@ export function useGovernance() {
         } catch (error: any) {
             addLog(`[ERROR] Scan failed: ${error.message}`);
         } finally {
+            // RELEASE TICKET (Queue Cleanup)
+            if (ticketId) {
+                fetch('/api/queue', {
+                    method: 'POST',
+                    body: JSON.stringify({ action: 'RELEASE', ticketId })
+                }).catch(e => console.error("Failed to release lock", e));
+            }
+
             setIsProcessing(false);
             setCurrentStep('IDLE');
         }

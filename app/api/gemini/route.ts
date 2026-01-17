@@ -141,7 +141,8 @@ export async function POST(req: Request) {
             generationConfig: {
                 // Enforce STRICT JSON output. This fixes the "0 claims" plain text issue.
                 // Supported on Gemini 1.5 Pro/Flash and 2.0 Flash/Pro models.
-                responseMimeType: "application/json"
+                responseMimeType: "application/json",
+                maxOutputTokens: 8192 // Ensure full JSON generation for deep reports
             }
         });
 

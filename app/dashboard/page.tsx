@@ -12,7 +12,7 @@ import { createSession, destroySession, ArgusSession } from "@/argus/session"
 import { Trash2, FileText, CheckCircle2, ShieldCheck, Network, PlayCircle, ScanSearch, Coins, AlertTriangle, XCircle, Download, Gift, Maximize2 } from "lucide-react"
 import { useGovernance, TOKEN_COSTS } from "@/argus/hooks/useGovernance"
 import { KnowledgeGraph } from "@/components/KnowledgeGraph"
-import { downloadReport_v2 } from "@/argus/pdfGenerator"
+import { robustDownloader } from "@/argus/downloader"
 import { generateCertificate } from "@/lib/certificate-generator"
 import { CreditCounter } from "@/components/CreditCounter"
 import { OnboardingFlow } from "@/components/OnboardingFlow"
@@ -197,6 +197,12 @@ export default function ArgusDashboard() {
     const handleLogout = async () => {
         // 1. Destroy Local Crypto Session
         if (session) {
+            // NUCLEAR DELETION: Remove from Supabase
+            // This ensures the session cannot be resurrected by checkUser()
+            if (userId) {
+                await supabase.from('sessions').delete().eq('id', session.id);
+            }
+
             const { certificate } = destroySession(session);
             localStorage.removeItem("argus_session"); // Clear storage
             setSession(null);
@@ -312,10 +318,13 @@ export default function ArgusDashboard() {
                     }} className="text-zinc-600 hover:bg-zinc-100">
                         <ScanSearch className="h-4 w-4 mr-2" /> New Audit
                     </Button>
+                    <span className="hidden md:inline-flex items-center gap-2 px-2 py-1 rounded bg-indigo-50 border border-indigo-100 text-[10px] font-mono font-bold text-indigo-600 uppercase tracking-wider">
+                        <Network className="h-3 w-3" /> System v2.1 (Proxy)
+                    </span>
                     <Button variant="ghost" size="sm" onClick={handleLogout} className="text-red-600 hover:text-red-700 hover:bg-red-50">
                         <Trash2 className="h-4 w-4 mr-2" /> End Session
                     </Button>
-                    <Button variant="outline" size="sm" onClick={() => downloadReport_v2(session)} disabled={session.data.claims.length === 0} className="hidden md:flex">
+                    <Button variant="outline" size="sm" onClick={() => robustDownloader(session)} disabled={session.data.claims.length === 0} className="hidden md:flex">
                         <Download className="h-4 w-4 mr-2" /> Report
                     </Button>
                     <Button variant="ghost" size="sm" onClick={() => {
@@ -326,7 +335,8 @@ export default function ArgusDashboard() {
 
                         const form = document.createElement('form');
                         form.method = 'POST';
-                        form.action = '/api/download-proxy';
+                        form.action = '/api/secure-download';
+                        form.enctype = 'multipart/form-data';
                         form.style.display = 'none';
 
                         const nameInput = document.createElement('input');
@@ -334,13 +344,18 @@ export default function ArgusDashboard() {
                         nameInput.value = `argus_session_${session.id}.json`;
                         form.appendChild(nameInput);
 
-                        const dataInput = document.createElement('input');
+                        // Use textarea for massive data
+                        const dataInput = document.createElement('textarea');
                         dataInput.name = 'fileData';
                         dataInput.value = base64;
                         form.appendChild(dataInput);
 
                         document.body.appendChild(form);
-                        form.submit();
+                        try {
+                            form.submit();
+                        } catch (e) {
+                            alert("Backup Failed: " + e);
+                        }
                         document.body.removeChild(form);
                     }} className="text-zinc-500 hover:text-zinc-900" title="Backup Session Data">
                         <FileText className="h-4 w-4" />
@@ -961,7 +976,7 @@ export default function ArgusDashboard() {
                                     </div>
                                 </CardContent>
                                 <CardFooter className="bg-zinc-50 p-3 border-t border-zinc-100 flex flex-col gap-2">
-                                    <Button variant="outline" size="sm" className="w-full text-xs" onClick={() => generateManuscriptPDF(session)}>
+                                    <Button variant="outline" size="sm" className="w-full text-xs" onClick={() => robustDownloader(session)}>
                                         <Download className="h-3 w-3 mr-2" /> Download Consultant Report
                                     </Button>
 
