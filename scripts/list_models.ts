@@ -12,7 +12,7 @@ if (!apiKey) {
 }
 
 async function main() {
-    const genAI = new GoogleGenerativeAI(apiKey);
+    const genAI = new GoogleGenerativeAI(apiKey || "");
     // There isn't a direct listModels on genAI instance in some versions, 
     // it's usually on the ModelManager or similar. 
     // But let's check the error message advice: "Call ListModels".
