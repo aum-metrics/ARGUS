@@ -1,79 +1,85 @@
 # ARGUS-Thesis User Guide
 
-## Welcome to ARGUS-Thesis
-ARGUS-Thesis is the "spell-checker for logic." It helps researchers, students, and professors validate their papers before submission. This guide explains how to get started, run audits, and manage your account.
+## 1. Introduction
+Welcome to **ARGUS-Thesis**, the Adversarial Research Governance System. This platform serves as a "pre-flight check" for your academic manuscripts, using a swarm of 6 adversarial AI agents to stress-test your claims, logic, and methodology before you submit to a journal.
 
 ---
 
-## 1. Account Types & Sign Up
+## 2. Getting Started
 
-### Individual Researcher
-Best for: PhD Students, Independent Researchers, Post-docs.
-*   **How to Sign Up**: 
-    1. Go to the [Login Page](/login).
-    2. Click the "Sign Up" tab.
-    3. Enter your email and password.
-    4. You will receive a verification email. Click the link to activate.
-*   **Billing**: Pay-as-you-go. Buy "Audits" individually (~$15/paper).
+### 2.1. Account Creation
+*   **Individual**: Sign up directly using your email (university email recommended). No invite needed.
+*   **Verification**: Ensure you confirm your email address to unlock full features.
 
-### Organization / Lab (Enterprise)
-Best for: University Departments, Research Labs, Journals.
-*   **How to Sign Up**: 
-    *   Currently, Organization accounts are **provisioned by our Sales Team**.
-    *   If your University has a license, ask your Department Admin for an invite link.
-    *   If you want to set up an Organization for your team, please contact us via the [Enterprise Page](/enterprise).
-*   **Benefits**: Shared credit pool, Centralized billing, Admin dashboard.
+### 2.2. Organization Setup (New!)
+ARGUS-Thesis now supports **Self-Service Organizations**. If you are a Lab Director or Principal Investigator:
+1.  Go to **Settings** > **Organization**.
+2.  Click **"Create Organization"**.
+3.  Enter your Lab/Dept Name (e.g., "Stanford AI Lab").
+4.  You automatically become the **Admin**.
+5.  **Invite Members**: Enter the email of your students/postdocs (they must already have an individual account) to add them to your team.
+6.  **Shared Credits**: All members draw from the Organization's credit pool, which you manage.
 
 ---
 
-## 2. Using the Dashboard
+## 3. The Audit Workflow
+The core of ARGUS-Thesis is the "Adversarial Audit." Here is the granular step-by-step process:
 
-Once logged in, you will land on the **Dashboard**.
+### Step 1: Claim Extraction (The Compiler)
+*   **Input**: Paste your Abstract or full Manuscript text into the Dashboard.
+*   **Action**: Click **"Extract Claims"**.
+*   **What Happens**: The system acts like a compiler (Lexer/Parser). It breaks your text into atomic logical assertions (e.g., "We achieve SOTA accuracy of 99%").
+*   **Output**: A list of "Claims" appears on the right panel.
 
-### The "New Validation" Flow
-1.  **Input**:
-    *   **Method A (Upload)**: Drag & Drop your research PDF. ARGUS will extract the text.
-    *   **Method B (Paste)**: Copy-paste your Abstract or Introduction directly into the text area.
-2.  **Configure**:
-    *   Select "Standard Audit" (Balance of speed/rigor) or "Deep Scan" (Maximum rigor).
-3.  **Run**:
-    *   Click **"Start Validation"**.
-    *   The system will instantiate the 6-Adversary Swarm.
-    *   Please wait 30-60 seconds for the agents to debate and converge.
+### Step 2: Selecting Adversaries
+You don't need to run every agent on every claim. Be strategic to save credits.
+*   **Reviewer #2**: General hostility. Good for catching "lazy" logic.
+*   **Methodologist**: Checks statistical rigor and study design.
+*   **Prior Work**: Checks novelty against implied baselines.
+*   **Privacy**: Checks for data leaks.
+*   **Action**: Select a Claim, then click an Agent (e.g., "Run Methodologist").
 
-### Understanding the Report
-The final report gives you three key outputs:
-1.  **Argus Score (0-100)**: A confidence metric. >80 is "Journal Ready". <50 indicates "Major Flaws".
-2.  **Claim Analysis**: A breakdown of every claim found in your text, with specific "Attack Vectors" (criticisms) and a verdict (Pass/Fail).
-3.  **Novelty Tier**:
-    *   *Type I*: Novel Contribution.
-    *   *Type II*: Incremental.
-    *   *Type III*: Duplicate/Derivative.
+### Step 3: The Verdict
+*   **ACCEPTED**: The claim stands up to scrutiny.
+*   **REJECTED**: The agent found a flaw. It will provide a specific reason (e.g., "P-value hacking detected," "Circular reasoning").
+*   **Action**: Read the critique. Modify your manuscript. Re-run.
 
----
-
-## 3. Credits & billing
-
-*   **1 Credit = 1 Audit** (up to 5,000 words).
-*   **Free Trial**: New Individual accounts get **3 Free Credits**.
-*   **Purchase**: Go to **Settings > Billing** to buy more credit packs securely via Razorpay.
+### Step 4: Generating Reports
+Once you are satisfied:
+*   **Download PDF Report**: A clean summary of the audit trail to attach to your submission.
+*   **Download Certificate**: A cryptographic proof that your paper passed ARGUS Governance.
 
 ---
 
-## 4. Security & Privacy
-*   **Ephemeral Mode**: By default, ARGUS runs in "Ephemeral Mode".
-*   **What this means**: Your PDF and its text are processed in RAM. Once you close the tab, the data is wiped using a cryptographically secure method. We cannot see your research.
-*   **Deletion Certificate**: You can download a "Certificate of Deletion" after every session for your records.
+## 4. Credits & Billing
+*   **Credit = 1 Audit Cycle**: One credit allows you to extract claims and run a standard suite of agents on a manuscript.
+*   **Pricing**: $15 (approx ₹1,249) per Credit.
+*   **Purchasing**: Click the "Top Up" button in the Dashboard. Secure payment via Razorpay.
+*   **Refunds**: Failed technical executions are refunded automatically. "Low quality" papers are not grounds for refunds—the tool's job is to critique.
 
 ---
 
 ## 5. Troubleshooting
 
-*   **"Auth session missing"**: Accessing the dashboard requires a login. Please sign in.
-*   **PDF Parsing Error**: Ensure your PDF is text-selectable (not scanned images).
-*   **Credit Balance not updating**: Refresh the page. If issues persist, contact support.
+### Chatbot Support
+The **Argus Support Assistant** (bottom right bubble) can answer questions about pricing, privacy, and workflows.
+*   *Note: The Chatbot cannot edit your paper or fix bugs.*
+
+### Common Issues & Fixes
+| Issue | Solution |
+| :--- | :--- |
+| **"Favicon not showing"** | Force refresh (Cmd+Shift+R). We use aggressive caching for performance. |
+| **"Vercel Build Error"** | This is usually transient. If persistent, check your `claim.status` field (we deprecated `verdict`). |
+| **"Credits not updating"** | Refresh the page. Payment webhooks can take up to 10 seconds to sync. |
+| **"PDF Generation fails"** | Ensure you have allowed pop-ups or are using a modern browser (Chrome/Edge/Arc). |
 
 ---
 
-**Need Help?**
-Contact `support@argus-thesis.com`
+## 6. Privacy & Security
+*   **Ephemeral RAM**: Your data is not stored in a persistent database validation text column. It exists in RAM during the session and is wiped when you close the tab.
+*   **No Training**: We do not use your manuscripts to train our models.
+*   **Zero-Knowledge**: Once the session ends, we verify *that* an audit happened (metadata), but we forget *what* was audited.
+
+---
+
+**Support Contact**: `contact@argus-thesis.com`

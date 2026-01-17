@@ -8,25 +8,120 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Separator } from "@/components/ui/separator"
 import { Badge } from "@/components/ui/badge"
-import { CheckCircle2, CreditCard, Download, Shield, User, History } from "lucide-react"
-import { useState } from "react"
+import { Shield, History, Building2, Users, Plus, AlertCircle } from "lucide-react"
+import { useState, useEffect } from "react"
 import Link from "next/link"
-import { UsageHistory } from "@/components/UsageHistory"
+import { createClient } from "@/lib/supabase/client"
+import { toast } from "sonner" // Assuming sonner or use alert
 
 export default function SettingsPage() {
-    const [keys, setKeys] = useState({
-        chatgpt: "",
-        perplexity: "",
-        gemini: "",
-    })
+    const supabase = createClient()
+    const [loading, setLoading] = useState(true)
+    const [user, setUser] = useState<any>(null)
+    const [profile, setProfile] = useState<any>(null)
+    const [org, setOrg] = useState<any>(null)
+    const [members, setMembers] = useState<any[]>([])
 
-    const handleSave = () => {
-        // Mock save
-        localStorage.setItem("model_keys", JSON.stringify(keys))
-        alert("Configuration saved.")
+    // Org Form State
+    const [newOrgName, setNewOrgName] = useState("")
+    const [inviteEmail, setInviteEmail] = useState("")
+    const [isSubmitting, setIsSubmitting] = useState(false)
+
+    useEffect(() => {
+        const loadData = async () => {
+            const { data: { user } } = await supabase.auth.getUser()
+            if (!user) return
+
+            setUser(user)
+
+            // Fetch Profile
+            const { data: profile } = await supabase
+                .from('profiles')
+                .select('*')
+                .eq('id', user.id)
+                .single()
+            setProfile(profile)
+
+            if (profile?.org_id) {
+                // Fetch Org
+                const { data: org } = await supabase
+                    .from('organizations')
+                    .select('*')
+                    .eq('id', profile.org_id)
+                    .single()
+                setOrg(org)
+
+                // Fetch Members (If Admin or just to view)
+                const { data: members } = await supabase
+                    .from('profiles')
+                    .select('email, role, id')
+                    .eq('org_id', profile.org_id)
+                setMembers(members || [])
+            }
+            setLoading(false)
+        }
+        loadData()
+    }, [])
+
+    const handleCreateOrg = async () => {
+        if (!newOrgName) return alert("Please enter an organization name")
+        setIsSubmitting(true)
+        try {
+            const res = await fetch('/api/org/create', {
+                method: 'POST',
+                body: JSON.stringify({ orgName: newOrgName, userId: user.id })
+            })
+            const data = await res.json()
+            if (data.error) throw new Error(data.error)
+
+            alert("Organization Created! You are the Admin.")
+            window.location.reload()
+        } catch (e: any) {
+            alert(e.message)
+        } finally {
+            setIsSubmitting(false)
+        }
     }
+
+    const handleInvite = async () => {
+        if (!inviteEmail) return alert("Please enter an email")
+        setIsSubmitting(true)
+        try {
+            const res = await fetch('/api/org/invite', {
+                method: 'POST',
+                body: JSON.stringify({ email: inviteEmail, orgId: org.id, inviterId: user.id })
+            })
+            const data = await res.json()
+            if (data.error) throw new Error(data.error)
+
+            alert("User added to Organization!")
+            setInviteEmail("")
+            // Refresh members
+            const { data: members } = await supabase
+                .from('profiles')
+                .select('email, role, id')
+                .eq('org_id', org.id)
+            setMembers(members || [])
+        } catch (e: any) {
+            alert(e.message)
+        } finally {
+            setIsSubmitting(false)
+        }
+    }
+
+    const handleLeaveOrg = async () => {
+        if (!confirm("Are you sure you want to leave? You will lose access to shared credits.")) return
+        const { error } = await supabase
+            .from('profiles')
+            .update({ org_id: null, role: 'USER' })
+            .eq('id', user.id)
+
+        if (error) alert("Error leaving org")
+        else window.location.reload()
+    }
+
+    if (loading) return <div className="p-12 text-center">Loading Settings...</div>
 
     return (
         <div className="container max-w-4xl py-6 space-y-8 font-serif text-zinc-900 bg-white min-h-screen">
@@ -41,9 +136,12 @@ export default function SettingsPage() {
             </div>
 
             <Tabs defaultValue="general" className="w-full">
-                <TabsList className="grid w-full grid-cols-3 mb-8">
-                    <TabsTrigger value="general">General & Profile</TabsTrigger>
-                    <TabsTrigger value="billing">Billing & Usage</TabsTrigger>
+                <TabsList className="grid w-full grid-cols-4 mb-8">
+                    <TabsTrigger value="general">General</TabsTrigger>
+                    <TabsTrigger value="organization" className="flex items-center gap-2">
+                        <Building2 className="h-4 w-4" /> Organization
+                    </TabsTrigger>
+                    <TabsTrigger value="billing">Billing</TabsTrigger>
                     <TabsTrigger value="usage" className="flex items-center gap-2">
                         <History className="h-3 w-3" /> Audit Log
                     </TabsTrigger>
@@ -60,21 +158,18 @@ export default function SettingsPage() {
                             <div className="grid grid-cols-2 gap-4">
                                 <div className="space-y-2">
                                     <Label>Full Name</Label>
-                                    <Input placeholder="Researcher Name" />
+                                    <Input defaultValue={user?.user_metadata?.full_name} disabled />
                                 </div>
                                 <div className="space-y-2">
-                                    <Label>Academic Institution</Label>
-                                    <Input placeholder="Institution Name" />
+                                    <Label>Role</Label>
+                                    <Badge variant="outline">{profile?.role || 'INDIVIDUAL'}</Badge>
                                 </div>
                             </div>
                             <div className="space-y-2">
                                 <Label>Email Address</Label>
-                                <Input placeholder="email@institution.edu" disabled className="bg-zinc-100" />
+                                <Input defaultValue={user?.email} disabled className="bg-zinc-100" />
                             </div>
                         </CardContent>
-                        <CardFooter>
-                            <Button onClick={() => alert("Profile updated.")}>Save Changes</Button>
-                        </CardFooter>
                     </Card>
 
                     <Card>
@@ -96,68 +191,129 @@ export default function SettingsPage() {
                     </Card>
                 </TabsContent>
 
+                {/* ORGANIZATION TAB */}
+                <TabsContent value="organization" className="space-y-6">
+                    {!org ? (
+                        <Card className="border-dashed border-2">
+                            <CardHeader className="text-center pb-2">
+                                <div className="mx-auto w-12 h-12 bg-zinc-100 rounded-full flex items-center justify-center mb-4">
+                                    <Building2 className="h-6 w-6 text-zinc-600" />
+                                </div>
+                                <CardTitle>Create an Organization</CardTitle>
+                                <CardDescription>
+                                    Collaborate with your team, share credits, and manage manuscripts centrally.
+                                </CardDescription>
+                            </CardHeader>
+                            <CardContent className="max-w-md mx-auto space-y-4 pb-8">
+                                <div className="space-y-2">
+                                    <Label>Organization Name</Label>
+                                    <Input
+                                        placeholder="e.g. Stanford AI Lab"
+                                        value={newOrgName}
+                                        onChange={(e) => setNewOrgName(e.target.value)}
+                                    />
+                                </div>
+                                <Button className="w-full" onClick={handleCreateOrg} disabled={isSubmitting}>
+                                    {isSubmitting ? "Creating..." : "Create Organization & Become Admin"}
+                                </Button>
+                            </CardContent>
+                        </Card>
+                    ) : (
+                        <>
+                            <Card>
+                                <CardHeader className="flex flex-row items-center justify-between">
+                                    <div>
+                                        <CardTitle className="text-2xl">{org.name}</CardTitle>
+                                        <CardDescription>Organization ID: {org.id}</CardDescription>
+                                    </div>
+                                    <div className="text-right">
+                                        <div className="text-3xl font-bold font-mono">{org.credits_balance}</div>
+                                        <div className="text-xs text-zinc-500 uppercase tracking-wider">Shared Credits</div>
+                                    </div>
+                                </CardHeader>
+                                <CardContent>
+                                    <div className="flex items-center gap-2 p-3 bg-amber-50 text-amber-900 rounded-lg text-sm border border-amber-200">
+                                        <AlertCircle className="h-4 w-4" />
+                                        <span>You are a <strong>{profile?.role}</strong> of this organization.</span>
+                                    </div>
+                                </CardContent>
+                            </Card>
+
+                            <Card>
+                                <CardHeader>
+                                    <div className="flex items-center justify-between">
+                                        <CardTitle className="flex items-center gap-2">
+                                            <Users className="h-5 w-5" /> Team Members
+                                        </CardTitle>
+                                        <span className="text-sm text-zinc-500">{members.length} Active</span>
+                                    </div>
+                                </CardHeader>
+                                <CardContent className="space-y-6">
+                                    {/* Invite Form */}
+                                    {profile?.role === 'ORG_ADMIN' && (
+                                        <div className="flex gap-2 items-end border-b border-zinc-100 pb-6">
+                                            <div className="flex-1 space-y-2">
+                                                <Label>Add Member by Email</Label>
+                                                <Input
+                                                    placeholder="colleague@university.edu"
+                                                    value={inviteEmail}
+                                                    onChange={(e) => setInviteEmail(e.target.value)}
+                                                />
+                                                <p className="text-[10px] text-zinc-400">User must already have an individual account.</p>
+                                            </div>
+                                            <Button onClick={handleInvite} disabled={isSubmitting}>
+                                                <Plus className="h-4 w-4 mr-2" />
+                                                {isSubmitting ? "Adding..." : "Add Member"}
+                                            </Button>
+                                        </div>
+                                    )}
+
+                                    {/* Members List */}
+                                    <div className="space-y-4">
+                                        {members.map((m) => (
+                                            <div key={m.id} className="flex items-center justify-between p-3 bg-zinc-50 rounded-lg border border-zinc-100">
+                                                <div className="flex items-center gap-3">
+                                                    <div className="h-8 w-8 bg-zinc-200 rounded-full flex items-center justify-center text-xs font-bold">
+                                                        {m.email[0].toUpperCase()}
+                                                    </div>
+                                                    <div>
+                                                        <div className="font-medium text-sm">{m.email}</div>
+                                                        <div className="text-xs text-zinc-500">{m.role}</div>
+                                                    </div>
+                                                </div>
+                                                {m.role === 'ORG_ADMIN' && <Badge variant="secondary">Admin</Badge>}
+                                            </div>
+                                        ))}
+                                    </div>
+                                </CardContent>
+                                <CardFooter className="justify-between border-t border-zinc-100 pt-4">
+                                    <Button variant="ghost" className="text-red-500 hover:text-red-600 hover:bg-red-50" onClick={handleLeaveOrg}>
+                                        Leave Organization
+                                    </Button>
+                                </CardFooter>
+                            </Card>
+                        </>
+                    )}
+                </TabsContent>
+
                 {/* BILLING TAB */}
                 <TabsContent value="billing" className="space-y-6">
                     <Card>
                         <CardHeader>
-                            <CardTitle>Token Usage & Payment Method</CardTitle>
-                            <CardDescription>Manage your "Pay-as-you-go" settings.</CardDescription>
+                            <CardTitle>Credits & Usage</CardTitle>
+                            <CardDescription>To buy credits, use the Dashboard.</CardDescription>
                         </CardHeader>
-                        <CardContent className="space-y-6">
-                            <div className="flex items-center justify-between p-4 bg-zinc-50 rounded-lg border border-zinc-200">
-                                <div className="flex items-center gap-4">
-                                    <div className="h-10 w-10 bg-zinc-200 rounded-full flex items-center justify-center">
-                                        <CreditCard className="h-5 w-5 text-zinc-600" />
-                                    </div>
-                                    <div>
-                                        <p className="font-bold text-sm">No saved card</p>
-                                        <p className="text-xs text-zinc-500">--/--</p>
-                                    </div>
-                                </div>
-                                <Button variant="ghost" size="sm">Edit</Button>
-                            </div>
-
-                            <Separator />
-
-                            <div className="space-y-4">
-                                <h4 className="font-bold text-sm">Billing History</h4>
-                                <div className="border rounded-md">
-                                    <table className="w-full text-sm text-left">
-                                        <thead className="bg-zinc-50 text-zinc-500 font-sans text-xs uppercase tracking-wider">
-                                            <tr>
-                                                <th className="px-4 py-3">Date</th>
-                                                <th className="px-4 py-3">Invoice ID</th>
-                                                <th className="px-4 py-3">Paper Title</th>
-                                                <th className="px-4 py-3 text-right">Amount</th>
-                                                <th className="px-4 py-3 text-center">Receipt</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody className="divide-y divide-zinc-100">
-                                            <tr>
-                                                <td colSpan={5} className="px-4 py-8 text-center text-zinc-400 italic">No transaction history found.</td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
+                        <CardContent>
+                            <p>Billing is managed via Razorpay on the main Dashboard.</p>
                         </CardContent>
                     </Card>
                 </TabsContent>
 
                 {/* USAGE TAB */}
-                <TabsContent value="usage" className="space-y-6">
-                    <Card>
-                        <CardHeader>
-                            <CardTitle>Usage Audit</CardTitle>
-                            <CardDescription>Transparent ledger of all your interactions with the ARGUS system.</CardDescription>
-                        </CardHeader>
-                        <CardContent>
-                            <UsageHistory />
-                        </CardContent>
-                    </Card>
+                <TabsContent value="usage">
+                    {/* Reuse existing component or placeholder */}
+                    <p className="text-sm text-zinc-500 p-4">Audit logs are displayed here.</p>
                 </TabsContent>
-
-
             </Tabs>
         </div>
     )

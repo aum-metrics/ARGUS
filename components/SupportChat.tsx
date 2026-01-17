@@ -155,7 +155,7 @@ export function SupportChat() {
             </div>
 
             {/* Chat Area */}
-            <div ref={scrollRef} className="flex-1 h-[400px] overflow-y-auto p-4 space-y-4 bg-zinc-50">
+            <div ref={scrollRef} className="flex-1 h-[500px] max-h-[60vh] overflow-y-auto p-4 space-y-4 bg-zinc-50 scroll-smooth">
                 {messages.map((msg) => (
                     <div key={msg.id} className={cn("flex flex-col max-w-[85%]", msg.role === 'user' ? "ml-auto items-end" : "mr-auto items-start")}>
                         <div className={cn(
