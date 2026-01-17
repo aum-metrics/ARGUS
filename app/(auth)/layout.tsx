@@ -1,6 +1,12 @@
 /**
  * Author: Sambath Kumar Natarajan
  */
+
+// Force dynamic rendering for auth pages to avoid build-time Supabase errors
+export const dynamic = 'force-dynamic'
+export const dynamicParams = true
+export const revalidate = 0
+
 export default function AuthLayout({
     children,
 }: {

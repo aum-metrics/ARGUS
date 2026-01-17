@@ -6,6 +6,9 @@
  */
 "use client"
 
+// Force dynamic rendering to avoid build-time Supabase errors
+export const dynamic = 'force-dynamic'
+
 import { cn, getURL } from "@/lib/utils"
 import { useState } from "react"
 import Link from "next/link"
