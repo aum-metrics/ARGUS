@@ -10,7 +10,7 @@ import { Input } from "@/components/ui/input"
 import { cn } from "@/lib/utils"
 
 // ----------------------------------------------------------------------
-// SAFE KNOWLEDGE BASE (STATIC LAYER)
+// DYNAMIC KNOWLEDGE BASE (SERVER-SIDE CONFIG)
 // ----------------------------------------------------------------------
 
 type ScenarioId = 'ROOT' | 'QA_MODE' | 'PRICING' | 'PRIVACY' | 'REFUNDS' | 'ENTERPRISE';
@@ -20,66 +20,6 @@ interface BotMessage {
     text: React.ReactNode;
     options?: { label: string; nextId: ScenarioId }[];
 }
-
-const SCENARIOS: Record<Exclude<ScenarioId, 'QA_MODE'>, BotMessage> = {
-    ROOT: {
-        id: 'ROOT',
-        text: "Hello! I'm the Argus Support Assistant. I can help with general questions. How can I assist you today?",
-        options: [
-            { label: "Pricing & Plans", nextId: 'PRICING' },
-            { label: "Data Privacy", nextId: 'PRIVACY' },
-            { label: "Refunds", nextId: 'REFUNDS' },
-            { label: "Enterprise / Labs", nextId: 'ENTERPRISE' },
-            { label: "Ask a Specific Question", nextId: 'QA_MODE' as any }, // Handled specially
-        ]
-    },
-    PRICING: {
-        id: 'PRICING',
-        text: (
-            <div className="space-y-2">
-                <p>We offer one simple model:</p>
-                <div className="flex items-center gap-2 bg-zinc-100 p-2 rounded">
-                    <span className="font-bold">$14.99</span>
-                    <span className="text-sm text-zinc-600">per Full Audit</span>
-                </div>
-                <ul className="list-disc pl-4 text-xs mt-2 space-y-1">
-                    <li>Multi-Agent Adversarial Protocol</li>
-                    <li>PDF Governance Report</li>
-                    <li>Compute Included (No API keys needed)</li>
-                </ul>
-            </div>
-        ),
-        options: [
-            { label: "Back to Menu", nextId: 'ROOT' }
-        ]
-    },
-    PRIVACY: {
-        id: 'PRIVACY',
-        text: (
-            <div className="space-y-2">
-                <p><strong>Security is our First Law.</strong></p>
-                <p>Your manuscript data is processed in ephemeral RAM only. We strictly DO NOT train models on your data.</p>
-            </div>
-        ),
-        options: [
-            { label: "Back to Menu", nextId: 'ROOT' }
-        ]
-    },
-    REFUNDS: {
-        id: 'REFUNDS',
-        text: "If the system failed to generate a report due to a technical error, we issue full refunds. Please email help@argus-thesis.com with your Session ID.",
-        options: [
-            { label: "Back to Menu", nextId: 'ROOT' }
-        ]
-    },
-    ENTERPRISE: {
-        id: 'ENTERPRISE',
-        text: "For University Departments and Labs, we offer bulk licensing. Visit the Enterprise page or contact help@argus-thesis.com.",
-        options: [
-            { label: "Back to Menu", nextId: 'ROOT' }
-        ]
-    }
-};
 
 interface Message {
     id: number;
@@ -94,10 +34,41 @@ export function SupportChat() {
     const [isLoading, setIsLoading] = useState(false);
     const [inputValue, setInputValue] = useState("");
 
-    const [messages, setMessages] = useState<Message[]>([
-        { id: 1, role: 'bot', content: SCENARIOS.ROOT.text, options: SCENARIOS.ROOT.options }
-    ]);
+    // Dynamic Config State
+    const [scenarios, setScenarios] = useState<Record<string, BotMessage> | null>(null);
+    const [messages, setMessages] = useState<Message[]>([]);
+
     const scrollRef = useRef<HTMLDivElement>(null);
+
+    // 1. Fetch Configuration on Mount
+    useEffect(() => {
+        async function loadConfig() {
+            try {
+                const res = await fetch('/api/support/config');
+                const data = await res.json();
+                setScenarios(data);
+                // Initialize with ROOT message once loaded
+                if (data && data.ROOT) {
+                    setMessages([{
+                        id: 1,
+                        role: 'bot',
+                        content: data.ROOT.text,
+                        options: data.ROOT.options
+                    }]);
+                }
+            } catch (e) {
+                console.error("Failed to load generic support config", e);
+                // Fallback hardcoded if API fails? For V1 Product, we should probably fail gracefully or show offline msg.
+                setMessages([{
+                    id: 1,
+                    role: 'bot',
+                    content: "System Offline. Please email help@argus-thesis.com",
+                    options: []
+                }]);
+            }
+        }
+        loadConfig();
+    }, []);
 
     // Auto-scroll
     useEffect(() => {
@@ -107,6 +78,8 @@ export function SupportChat() {
     }, [messages, isOpen, isLoading]);
 
     const handleOptionClick = (option: { label: string; nextId: ScenarioId }) => {
+        if (!scenarios) return;
+
         // 1. Add User Selection Message
         const userMsg: Message = {
             id: Date.now(),
@@ -129,17 +102,28 @@ export function SupportChat() {
             return;
         }
 
-        // 3. Handle Static Response
-        const responseFrame = SCENARIOS[option.nextId as Exclude<ScenarioId, 'QA_MODE'>];
-        setTimeout(() => {
-            const botMsg: Message = {
+        // 3. Handle Static Response from Dynamic Config
+        // Type assertion needed because JSON keys are strings
+        const responseFrame = scenarios[option.nextId as string];
+
+        if (responseFrame) {
+            setTimeout(() => {
+                const botMsg: Message = {
+                    id: Date.now() + 1,
+                    role: 'bot',
+                    content: responseFrame.text,
+                    options: responseFrame.options
+                };
+                setMessages(prev => [...prev, botMsg]);
+            }, 300);
+        } else {
+            // Fallback for missing ID
+            setMessages(prev => [...prev, {
                 id: Date.now() + 1,
                 role: 'bot',
-                content: responseFrame.text,
-                options: responseFrame.options
-            };
-            setMessages(prev => [...prev, botMsg]);
-        }, 300);
+                content: "I'm sorry, that topic isn't available right now."
+            }]);
+        }
     };
 
     const handleSendQuery = async () => {
@@ -221,7 +205,9 @@ export function SupportChat() {
                         <button
                             onClick={() => {
                                 setIsQaMode(false);
-                                setMessages(prev => [...prev, { id: Date.now(), role: 'bot', content: SCENARIOS.ROOT.text, options: SCENARIOS.ROOT.options }]);
+                                if (scenarios && scenarios.ROOT) {
+                                    setMessages(prev => [...prev, { id: Date.now(), role: 'bot', content: scenarios.ROOT.text, options: scenarios.ROOT.options }]);
+                                }
                             }}
                             className="text-[10px] bg-zinc-800 px-2 py-1 rounded hover:bg-zinc-700 transition"
                         >
