@@ -1,7 +1,7 @@
-# ARGUS User Guide
+# ARGUS-Thesis User Guide
 
-## Welcome to ARGUS
-ARGUS is the "spell-checker for logic." It helps researchers, students, and professors validate their papers before submission. This guide explains how to get started, run audits, and manage your account.
+## Welcome to ARGUS-Thesis
+ARGUS-Thesis is the "spell-checker for logic." It helps researchers, students, and professors validate their papers before submission. This guide explains how to get started, run audits, and manage your account.
 
 ---
 
@@ -76,4 +76,4 @@ The final report gives you three key outputs:
 ---
 
 **Need Help?**
-Contact `support@argus-governance.com`
+Contact `support@argus-thesis.com`

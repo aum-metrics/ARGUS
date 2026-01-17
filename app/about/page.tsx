@@ -34,7 +34,7 @@ export default function AboutPage() {
                             <div>
                                 <h2 className="text-3xl font-bold font-serif mb-6">The Mission</h2>
                                 <p className="text-lg text-zinc-600 leading-relaxed mb-6 font-serif">
-                                    Argus was founded on a simple, yet radial premise: **Scientific verification must be harder than scientific generation.**
+                                    Argus-Thesis was founded on a simple, yet radial premise: **Scientific verification must be harder than scientific generation.**
                                 </p>
                                 <p className="text-zinc-600 leading-relaxed font-serif">
                                     As AI tools make it effortless to generate plausible-sounding text, the barrier to producing low-quality research has collapsed. We are rebuilding that barrier—not with bureaucracy, but with superior engineering.
@@ -84,7 +84,7 @@ export default function AboutPage() {
                             </div>
                             <h2 className="text-3xl font-bold font-serif mb-4">The Origin</h2>
                             <p className="text-zinc-600 leading-relaxed font-serif mb-6">
-                                Argus was architected by an **Executive MBA student at IIT Madras**, leveraging nearly two decades of professional experience in Computer Science and high-stakes IT Consulting.
+                                Argus-Thesis was architected by an **Executive MBA student at IIT Madras**, leveraging nearly two decades of professional experience in Computer Science and high-stakes IT Consulting.
                             </p>
                             <p className="text-zinc-600 leading-relaxed font-serif">
                                 It is an engineered response to a pervasive academic problem, built with the solidity of enterprise systems and the nuance of scholarly inquiry.

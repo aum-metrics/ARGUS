@@ -46,7 +46,7 @@ export default function HowItWorksPage() {
                                 <h2 className="text-2xl font-bold">2. Compiler-Like Rigor</h2>
                             </div>
                             <p className="text-zinc-700 leading-relaxed pl-14">
-                                ARGUS behaves like a compiler, not a chatbot. It parses your input document into atomic claims (AST), then allows you to run specific "unit tests" (adversarial agents) against each claim. You see the token cost before you commit to an audit.
+                                ARGUS-Thesis behaves like a compiler, not a chatbot. It parses your input document into atomic claims (AST), then allows you to run specific "unit tests" (adversarial agents) against each claim. You see the token cost before you commit to an audit.
                             </p>
                         </section>
 
@@ -120,13 +120,13 @@ export default function HowItWorksPage() {
 
                             <div className="pl-14 space-y-8">
                                 <div>
-                                    <h3 className="text-lg font-bold font-serif mb-2">Will ARGUS guarantee my paper gets accepted?</h3>
+                                    <h3 className="text-lg font-bold font-serif mb-2">Will ARGUS-Thesis guarantee my paper gets accepted?</h3>
                                     <p className="text-zinc-700 leading-relaxed">
-                                        No. ARGUS validates your methodology and logical consistency.
+                                        No. ARGUS-Thesis validates your methodology and logical consistency.
                                         It does NOT guarantee acceptance—journals care about novelty, impact, and empirical results too.
                                     </p>
                                     <p className="text-zinc-700 leading-relaxed mt-2">
-                                        However, ARGUS DOES help you:
+                                        However, ARGUS-Thesis DOES help you:
                                     </p>
                                     <ul className="list-disc pl-5 mt-2 space-y-1 text-zinc-700">
                                         <li>Identify fatal logical flaws before peer review</li>

@@ -1,7 +1,7 @@
-# ARGUS System Architecture (Technical Whitepaper V2.0)
+# ARGUS-Thesis System Architecture (Technical Whitepaper V2.0)
 
 ## Executive Summary
-ARGUS is a **Multi-Agent Governance Engine** designed to validate the logical coherence, methodological integrity, and novelty of academic research *before* peer review. Unlike standard "GenAI Wrappers" that rely on a single model to "critique" text, ARGUS implements a **Consensus Protocol** involving six diverse, adversarial AI agents. This architecture eliminates "hallucinated praise" and enforcing a rigorous, compiler-like validation loop.
+ARGUS-Thesis is a **Multi-Agent Governance Engine** designed to validate the logical coherence, methodological integrity, and novelty of academic research *before* peer review. Unlike standard "GenAI Wrappers" that rely on a single model to "critique" text, ARGUS-Thesis implements a **Consensus Protocol** involving six diverse, adversarial AI agents. This architecture eliminates "hallucinated praise" and enforcing a rigorous, compiler-like validation loop.
 
 ---
 

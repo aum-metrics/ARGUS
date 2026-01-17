@@ -89,7 +89,7 @@ export default function LoginPage() {
             </Link>
 
             <div className="mb-8 flex flex-col items-center gap-2">
-                <img src="/logo.jpg" alt="ARGUS" className="h-24 w-auto drop-shadow-sm rounded-lg" />
+                <img src="/logo.jpg?v=2" alt="ARGUS-Thesis" className="h-24 w-auto drop-shadow-sm rounded-lg" />
             </div>
 
             <Card className="w-full max-w-md bg-white/90 backdrop-blur-xl border-zinc-200/60 shadow-2xl relative overflow-hidden ring-1 ring-zinc-900/5">
@@ -254,7 +254,7 @@ export default function LoginPage() {
 
                 <CardFooter className="flex justify-center border-t border-zinc-100 pt-4">
                     <p className="text-xs text-center text-zinc-500 font-sans">
-                        Protected by Argus Governance. <br />
+                        Protected by ARGUS-Thesis Governance. <br />
                         <Link href="/terms" className="underline hover:text-zinc-900">Terms</Link> & <Link href="/privacy" className="underline hover:text-zinc-900">Privacy</Link>.
                     </p>
                 </CardFooter>

@@ -34,7 +34,7 @@ export default function PrivacyPage() {
                                 <FileX className="h-5 w-5" /> 1. Ephemeral First
                             </h2>
                             <p>
-                                ARGUS operates on a strict <strong>Session-Scoped Ephemeral Mode</strong>. Your inputs, claims, and generated critiques exist only in volatile RAM memory.
+                                ARGUS-Thesis operates on a strict <strong>Session-Scoped Ephemeral Mode</strong>. Your inputs, claims, and generated critiques exist only in volatile RAM memory.
                                 When the node process ends or your session times out (42 minutes), the memory is zeroed.
                             </p>
                         </section>

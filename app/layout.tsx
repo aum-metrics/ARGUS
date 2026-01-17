@@ -24,14 +24,14 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "ARGUS | Adversarial Research Governance System",
+  title: "ARGUS-Thesis | Adversarial Research Governance System",
   description: "Automated adversarial audit for academic claims. Validating rigorous research through multi-agent stress testing.",
   keywords: ["Academic", "SaaS", "Research", "Governance", "Review", "Thesis", "Audit", "Adversarial", "AI"],
-  authors: [{ name: "Argus Governance" }],
+  authors: [{ name: "ARGUS-Thesis Governance" }],
   icons: {
-    icon: "/favicon.ico",
-    shortcut: "/favicon.ico",
-    apple: "/favicon.ico",
+    icon: "/favicon.ico?v=2",
+    shortcut: "/favicon.ico?v=2",
+    apple: "/favicon.ico?v=2",
   },
 };
 

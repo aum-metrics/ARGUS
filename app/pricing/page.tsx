@@ -75,7 +75,7 @@ export default function PricingPage() {
                             <div className="relative z-10">
                                 <h3 className="text-2xl font-bold font-serif mb-4">Are you a Department Head or Lab Director?</h3>
                                 <p className="text-zinc-400 max-w-2xl mx-auto mb-8 font-sans">
-                                    Equip your entire research cohort with ARGUS. Standardize pre-submission rigor, reduce desk rejections, and track output quality with our unified dashboard.
+                                    Equip your entire research cohort with ARGUS-Thesis. Standardize pre-submission rigor, reduce desk rejections, and track output quality with our unified dashboard.
                                 </p>
                                 <div className="flex flex-col sm:flex-row gap-4 justify-center">
                                     <Link href="/enterprise">
@@ -97,7 +97,7 @@ export default function PricingPage() {
                         <div className="text-center space-y-4">
                             <h3 className="text-xl font-bold font-serif">Why only one tier?</h3>
                             <p className="text-zinc-600">
-                                ARGUS requires <strong>managed, high-reasoning compute clusters</strong> to perform its adversarial audit. We bundle this cost directly into the session fee to ensure consistent, secure performance without you needing to manage API keys.
+                                ARGUS-Thesis requires <strong>managed, high-reasoning compute clusters</strong> to perform its adversarial audit. We bundle this cost directly into the session fee to ensure consistent, secure performance without you needing to manage API keys.
                             </p>
                         </div>
 
@@ -116,7 +116,7 @@ export default function PricingPage() {
                                     Most abstracts and early-stage manuscripts contain fewer than 15 core claims. Full-length papers with extensive contributions may contain more. If your paper exceeds the limit, ARGUS will prioritize the most central claims and clearly indicate which ones were not audited.
                                 </p>
                                 <p className="text-zinc-500 italic border-t border-zinc-200 pt-4 mt-4">
-                                    You do not need to manually identify claims. ARGUS does this for you.
+                                    You do not need to manually identify claims. ARGUS-Thesis does this for you.
                                 </p>
                             </div>
                         </div>

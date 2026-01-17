@@ -27,12 +27,12 @@ export default function EnterprisePage() {
                             Governance at <br className="hidden md:inline" /> <span className="text-zinc-500 underline decoration-zinc-200 underline-offset-8">Institutional Scale</span>.
                         </h1>
                         <p className="mx-auto max-w-2xl text-lg md:text-xl text-zinc-500 leading-relaxed mb-10 font-serif">
-                            Deploy ARGUS across your entire department. Standardize pre-submission rigor, track output quality, and reduce desk rejections by 40%.
+                            Deploy ARGUS-Thesis across your entire department. Standardize pre-submission rigor, track output quality, and reduce desk rejections by 40%.
                         </p>
                         <div className="flex flex-col sm:flex-row gap-4 justify-center font-sans">
                             <Link href="/contact">
                                 <Button size="lg" className="bg-zinc-900 text-white hover:bg-zinc-800 h-14 px-8 rounded-full font-bold text-base shadow-xl hover:shadow-2xl transition-all">
-                                    Partner with ARGUS <ArrowRight className="ml-2 h-5 w-5" />
+                                    Partner with ARGUS-Thesis <ArrowRight className="ml-2 h-5 w-5" />
                                 </Button>
                             </Link>
                             <Link href="/protocol">

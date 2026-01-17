@@ -35,7 +35,7 @@ export default function Home() {
                   Pre-Flight <br className="hidden sm:inline" /> <span className="text-zinc-500 decoration-zinc-300 underline underline-offset-8">Validator</span> for Research.
                 </h1>
                 <p className="mx-auto max-w-[800px] text-zinc-500 md:text-xl/relaxed lg:text-2xl/relaxed font-serif leading-normal uppercase-nums">
-                  Define the institutional standard. ARGUS functions as an adversarial pre-flight check. It generates a <strong>Technical Governance Report</strong> evaluating your manuscript against the structural patterns of high-impact research.
+                  Define the institutional standard. ARGUS-Thesis functions as an adversarial pre-flight check. It generates a <strong>Technical Governance Report</strong> evaluating your manuscript against the structural patterns of high-impact research.
                 </p>
 
                 <div className="mt-12 w-full max-w-4xl mx-auto border-t border-zinc-100 pt-8">
@@ -99,7 +99,7 @@ export default function Home() {
                   <BookOpen className="h-4 w-4" /> View Sample Audit Report (PDF)
                 </Link>
                 <p className="text-xs text-zinc-400 font-mono tracking-wide">
-                  Top 25% of Papers Verified by ARGUS<br />are Accepted without Revisions.
+                  Top 25% of Papers Verified by ARGUS-Thesis<br />are Accepted without Revisions.
                 </p>
               </div>
 
@@ -146,7 +146,7 @@ export default function Home() {
                   The Adversarial Compiler.
                 </h2>
                 <p className="text-xl text-zinc-500 font-serif leading-relaxed max-w-2xl mx-auto">
-                  Research is not written; it is forged. ARGUS treats your manuscript as code, compiling it against strict logical axioms and novelty requirements.
+                  Research is not written; it is forged. ARGUS-Thesis treats your manuscript as code, compiling it against strict logical axioms and novelty requirements.
                 </p>
               </div>
 
@@ -223,7 +223,7 @@ export default function Home() {
               <div className="grid md:grid-cols-2 gap-8 text-left">
                 <div className="space-y-2">
                   <h4 className="font-serif font-bold text-zinc-900 text-lg">Logical Consistency Only</h4>
-                  <p className="text-base text-zinc-600 font-serif leading-relaxed">ARGUS verifies internal logic and novelty structure. It does not verify external empirical data correctness vs the real world.</p>
+                  <p className="text-base text-zinc-600 font-serif leading-relaxed">ARGUS-Thesis verifies internal logic and novelty structure. It does not verify external empirical data correctness vs the real world.</p>
                 </div>
                 <div className="space-y-2">
                   <h4 className="font-serif font-bold text-zinc-900 text-lg">No Authorship</h4>

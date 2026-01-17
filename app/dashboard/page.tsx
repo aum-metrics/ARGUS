@@ -253,7 +253,7 @@ export default function ArgusDashboard() {
                 <div className="flex items-center gap-2">
                     <Link href="/">
                         <div className="flex items-center gap-2 hover:opacity-80 transition-opacity cursor-pointer">
-                            <img src="/logo.jpg" alt="ARGUS" className="h-10 w-auto" />
+                            <img src="/logo.jpg?v=2" alt="ARGUS-Thesis" className="h-10 w-auto" />
                         </div>
                     </Link>
                     <span className="text-zinc-300 mx-2">/</span>
@@ -656,7 +656,7 @@ export default function ArgusDashboard() {
                                                                 <span>One-Time Free Trial</span>
                                                             </div>
                                                             <p className="text-xs text-indigo-600 mb-4 leading-relaxed">
-                                                                Experience the full adversarial capabilities of ARGUS on your first manuscript without charge.
+                                                                Experience the full adversarial capabilities of ARGUS-Thesis on your first manuscript without charge.
                                                             </p>
                                                             <Button
                                                                 className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold"
@@ -761,7 +761,7 @@ export default function ArgusDashboard() {
                                                                             key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID, // Use public env var
                                                                             amount: orderData.amount,
                                                                             currency: orderData.currency,
-                                                                            name: "ARGUS Governance",
+                                                                            name: "ARGUS-Thesis Governance",
                                                                             description: "Full Adversarial Audit",
                                                                             order_id: orderData.id,
                                                                             handler: async function (response: any) {

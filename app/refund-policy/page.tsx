@@ -35,7 +35,7 @@ export default function RefundPolicy() {
                         <section>
                             <h2 className="text-xl font-bold text-zinc-900 mb-4">1. No Refunds</h2>
                             <p>
-                                ARGUS operates on a "consume-on-demand" model. Instantiating the governance agents consumes irreversible computational resources (tokens) from our providers.
+                                ARGUS-Thesis operates on a "consume-on-demand" model. Instantiating the governance agents consumes irreversible computational resources (tokens) from our providers.
                                 Therefore, <strong>we do not offer refunds</strong> for any "Full Adversarial Audit" or "Platform Fee" payments once the audit process has been unlocked.
                             </p>
                         </section>

@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 
 export const metadata: Metadata = {
     title: 'Why Was My Paper Rejected? | ARGUS Philosophy',
-    description: 'Stop guessing why your paper was rejected. ARGUS uses adversarial AI to simulate peer review before submission. Research validation for the modern era.',
+    description: 'Stop guessing why your paper was rejected. ARGUS-Thesis uses adversarial AI to simulate peer review before submission. Research validation for the modern era.',
     keywords: ['paper rejected peer review', 'why was my paper rejected', 'adversarial peer review', 'research validation', 'AI peer review']
 };
 
@@ -19,7 +19,7 @@ export default function PhilosophyPage() {
             <header className="px-6 h-16 flex items-center justify-between border-b border-zinc-200 bg-white sticky top-0 z-50">
                 <Link href="/">
                     <div className="flex items-center gap-2 hover:opacity-80 transition-opacity cursor-pointer">
-                        <img src="/logo.jpg" alt="ARGUS" className="h-10 w-auto" />
+                        <img src="/logo.jpg?v=2" alt="ARGUS-Thesis" className="h-10 w-auto" />
                     </div>
                 </Link>
                 <Link href="/login">
@@ -49,7 +49,7 @@ export default function PhilosophyPage() {
                         Enter Adversarial Peer Review
                     </h2>
                     <p>
-                        We built <strong>ARGUS</strong> on a single, radical philosophy:
+                        We built <strong>ARGUS-Thesis</strong> on a single, radical philosophy:
                         <span className="bg-yellow-50 px-1 font-semibold">You should not be the first person to critique your own work.</span>
                     </p>
                     <p>
@@ -57,7 +57,7 @@ export default function PhilosophyPage() {
                         This asymmetry is the primary cause of rejection.
                     </p>
                     <p>
-                        ARGUS is not a "grammar checker." It is an <strong>Adversarial Engine</strong>. We use advanced AI agents configured with the persona of "Reviewer #2"—the one who hates your methodology, doubts your data, and questions your novelty.
+                        ARGUS-Thesis is not a "grammar checker." It is an <strong>Adversarial Engine</strong>. We use advanced AI agents configured with the persona of "Reviewer #2"—the one who hates your methodology, doubts your data, and questions your novelty.
                     </p>
 
                     <h2 className="text-2xl font-bold mt-12 mb-4">Research Validation Before Submission</h2>
@@ -82,7 +82,7 @@ export default function PhilosophyPage() {
                         Most AI platforms train on your data. <strong>We do not.</strong>
                     </p>
                     <p>
-                        ARGUS operates on an "Ephemeral Memory" architecture. Your manuscript is ingested, analyzed, and forgotten.
+                        ARGUS-Thesis operates on an "Ephemeral Memory" architecture. Your manuscript is ingested, analyzed, and forgotten.
                         The only record that remains is the audit trail of the metadata—that the work was done, not what the work contains.
                         Your intellectual property remains yours, untouched and untainted.
                     </p>
@@ -106,7 +106,7 @@ export default function PhilosophyPage() {
             {/* Footer */}
             <footer className="border-t border-zinc-200 py-12 bg-zinc-50 mt-12">
                 <div className="container mx-auto px-4 text-center text-zinc-500 text-sm">
-                    <p className="mb-4">© 2026 ARGUS Protocol. All Academic Rights Reserved.</p>
+                    <p className="mb-4">© 2026 ARGUS-Thesis Protocol. All Academic Rights Reserved.</p>
                 </div>
             </footer>
         </div>

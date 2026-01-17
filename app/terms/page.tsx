@@ -34,7 +34,7 @@ export default function TermsPage() {
                         <section>
                             <h2 className="text-xl font-bold text-zinc-900 mb-4">2. Nature of the Service (Adversarial Audit)</h2>
                             <p>
-                                ARGUS is not an editing tool, a writing assistant, or a plagiarism checker. It is an <strong>adversarial stress-testing system</strong>.
+                                ARGUS-Thesis is not an editing tool, a writing assistant, or a plagiarism checker. It is an <strong>adversarial stress-testing system</strong>.
                                 Its meaningful output may include severe critiques, rejection of your premises, or identification of logical fallacies.
                                 By using the Service, you acknowledge that the system is designed to challenge your work, not to validate it.
                             </p>
@@ -76,7 +76,7 @@ export default function TermsPage() {
                                 STRICT NO REFUND POLICY:
                             </p>
                             <p className="mt-2">
-                                All purchases of ARGUS Audit Credits or Platform Access are <strong>FINAL and NON-REFUNDABLE</strong>.
+                                All purchases of ARGUS-Thesis Audit Credits or Platform Access are <strong>FINAL and NON-REFUNDABLE</strong>.
                             </p>
                             <p className="mt-2">
                                 Because the Service incurs immediate irreversible costs (LLM token consumption) upon initiation, we cannot offer refunds once a session has begun.

@@ -10,7 +10,7 @@ export function Header() {
             <div className="flex items-center gap-2">
                 <Link href="/">
                     <div className="flex items-center gap-2 cursor-pointer">
-                        <img src="/logo.jpg" alt="ARGUS" className="h-10 w-auto" />
+                        <img src="/logo.jpg?v=2" alt="ARGUS-Thesis" className="h-10 w-auto" />
                     </div>
                 </Link>
             </div>
