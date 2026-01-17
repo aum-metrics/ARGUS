@@ -143,13 +143,15 @@ export default function PlaygroundPage() {
 
                 {/* Social Proof */}
                 <div className="mt-16 text-center">
-                    <p className="text-sm font-semibold text-zinc-400 uppercase tracking-widest mb-6">Trusted By Researchers At</p>
+                    <p className="text-sm font-semibold text-zinc-400 uppercase tracking-widest mb-6">Calibrated for Researchers at</p>
                     <div className="flex flex-wrap justify-center gap-8 opacity-50 grayscale hover:grayscale-0 transition-all duration-500">
-                        {/* Simple placeholders for University Logos */}
+                        <div className="text-xl font-serif font-bold text-zinc-600">IITs</div>
+                        <div className="text-xl font-serif font-bold text-zinc-600">IIMs</div>
                         <div className="text-xl font-serif font-bold text-zinc-600">Stanford</div>
                         <div className="text-xl font-serif font-bold text-zinc-600">MIT</div>
                         <div className="text-xl font-serif font-bold text-zinc-600">Oxford</div>
-                        <div className="text-xl font-serif font-bold text-zinc-600">ETH Zürich</div>
+                        <div className="text-xl font-serif font-bold text-zinc-600">Harvard</div>
+                        <div className="text-xl font-serif font-bold text-zinc-600">IISc</div>
                     </div>
                 </div>
 

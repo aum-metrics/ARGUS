@@ -65,6 +65,12 @@ export default function Home() {
                     </Button>
                   </Link>
 
+                  <Link href="/playground" className="w-full sm:w-auto">
+                    <Button size="lg" variant="outline" className="w-full sm:w-auto border-indigo-200 text-indigo-700 bg-indigo-50 hover:bg-indigo-100 hover:border-indigo-300 px-8 h-14 rounded-full text-base font-bold shadow-sm hover:shadow-md transition-all duration-300">
+                      Try Logic Scan (Free)
+                    </Button>
+                  </Link>
+
                   <Dialog>
                     <DialogTrigger asChild>
                       <Button size="lg" variant="outline" className="w-full sm:w-auto border-zinc-200 text-zinc-700 hover:bg-zinc-50 hover:text-black hover:border-zinc-300 px-8 h-14 rounded-full text-base font-medium gap-2">
