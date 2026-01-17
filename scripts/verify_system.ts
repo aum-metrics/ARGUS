@@ -1,5 +1,9 @@
+#!/usr/bin/env tsx
 /**
  * Author: Sambath Kumar Natarajan
+ * 
+ * E2E System Verification Script
+ * Validates Core JSON Schema, PDF Parsing, and Session Logic
  */
 
 /**
@@ -18,8 +22,7 @@ import { ArgusSession, createSession } from '../argus/session';
 const MOCK_PDF_BUFFER = Buffer.from("Test PDF Content: Adversarial training reduces overfitting by 20%.");
 
 async function runTest() {
-    console.log(">>> STARTING ARGUS SYSTEM CHECK <<<
-");
+    console.log(">>> STARTING ARGUS SYSTEM CHECK <<<\n");
 
     // TEST 1: Session Initialization
     console.log("[1/4] Testing Session Factory...");
@@ -31,8 +34,7 @@ async function runTest() {
     }
 
     // TEST 2: PDF Parsing (Simulation)
-    console.log("
-[2/4] Testing PDF Parsing Logic...");
+    console.log("\n[2/4] Testing PDF Parsing Logic...");
     // We simulate the logic in route.ts
     try {
         const pdflib = require('pdf-parse');
@@ -47,8 +49,7 @@ async function runTest() {
     }
 
     // TEST 3: Claim Schema Validation (The "Valid JSON" Check)
-    console.log("
-[3/4] Testing Claim JSON Structure...");
+    console.log("\n[3/4] Testing Claim JSON Structure...");
     const sampleClaim = {
         id: "C1",
         statement: "Adversarial training reduces overfitting by 20%.",
@@ -72,8 +73,7 @@ async function runTest() {
     }
 
     // TEST 4: Output Report Validity (Manuscript PDF Data)
-    console.log("
-[4/4] Testing Output Report Feasibility...");
+    console.log("\n[4/4] Testing Output Report Feasibility...");
     if (session.data.claims.length > 0) {
         // Can we serialize it?
         const json = JSON.stringify(session);
@@ -82,8 +82,7 @@ async function runTest() {
         }
     }
 
-    console.log("
->>> SYSTEM CHECK COMPLETE: READY FOR PRODUCTION <<<");
+    console.log("\n>>> SYSTEM CHECK COMPLETE: READY FOR PRODUCTION <<<");
 }
 
 runTest();

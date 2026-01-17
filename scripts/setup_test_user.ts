@@ -1,5 +1,8 @@
 /**
  * Author: Sambath Kumar Natarajan
+ * 
+ * Test User Setup Script
+ * Creates or updates a test user with organization and credits for E2E testing
  */
 import { createClient } from '@supabase/supabase-js'
 import * as dotenv from 'dotenv'

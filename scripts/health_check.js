@@ -1,3 +1,11 @@
+#!/usr/bin/env node
+/**
+ * Author: Sambath Kumar Natarajan
+ * 
+ * System Health Check Script
+ * verify environment variables, core file integrity, and dependencies
+ */
+
 const fs = require('fs');
 const https = require('https');
 const path = require('path');

@@ -1,5 +1,9 @@
+#!/usr/bin/env tsx
 /**
  * Author: Sambath Kumar Natarajan
+ * 
+ * Test Backend API Script
+ * Pings the API routes (mocking auth) to verify backend connectivity and response
  */
 
 import chalk from 'chalk';

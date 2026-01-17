@@ -1,5 +1,8 @@
 /**
  * Author: Sambath Kumar Natarajan
+ * 
+ * Login Page
+ * Handles user authentication via Supabase Auth with email/password and OTP flows.
  */
 "use client"
 

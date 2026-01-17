@@ -1,5 +1,9 @@
+#!/usr/bin/env tsx
 /**
  * Author: Sambath Kumar Natarajan
+ * 
+ * Generate Test PDFs Script
+ * Generates sample PDF files (Good and Bad claims) for testing parsing logic
  */
 
 import { jsPDF } from "jspdf";

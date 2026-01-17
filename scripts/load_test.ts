@@ -1,11 +1,9 @@
+#!/usr/bin/env tsx
 /**
  * Author: Sambath Kumar Natarajan
- */
-
-/**
- * ARGUS SCALE TEST
- * ----------------
- * Simulates 100 concurrent users performing critical actions.
+ * 
+ * Load Testing Script
+ * Simulates concurrent user traffic to stress test public API endpoints
  */
 
 async function runLoadTest() {
@@ -62,8 +60,7 @@ async function runLoadTest() {
     const totalTime = Date.now() - start;
     const avgLat = results.latencies.reduce((a, b) => a + b, 0) / results.latencies.length;
 
-    console.log("
->>> LOAD TEST RESULTS <<<");
+    console.log("\n>>> LOAD TEST RESULTS <<<");
     console.log(`Total Requests: ${CONCURRENCY}`);
     console.log(`Success: ${results.success}`);
     console.log(`Failed: ${results.failed}`);

@@ -1,3 +1,10 @@
+#!/usr/bin/env node
+/**
+ * Author: Sambath Kumar Natarajan
+ * 
+ * Gemini Debug Script
+ * Tests connectivity to Google Gemini API and lists available models
+ */
 
 const fs = require('fs');
 const path = require('path');

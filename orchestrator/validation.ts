@@ -51,8 +51,7 @@ Critique the following output from ${primaryOutput.model} for Phase ${phase}:
 ${primaryOutput.content}
 
 Audit for:
-${CONSTITUTION.roles[challengerAdapter.role].responsibilities.join('
-')}
+${CONSTITUTION.roles[challengerAdapter.role].responsibilities.join('\n')}
 
 Provide your critique in the following format:
 VERDICT: [PASS/FAIL]

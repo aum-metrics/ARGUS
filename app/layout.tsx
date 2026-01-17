@@ -1,5 +1,8 @@
 /**
  * Author: Sambath Kumar Natarajan
+ * 
+ * Root Layout
+ * Defines global styles, fonts, metadata, and the main html/body structure for the app.
  */
 import type { Metadata } from "next";
 import { Analytics } from "@vercel/analytics/react";
@@ -26,9 +29,9 @@ export const metadata: Metadata = {
   keywords: ["Academic", "SaaS", "Research", "Governance", "Review", "Thesis", "Audit", "Adversarial", "AI"],
   authors: [{ name: "Argus Governance" }],
   icons: {
-    icon: "/Favicon.jpg",
-    shortcut: "/Favicon.jpg",
-    apple: "/Favicon.jpg",
+    icon: "/favicon.ico",
+    shortcut: "/favicon.ico",
+    apple: "/favicon.ico",
   },
 };
 

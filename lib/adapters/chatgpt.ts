@@ -29,8 +29,7 @@ export class ChatGPTAdapter implements ModelAdapter {
     async validate(content: string, criteria: string[]): Promise<{ valid: boolean; issues: string[] }> {
         const validationPrompt = `
         Validate the following content against these criteria:
-        ${criteria.map(c => `- ${c}`).join('
-')}
+        ${criteria.map(c => `- ${c}`).join('\n')}
         
         Content:
         "${content}"

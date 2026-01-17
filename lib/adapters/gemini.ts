@@ -28,8 +28,7 @@ export class GeminiAdapter implements ModelAdapter {
     async validate(content: string, criteria: string[]): Promise<{ valid: boolean; issues: string[] }> {
         const validationPrompt = `
         As the Formal Adjudicator, check the following content against these rules:
-        ${criteria.map(c => `- ${c}`).join('
-')}
+        ${criteria.map(c => `- ${c}`).join('\n')}
         
         Content:
         "${content}"

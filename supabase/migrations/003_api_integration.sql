@@ -1,6 +1,9 @@
 --
 -- Author: Sambath Kumar Natarajan
 --
+-- API Integration Migration
+-- Creates tables for API keys and webhooks (api_keys, api_audits) for enterprise features.
+--
 -- API Keys Table (Enterprise Integration)
 create table public.api_keys (
   id uuid default gen_random_uuid() primary key,

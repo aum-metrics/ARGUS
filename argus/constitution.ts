@@ -1,5 +1,8 @@
 /**
  * Author: Sambath Kumar Natarajan
+ * 
+ * Core Constitution Definitions
+ * Defines system roles, constraints, governance rules, and pricing structure for ARGUS.
  */
 export const ARGUS_CONSTITUTION = {
     identity: {

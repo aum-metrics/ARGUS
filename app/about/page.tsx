@@ -1,5 +1,8 @@
 /**
  * Author: Sambath Kumar Natarajan
+ * 
+ * About Page
+ * Displays mission statement, team information, and core philosophy of the platform.
  */
 import Link from "next/link"
 import { Footer } from "@/components/Footer"

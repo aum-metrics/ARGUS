@@ -1,5 +1,8 @@
 /**
  * Author: Sambath Kumar Natarajan
+ * 
+ * E2E Simulation Script
+ * Simulates a full audit workflow (Constructor -> Destroyer -> Verdict) using local mimics
  */
 
 import { type GovernanceRole } from '../argus/governance';
@@ -67,12 +70,11 @@ async function runSimulation() {
 
     if (!constructorOutput) {
         console.log("⚠️  Server/API not reachable or configured. Using Mock Simulation to demonstrate Logic Flow.");
-        constructorOutput = "CLAIM: AGI will inevitably centralize power due to compute scaling laws.
-ASSUMPTIONS: Compute costs will rise, Efficiency requires centralization.";
+        constructorOutput = "CLAIM: AGI will inevitably centralize power due to compute scaling laws.\n" +
+            "ASSUMPTIONS: Compute costs will rise, Efficiency requires centralization.";
     }
 
-    console.log(`[Result] Constructor: ${constructorOutput.replace(/
-/g, ' ')}`);
+    console.log(`[Result] Constructor: ${constructorOutput.replace(/\n/g, ' ')}`);
     claim = "AGI will inevitably centralize power due to compute scaling laws.";
 
     // 2. Attack (Destroyer)
@@ -90,13 +92,12 @@ ASSUMPTIONS: Compute costs will rise, Efficiency requires centralization.";
     let verdictOutput = await callAgent(getRolePrompt('JOURNAL_REVIEWER_SIMULATOR', `Claim: ${claim}
 Attack: ${destroyerOutput}`));
     if (!verdictOutput) {
-        verdictOutput = "VERDICT: REJECT
-FAILURE_TAGS: Technological Determinism Fallacy, Ignores Distributed Computing";
+        verdictOutput = "VERDICT: REJECT\n" +
+            "FAILURE_TAGS: Technological Determinism Fallacy, Ignores Distributed Computing";
     }
     console.log(`[Result] Verdict: ${verdictOutput}`);
 
-    console.log("
->>> SIMULATION COMPLETE. VISUALIZATION NODES GENERATED: 3 (Claim, Destroyer, Verdict)");
+    console.log("\n>>> SIMULATION COMPLETE. VISUALIZATION NODES GENERATED: 3 (Claim, Destroyer, Verdict)");
 }
 
 runSimulation();

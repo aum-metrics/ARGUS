@@ -1,11 +1,9 @@
+#!/usr/bin/env tsx
 /**
  * Author: Sambath Kumar Natarajan
- */
-#!/usr/bin/env tsx
-
-/**
+ * 
  * Debug Credit System
- * Checks actual credit state for sambath@me.com
+ * Checks actual credit state for sambath@me.com and verifies credit logic
  */
 
 import { createClient } from '@supabase/supabase-js';
@@ -20,8 +18,7 @@ const supabase = createClient(
 
 async function debugCredits() {
     console.log('🔍 Credit System Debug');
-    console.log('================================
-');
+    console.log('================================\n');
 
     // 1. Find user
     const { data: { users }, error: usersError } = await supabase.auth.admin.listUsers();
@@ -114,8 +111,7 @@ async function debugCredits() {
     console.log(`   Used: ${usage || 0}`);
     console.log(`   Remaining: ${totalCredits - (usage || 0)}`);
     console.log(`   Has Credits: ${hasRemainingCredits ? '✅ YES' : '❌ NO'}`);
-    console.log('================================
-');
+    console.log('================================\n');
 
     // 7. Check active session
     const { data: sessions } = await supabase
@@ -133,8 +129,7 @@ async function debugCredits() {
         console.log(`   Updated: ${sessions[0].updated_at}
 `);
     } else {
-        console.log('💾 No active sessions
-');
+        console.log('💾 No active sessions\n');
     }
 }
 

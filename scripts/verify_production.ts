@@ -1,12 +1,13 @@
+#!/usr/bin/env tsx
 /**
  * Author: Sambath Kumar Natarajan
  */
-#!/usr/bin/env tsx
 
 /**
  * Production Verification Script
  * Verifies all production features are working correctly
  */
+
 
 import { createClient } from '@supabase/supabase-js';
 import dotenv from 'dotenv';
@@ -20,8 +21,7 @@ const supabase = createClient(
 
 async function verifyProduction() {
     console.log('🔍 ARGUS Production Verification');
-    console.log('================================
-');
+    console.log('================================\n');
 
     let allPassed = true;
 
@@ -41,8 +41,7 @@ async function verifyProduction() {
     }
 
     // 2. Check api_keys table exists
-    console.log('
-2. Checking api_keys table...');
+    console.log('\n2. Checking api_keys table...');
     const { data: apiKeys, error: apiKeysError } = await supabase
         .from('api_keys')
         .select('*')
@@ -57,8 +56,7 @@ async function verifyProduction() {
     }
 
     // 3. Check api_audits table exists
-    console.log('
-3. Checking api_audits table...');
+    console.log('\n3. Checking api_audits table...');
     const { data: apiAudits, error: apiAuditsError } = await supabase
         .from('api_audits')
         .select('*')
@@ -73,8 +71,7 @@ async function verifyProduction() {
     }
 
     // 4. Check environment variables
-    console.log('
-4. Checking environment variables...');
+    console.log('\n4. Checking environment variables...');
     const requiredEnvVars = [
         'NEXT_PUBLIC_SUPABASE_URL',
         'NEXT_PUBLIC_SUPABASE_ANON_KEY',
@@ -94,8 +91,7 @@ async function verifyProduction() {
     }
 
     // 5. Check test user exists
-    console.log('
-5. Checking test user (sambath@me.com)...');
+    console.log('\n5. Checking test user (sambath@me.com)...');
     const { data: profile, error: profileError } = await supabase
         .from('profiles')
         .select('*, organizations(*)')
@@ -113,15 +109,13 @@ async function verifyProduction() {
         }
     }
 
-    console.log('
-================================');
+    console.log('\n================================');
     if (allPassed) {
         console.log('✅ All checks passed! System is production-ready.');
     } else {
         console.log('❌ Some checks failed. Please address the issues above.');
     }
-    console.log('================================
-');
+    console.log('================================\n');
 
     process.exit(allPassed ? 0 : 1);
 }

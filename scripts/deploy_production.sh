@@ -1,7 +1,9 @@
 #!/bin/bash
-
+# Author: Sambath Kumar Natarajan
+#
 # Production Deployment Script
-# Applies database migrations via Supabase API
+# Orchestrates the deployment sequence and prompts for manual migration steps
+
 
 set -e
 

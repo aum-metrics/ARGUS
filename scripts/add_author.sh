@@ -1,6 +1,9 @@
 #!/bin/bash
-# Script to add author attribution to all TypeScript and SQL files
 # Author: Sambath Kumar Natarajan
+#
+# Add Author Script
+# Automatically adds author attribution to all TypeScript and SQL files in the project
+
 
 AUTHOR_COMMENT="/**\n * Author: Sambath Kumar Natarajan\n */"
 AUTHOR_COMMENT_SQL="--\n-- Author: Sambath Kumar Natarajan\n--"

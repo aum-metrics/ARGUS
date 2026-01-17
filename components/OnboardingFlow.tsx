@@ -37,10 +37,10 @@ export function OnboardingFlow({ onComplete }: OnboardingProps) {
         {
             icon: Zap,
             title: "How It Works",
-            description: "1. Upload your paper or paste text
+            description: `1. Upload your paper or paste text
 2. We extract key claims
 3. Our adversarial AI audits each claim
-4. Get a detailed readiness report",
+4. Get a detailed readiness report`,
             color: "text-purple-600 bg-purple-50"
         },
         {
@@ -106,8 +106,8 @@ export function OnboardingFlow({ onComplete }: OnboardingProps) {
                             <div
                                 key={i}
                                 className={`h-2 rounded-full transition-all ${i === step
-                                        ? 'w-8 bg-zinc-900'
-                                        : 'w-2 bg-zinc-300'
+                                    ? 'w-8 bg-zinc-900'
+                                    : 'w-2 bg-zinc-300'
                                     }`}
                             />
                         ))}

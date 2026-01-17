@@ -1,17 +1,16 @@
+#!/usr/bin/env tsx
 /**
  * Author: Sambath Kumar Natarajan
- */
-#!/usr/bin/env tsx
-
-/**
- * Fix Profile Duplication
- * Removes duplicate profiles and ensures one profile per user
+ * 
+ * Fix Profile Duplication Script
+ * Removes duplicate profiles and ensures one profile per user to fix auth issues
  */
 
 import { createClient } from '@supabase/supabase-js';
 import dotenv from 'dotenv';
+import { resolve } from 'path';
 
-dotenv.config({ path: '.env.local' });
+dotenv.config({ path: resolve(process.cwd(), '.env.local') });
 
 const supabase = createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -20,8 +19,7 @@ const supabase = createClient(
 
 async function fixProfiles() {
     console.log('🔧 Fixing Profile Duplication');
-    console.log('================================
-');
+    console.log('================================\n');
 
     // 1. Find user
     const { data: { users } } = await supabase.auth.admin.listUsers();
@@ -32,8 +30,7 @@ async function fixProfiles() {
         return;
     }
 
-    console.log(`✅ User: ${user.email} (${user.id})
-`);
+    console.log(`✅ User: ${user.email} (${user.id})\n`);
 
     // 2. Check for duplicate profiles
     const { data: profiles, error } = await supabase
@@ -49,8 +46,7 @@ async function fixProfiles() {
     console.log(`📋 Found ${profiles?.length || 0} profile(s)`);
 
     if (!profiles || profiles.length === 0) {
-        console.log('
-🆕 Creating new profile...');
+        console.log('\n🆕 Creating new profile...');
 
         // Get org
         const { data: org } = await supabase
@@ -79,22 +75,17 @@ async function fixProfiles() {
             console.log('✅ Profile created');
         }
     } else if (profiles.length > 1) {
-        console.log('
-⚠️  Multiple profiles detected! Keeping first, deleting rest...');
+        console.log('\n⚠️  Multiple profiles detected! Keeping first, deleting rest...');
 
         const keepProfile = profiles[0];
-        const deleteIds = profiles.slice(1).map(p => p.id);
+        // const deleteIds = profiles.slice(1).map(p => p.id);
 
-        // This won't work because id is the same - the issue is different
-        // Let me check what's actually happening
-        console.log('
-Profile details:');
+        console.log('\nProfile details: ');
         profiles.forEach((p, i) => {
             console.log(`  ${i + 1}. ID: ${p.id}, Org: ${p.org_id}, Email: ${p.email}`);
         });
     } else {
-        console.log('
-✅ Single profile found:');
+        console.log('\n✅ Single profile found: ');
         const p = profiles[0];
         console.log(`   Email: ${p.email}`);
         console.log(`   Org ID: ${p.org_id}`);
@@ -109,16 +100,13 @@ Profile details:');
                 .single();
 
             if (org) {
-                console.log(`
-🏢 Organization: ${org.name}`);
+                console.log(`\n🏢 Organization: ${org.name}`);
                 console.log(`   Credits: ${org.credits_balance}/${org.credits_total}`);
             }
         }
     }
 
-    console.log('
-================================
-');
+    console.log('\n================================\n');
 }
 
 fixProfiles().catch(console.error);

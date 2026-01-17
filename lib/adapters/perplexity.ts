@@ -36,8 +36,7 @@ export class PerplexityAdapter implements ModelAdapter {
         const validationPrompt = `
         Audit the following text for factual accuracy and citation validity.
         Criteria:
-        ${criteria.map(c => `- ${c}`).join('
-')}
+        ${criteria.map(c => `- ${c}`).join('\n')}
         
         Text:
         "${content}"

@@ -1,5 +1,9 @@
+#!/usr/bin/env tsx
 /**
  * Author: Sambath Kumar Natarajan
+ * 
+ * List Gemini Models Script
+ * Lists available models from Google Generative AI API to verify key permissions
  */
 
 import { GoogleGenerativeAI } from '@google/generative-ai';
