@@ -130,10 +130,36 @@ export async function POST(req: Request) {
                 'THESIS_CONSTRUCTOR': MODELS.FAST,      // Speed for extraction
                 'THESIS_DESTROYER': MODELS.REASONING,   // Intelligence for attack
                 'JOURNAL_REVIEWER_SIMULATOR': MODELS.REASONING,
+                'SUPPORT_AGENT': MODELS.FAST,           // [NEW] Chatbot
                 'DEFAULT': MODELS.FAST
             };
             selectedModel = ROLE_TO_MODEL[role] || MODELS.FAST;
             // console.debug(`[ROUTER] Text-only request. Selected Model: ${selectedModel} for Role: ${role}`);
+        }
+
+        // [NEW] Context Injection for Support Agent
+        let finalPrompt = prompt;
+        if (role === 'SUPPORT_AGENT') {
+            // We inject a condensed version of the User Guide to save tokens/latency vs reading full file
+            // Or we could read the file. Let's start with a high-quality condensed context.
+            const SUPPORT_CONTEXT = `
+             SYSTEM_ROLE: You are the Argus Support Assistant.
+             CONTEXT:
+             - Argus is an Adversarial Governance Engine for academic research.
+             - "Privacy by Physics": Data is processed in ephemeral RAM only, never stored.
+             - Agents: "Thesis Constructor" (Structure), "Thesis Destroyer" (Logic), "Methodology Analyst" (Stats).
+             - Statuses: 
+               - GREEN/Supported: Matches literature.
+               - RED/Contradicted: AI found counter-evidence.
+               - YELLOW/Unverified: Novel claim (Good!).
+             - Billing: $14.99/audit (Personal) or Enterprise Pool.
+             - Refunds: Only for technical failures, not because the AI disagreed with the paper.
+             - Troubleshooting: "Extraction Failed" -> Check PDF text layer. "Quota Exceeded" -> Top up.
+             
+             INSTRUCTION: Answer the user's question based ONLY on this context. Be helpful, concise, and professional. 
+             Convert response to JSON { "answer": "..." }.
+             `;
+            finalPrompt = `${SUPPORT_CONTEXT}\n\nUSER QUESTION: ${prompt}`;
         }
 
         const model = genAI.getGenerativeModel({
@@ -147,7 +173,7 @@ export async function POST(req: Request) {
         });
 
         // Construct Parts (Text + Images)
-        const parts: any[] = [{ text: prompt }];
+        const parts: any[] = [{ text: finalPrompt }];
 
         if (Array.isArray(images) && images.length > 0) {
             images.forEach((base64Image: string) => {
