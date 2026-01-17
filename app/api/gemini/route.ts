@@ -202,9 +202,50 @@ export async function POST(req: Request) {
         }
 
         // Safety Fallback (Client-side retry handles 429)
-        const result = await model.generateContent(parts);
-        const response = await result.response;
-        const text = response.text();
+        let text = "";
+
+        // -----------------------------------------------------
+        // INTELLIGENCE V2.0: REFLECTOR LOOP (System 2 Thinking)
+        // Only for "Thesis Destroyer" which requires high-reasoning.
+        // -----------------------------------------------------
+        if (role === 'THESIS_DESTROYER' && selectedModel === MODELS.REASONING) {
+            // console.debug("[AGENT] Entering Reflector Loop for Thesis Destroyer");
+
+            // STEP 1: DRAFT (Fast, Aggressive)
+            // We temporarily use a faster model or the same model with lower temp if needed.
+            // For now, staying with selectedModel.
+            const draftResult = await model.generateContent(parts);
+            const draftResponse = await draftResult.response;
+            const draftText = draftResponse.text();
+
+            // STEP 2: REFLECT (Critique & Refine)
+            // We feed the draft back into the model to fix "strawman" arguments or hallucinations.
+            const reflectionPrompt = `
+             CRITIC_ROLE: You are the Senior Editor of specific scientific journal.
+             TASK: Review the following "Attack Critique" drafted by a junior reviewer.
+             
+             DRAFT ATTACK:
+             ${draftText}
+             
+             CRITERIA:
+             1. Are the attacks logical? Remove any ad-hominem or tone issues.
+             2. Are the counter-claims specific? Ensure no generic "this is vague" complaints without proof.
+             3. Is the JSON format valid?
+             
+             ACTION: rewriting the critique to be sharper, kinder, and more rigorous. Output ONLY the final JSON.
+             `;
+
+            const refineResult = await model.generateContent(reflectionPrompt);
+            const refineResponse = await refineResult.response;
+            text = refineResponse.text();
+            // console.debug("[AGENT] Reflector Loop Complete. Refined Output Length:", text.length);
+
+        } else {
+            // STANDARD ONE-SHOT (Speed)
+            const result = await model.generateContent(parts);
+            const response = await result.response;
+            text = response.text();
+        }
 
         // -----------------------------------------------------
         // PRODUCTION LOGGING (No Content Storage)
