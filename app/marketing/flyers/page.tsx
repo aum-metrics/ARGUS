@@ -14,7 +14,7 @@ export default function FlyersPage() {
 
                 <div className="z-10 relative space-y-8 flex flex-col items-center">
                     {/* LOGO INTEGRATION */}
-                    <div className="w-32 h-32 rounded-full overflow-hidden border-4 border-white/10 mb-8 mx-auto">
+                    <div className="w-32 h-32 rounded-lg overflow-hidden border-4 border-white/10 mb-8 mx-auto">
                         <img src="/logo.jpg" alt="ARGUS Logo" className="w-full h-full object-cover" />
                     </div>
 
@@ -49,7 +49,7 @@ export default function FlyersPage() {
                 <div className="flex justify-between items-center border-b border-zinc-100 pb-8 mb-16">
                     <div className="flex items-center gap-4">
                         {/* LOGO INTEGRATION */}
-                        <div className="h-16 w-16 rounded-full overflow-hidden border border-zinc-200">
+                        <div className="h-16 w-16 rounded-lg overflow-hidden border border-zinc-200">
                             <img src="/logo.jpg" alt="ARGUS Logo" className="w-full h-full object-cover" />
                         </div>
                         <div>
@@ -139,7 +139,7 @@ export default function FlyersPage() {
                     </div>
                     <div className="flex items-center gap-4">
                         {/* LOGO INTEGRATION */}
-                        <div className="h-12 w-12 rounded-full overflow-hidden opacity-80">
+                        <div className="h-12 w-12 rounded-lg overflow-hidden opacity-80">
                             <img src="/logo.jpg" alt="ARGUS Logo" className="w-full h-full object-cover" />
                         </div>
                         <div className="text-4xl font-bold text-white tracking-tighter">
