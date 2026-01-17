@@ -7,6 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { PilotCreationModal } from "@/components/PilotCreationModal";
 import {
     Activity,
     Users,
@@ -36,6 +37,7 @@ export default function AdminDashboard() {
     const [data, setData] = useState<AdminData | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
+    const [showPilotModal, setShowPilotModal] = useState(false);
 
     const fetchStats = async () => {
         setLoading(true);
@@ -193,25 +195,7 @@ export default function AdminDashboard() {
                                 <Button
                                     size="sm"
                                     className="bg-indigo-600 hover:bg-indigo-700 text-white"
-                                    onClick={() => {
-                                        const name = prompt("University Name:");
-                                        const email = prompt("Contact Email:");
-                                        const contactName = prompt("Contact Name:");
-                                        if (name && email && contactName) {
-                                            fetch('/api/admin/create-pilot', {
-                                                method: 'POST',
-                                                headers: { 'Content-Type': 'application/json' },
-                                                body: JSON.stringify({ universityName: name, contactEmail: email, contactName, credits: 10, durationDays: 90 })
-                                            }).then(res => res.json()).then(data => {
-                                                if (data.success) {
-                                                    alert(`Pilot created for ${name}! 10 credits, expires in 90 days.`);
-                                                    fetchStats();
-                                                } else {
-                                                    alert(data.error || 'Failed to create pilot');
-                                                }
-                                            });
-                                        }
-                                    }}
+                                    onClick={() => setShowPilotModal(true)}
                                 >
                                     + Create Pilot (10 Free Credits)
                                 </Button>
@@ -278,6 +262,13 @@ export default function AdminDashboard() {
                     </TabsContent>
                 </Tabs>
             </main>
+
+            {/* Pilot Creation Modal */}
+            <PilotCreationModal
+                open={showPilotModal}
+                onOpenChange={setShowPilotModal}
+                onSuccess={fetchStats}
+            />
         </div>
     );
 }
