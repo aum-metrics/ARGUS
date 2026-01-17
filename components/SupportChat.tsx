@@ -38,12 +38,16 @@ const SCENARIOS: Record<ScenarioId, BotMessage> = {
         id: 'PRICING',
         text: (
             <div className="space-y-2">
-                <p>We offer two simple tiers:</p>
-                <ul className="list-disc pl-4 text-sm">
-                    <li><strong>$25 Standard:</strong> Full audit compute included.</li>
-                    <li><strong>$9 BYOK:</strong> You use your own API keys.</li>
+                <p>We offer one simple model:</p>
+                <div className="flex items-center gap-2 bg-zinc-100 p-2 rounded">
+                    <span className="font-bold">$14.99</span>
+                    <span className="text-sm text-zinc-600">per Full Audit</span>
+                </div>
+                <ul className="list-disc pl-4 text-xs mt-2 space-y-1">
+                    <li>Multi-Agent Adversarial Protocol</li>
+                    <li>PDF Governance Report</li>
+                    <li>Compute Included (No API keys needed)</li>
                 </ul>
-                <p>No subscriptions. Pay per audit.</p>
             </div>
         ),
         options: [

@@ -710,7 +710,7 @@ export default function ArgusDashboard() {
 
                                                     {/* Dynamic Pricing Logic */}
                                                     {(() => {
-                                                        const price = "$24.99";
+                                                        const price = "$14.99";
                                                         const label = "Full Adversarial Audit";
 
                                                         return (
@@ -747,8 +747,8 @@ export default function ArgusDashboard() {
                                                                         }
 
                                                                         // 2. Create Order
-                                                                        // Fixed Price: $24.99
-                                                                        const amount = 24.99;
+                                                                        // Fixed Price: $14.99
+                                                                        const amount = 14.99;
 
                                                                         const orderRes = await fetch("/api/create-order", {
                                                                             method: "POST",
