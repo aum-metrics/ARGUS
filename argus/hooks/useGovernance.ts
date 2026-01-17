@@ -270,48 +270,94 @@ FULL CONTEXT: ${currentSession.data.originalText.substring(0, 5000)}...`); // Gi
             const litPrompt = getRolePrompt('LITERATURE_ADVERSARY', `CLAIM: "${claim.statement}"`);
             const formPrompt = getRolePrompt('FORMALISM_AUDITOR', `CLAIM: "${claim.statement}"`);
 
-            // Execute Swarm
-            // We use Promise.all to run them concurrently for speed, relying on fetchWithRetry to handle rate limits.
-            const [attackRes, methodRes, litRes, formRes] = await Promise.all([
+            // Execute Swarm (Modified for V1.1 Async Chaining)
+            // 1. Fire fast agents AND the Draft Step of the slow agent in parallel
+            // This ensures we don't waste time waiting for the draft before starting others.
+
+            addLog(`[SWARM] Phase 1: Parallel Drafting & Fast Agents...`);
+
+            const results = await Promise.allSettled([
+                // A. Thesis Destroyer - STEP 1 (DRAFT)
                 fetchWithRetry('/api/gemini', {
                     method: 'POST',
                     body: JSON.stringify({
                         role: 'THESIS_DESTROYER',
                         sessionId: currentSession.id,
                         prompt: attackPrompt,
-                        images: claim.visualEvidence || [] // Pass visual evidence
+                        images: claim.visualEvidence || [],
+                        step: 'DRAFT' // [NEW] Explicit Step
                     })
                 }),
+                // B. Methodology (Fast)
                 fetchWithRetry('/api/gemini', {
                     method: 'POST',
                     body: JSON.stringify({
                         role: 'METHODOLOGY_PROSECUTOR',
                         sessionId: currentSession.id,
                         prompt: methodPrompt,
-                        images: claim.visualEvidence || [] // Pass visual evidence
+                        images: claim.visualEvidence || []
                     })
                 }),
+                // C. Literature (Fast)
                 fetchWithRetry('/api/gemini', {
                     method: 'POST',
                     body: JSON.stringify({
                         role: 'LITERATURE_ADVERSARY',
                         sessionId: currentSession.id,
                         prompt: litPrompt,
-                        images: claim.visualEvidence || [] // Pass visual evidence
+                        images: claim.visualEvidence || []
                     })
                 }),
+                // D. Formalism (Fast)
                 fetchWithRetry('/api/gemini', {
                     method: 'POST',
                     body: JSON.stringify({
                         role: 'FORMALISM_AUDITOR',
                         sessionId: currentSession.id,
                         prompt: formPrompt,
-                        images: claim.visualEvidence || [] // Pass visual evidence
+                        images: claim.visualEvidence || []
                     })
                 })
             ]);
 
-            const attackText = attackRes.content || "Logic attack failed.";
+            // Unpack Results (Robustly)
+            const attackDraftRes = results[0].status === 'fulfilled' ? results[0].value : { content: "Logic audit unavailable (Network Error).", nextStep: null };
+            const methodRes = results[1].status === 'fulfilled' ? results[1].value : { content: "Methodology audit bypassed (Timeout)." };
+            const litRes = results[2].status === 'fulfilled' ? results[2].value : { content: "Literature check bypassed (Timeout)." };
+            const formRes = results[3].status === 'fulfilled' ? results[3].value : { content: "Formalism check bypassed (Timeout)." };
+
+            // Log Failures if any
+            results.forEach((r, i) => {
+                if (r.status === 'rejected') {
+                    console.warn(`[PARTIAL FAILURE] Agent ${i} failed:`, r.reason);
+                    addLog(`[WARNING] Agent ${i} dropped out. Continuing audit...`);
+                }
+            });
+
+            // 2. Fire Refine Step (Sequential)
+            // We now take the draft and refine it. This breaks the 60s timeout into two ~20s chunks.
+            addLog(`[SWARM] Phase 2: Refining Logic (Deep Reflect)...`);
+            setCurrentStep(`AUDITING_${claimId}_REFINE`); // UI Hint
+
+            let attackText = attackDraftRes.content || "Logic attack failed.";
+
+            // Only refine if we got a valid draft and the API says so
+            if (attackDraftRes.nextStep === 'REFINE') {
+                const refineRes = await fetchWithRetry('/api/gemini', {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        role: 'THESIS_DESTROYER',
+                        sessionId: currentSession.id,
+                        prompt: attackPrompt, // Standard prompt
+                        context: attackDraftRes.content, // Pass DRAFT as context
+                        images: claim.visualEvidence || [],
+                        step: 'REFINE' // [NEW] Explicit Step
+                    })
+                });
+                attackText = refineRes.content || attackText; // Upgrade content
+                addLog(`[SWARM] Refinement Complete.`);
+            }
+
             const methodText = methodRes.content || "Methodology audit inactive.";
             const litText = litRes.content || "Literature check inactive.";
             const formText = formRes.content || "Formalism check inactive.";

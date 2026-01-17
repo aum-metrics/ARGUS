@@ -92,32 +92,14 @@ export async function POST(req: Request) {
 
 
         // -----------------------------------------------------
-        // MODEL ROUTING STRATEGY
+        // MODEL ROUTING STRATEGY (V1.4: HYBRID TIER)
         // -----------------------------------------------------
+        // We use a mix of 1.5 Pro (Deep Reasoning) and 2.0 Flash (Speed/Vision).
 
-        /* 
-         * PRODUCTION CONFIGURATION (Paid Tier / Vertex AI)
-         * When moving to production with a paid API Key or Vertex AI, 
-         * use these stable, high-quota models. You will NOT need to "hop" between experimental models.
-         *
-         * const MODELS = {
-         *    VISION: 'gemini-1.5-flash',     // Standard, high-throughput, multimodal
-         *    REASONING: 'gemini-1.5-pro',    // Best-in-class reasoning for the "Critic"
-         *    FAST: 'gemini-1.5-flash'        // Speed for UI interactions
-         * };
-         */
-
-        // DEVELOPMENT CONFIGURATION (Free Tier Workarounds)
-        // We use "Experimental" (-exp) and "Legacy" models to find open Free Tier buckets.
-        // This fragility is specific to the Free Tier and does not exist in Production.
-        // Fixed Model IDs based on actual API availability (Script Validated)
-        // ALL Production tiers are exhausted (429).
-        // Switching to 'gemini-2.0-flash-exp' (Experimental Lab Quota).
-        // This is the last line of defense for free tier today.
         const MODELS = {
-            VISION: 'gemini-2.0-flash-exp',
-            REASONING: 'gemini-2.0-flash-exp',
-            FAST: 'gemini-2.0-flash-exp'
+            VISION: 'gemini-2.0-flash-exp',     // Best for Multimodal
+            REASONING: 'gemini-1.5-pro',        // Best for "Reflector Loop" (Deep Logic, less hallucinations)
+            FAST: 'gemini-1.5-flash'            // Best for Chat/Summaries
         };
 
         let selectedModel = MODELS.FAST;
@@ -131,10 +113,10 @@ export async function POST(req: Request) {
         } else {
             // 2. Role-Based Switching (Text Only)
             const ROLE_TO_MODEL: Record<string, string> = {
-                'THESIS_CONSTRUCTOR': MODELS.FAST,      // Speed for extraction
-                'THESIS_DESTROYER': MODELS.REASONING,   // Intelligence for attack
+                'THESIS_CONSTRUCTOR': MODELS.VISION,    // Needs Vision cap if images exist, else strong text
+                'THESIS_DESTROYER': MODELS.REASONING,   // CRITICAL: Needs 1.5 Pro for proper logic attacks
                 'JOURNAL_REVIEWER_SIMULATOR': MODELS.REASONING,
-                'SUPPORT_AGENT': MODELS.FAST,           // [NEW] Chatbot
+                'SUPPORT_AGENT': MODELS.FAST,           // Chatbot stays fast
                 'DEFAULT': MODELS.FAST
             };
             selectedModel = ROLE_TO_MODEL[role] || MODELS.FAST;
@@ -209,21 +191,35 @@ export async function POST(req: Request) {
         let text = "";
 
         // -----------------------------------------------------
-        // INTELLIGENCE V2.0: REFLECTOR LOOP (System 2 Thinking)
-        // Only for "Thesis Destroyer" which requires high-reasoning.
+        // INTELLIGENCE V2.0: REFLECTOR LOOP (Atomic Steps)
         // -----------------------------------------------------
-        if (role === 'THESIS_DESTROYER' && selectedModel === MODELS.REASONING) {
-            // console.debug("[AGENT] Entering Reflector Loop for Thesis Destroyer");
+        const { step = 'FULL', context = '' } = body;
 
-            // STEP 1: DRAFT (Fast, Aggressive)
-            // We temporarily use a faster model or the same model with lower temp if needed.
-            // For now, staying with selectedModel.
-            const draftResult = await model.generateContent(parts);
-            const draftResponse = await draftResult.response;
-            const draftText = draftResponse.text();
+        // STEP 1: DRAFT (Fast, Aggressive)
+        if (role === 'THESIS_DESTROYER' && selectedModel === MODELS.REASONING && step === 'DRAFT') {
+            try {
+                const draftResult = await model.generateContent(parts);
+                const draftResponse = await draftResult.response;
+                text = draftResponse.text();
+            } catch (e: any) {
+                console.warn("Gemini Safety Block (Draft):", e.message);
+                text = JSON.stringify({ content: "Critique bloqué par les filtres de sécurité." }); // French/English fallback
+            }
 
-            // STEP 2: REFLECT (Critique & Refine)
-            // We feed the draft back into the model to fix "strawman" arguments or hallucinations.
+            // Add metadata for frontend to know this is a partial result
+            return NextResponse.json({
+                content: text,
+                nextStep: 'REFINE',
+                meta: 'DRAFT_COMPLETE'
+            });
+        }
+
+        // STEP 2: REFINE (Critique & Polish)
+        else if (role === 'THESIS_DESTROYER' && selectedModel === MODELS.REASONING && step === 'REFINE') {
+
+            // We need the previous draft to critique
+            const draftText = context || prompt; // Fallback to prompt if no context (should not happen)
+
             const reflectionPrompt = `
              CRITIC_ROLE: You are the Senior Editor of specific scientific journal.
              TASK: Review the following "Attack Critique" drafted by a junior reviewer.
@@ -239,16 +235,26 @@ export async function POST(req: Request) {
              ACTION: rewriting the critique to be sharper, kinder, and more rigorous. Output ONLY the final JSON.
              `;
 
-            const refineResult = await model.generateContent(reflectionPrompt);
-            const refineResponse = await refineResult.response;
-            text = refineResponse.text();
-            // console.debug("[AGENT] Reflector Loop Complete. Refined Output Length:", text.length);
+            try {
+                const refineResult = await model.generateContent(reflectionPrompt);
+                const refineResponse = await refineResult.response;
+                text = refineResponse.text();
+            } catch (e: any) {
+                console.warn("Gemini Safety Block (Refine):", e.message);
+                text = draftText; // Fallback to draft if refinement is blocked
+            }
+        }
 
-        } else {
-            // STANDARD ONE-SHOT (Speed)
-            const result = await model.generateContent(parts);
-            const response = await result.response;
-            text = response.text();
+        // DEFAULT: STANDARD ONE-SHOT
+        else {
+            try {
+                const result = await model.generateContent(parts);
+                const response = await result.response;
+                text = response.text();
+            } catch (e: any) {
+                console.warn("Gemini Safety Block (Standard):", e.message);
+                text = JSON.stringify({ error: "Response blocked by AI Safety Filters." });
+            }
         }
 
         // -----------------------------------------------------

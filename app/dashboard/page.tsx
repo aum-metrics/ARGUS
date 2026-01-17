@@ -19,6 +19,8 @@ import { OnboardingFlow } from "@/components/OnboardingFlow"
 import { LoadingState, ThinkingIndicator, ProgressBar } from "@/components/LoadingStates"
 import Link from "next/link"
 import { saveAs } from "file-saver"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { GovernanceLogViewer } from "@/components/GovernanceLogViewer"
 
 export default function ArgusDashboard() {
     const [session, setSession] = useState<ArgusSession | null>(null)
@@ -439,123 +441,161 @@ export default function ArgusDashboard() {
                                     </div>
                                 </div>
 
-                                <div className="space-y-4">
-                                    {/* PDF PARSER */}
-                                    <div className="p-4 border-2 border-dashed border-zinc-200 rounded-lg bg-zinc-50/50 hover:bg-zinc-50 transition-colors text-center">
-                                        <input
-                                            type="file"
-                                            accept="application/pdf"
-                                            className="hidden"
-                                            id="pdf-upload"
-                                            disabled={session.data.claims.length > 0 || isProcessing}
-                                            onChange={async (e) => {
-                                                if (e.target.files && e.target.files[0]) {
-                                                    const file = e.target.files[0];
+                                {/* INGESTION TABS */}
+                                <Tabs defaultValue="pdf" className="w-full">
+                                    <TabsList className="grid w-full grid-cols-3 mb-4">
+                                        <TabsTrigger value="pdf" disabled={isProcessing}>Upload PDF</TabsTrigger>
+                                        <TabsTrigger value="text" disabled={isProcessing}>Paste Text</TabsTrigger>
+                                        <TabsTrigger value="url" disabled={true} title="Coming Soon">Fetch URL</TabsTrigger>
+                                    </TabsList>
 
-                                                    // 1. Client Size Validation
-                                                    if (file.size > 10 * 1024 * 1024) { // 10MB Limit for PDFs
-                                                        alert("PDF is too large. Max 10MB.");
-                                                        return;
-                                                    }
+                                    <TabsContent value="pdf" className="space-y-4">
+                                        {/* PDF PARSER */}
+                                        <div className="p-4 border-2 border-dashed border-zinc-200 rounded-lg bg-zinc-50/50 hover:bg-zinc-50 transition-colors text-center">
+                                            <input
+                                                type="file"
+                                                accept="application/pdf, text/plain, text/markdown, .tex, .md, .txt"
+                                                className="hidden"
+                                                id="pdf-upload"
+                                                disabled={session.data.claims.length > 0 || isProcessing}
+                                                onChange={async (e) => {
+                                                    if (e.target.files && e.target.files[0]) {
+                                                        const file = e.target.files[0];
 
-                                                    setIsProcessing(true);
-                                                    setCurrentStep('PARSING_PDF');
-
-                                                    try {
-                                                        const formData = new FormData();
-                                                        formData.append('file', file);
-
-                                                        const res = await fetch('/api/parse-pdf', {
-                                                            method: 'POST',
-                                                            body: formData
-                                                        });
-
-                                                        if (!res.ok) {
-                                                            const errData = await res.json().catch(() => ({}));
-                                                            throw new Error(errData.error || `Upload failed with status ${res.status}`);
+                                                        // 1. Client Size Validation
+                                                        if (file.size > 10 * 1024 * 1024) { // 10MB Limit
+                                                            alert("File is too large. Max 10MB.");
+                                                            return;
                                                         }
 
-                                                        const data = await res.json();
-                                                        setPaperInput(data.text); // Auto-fill textarea
+                                                        setIsProcessing(true);
 
-                                                        // [NEW] Visual Essence
-                                                        if (data.images && data.images.length > 0) {
-                                                            setPaperImages(data.images);
+                                                        // A. TEXT FILES (Client-Side Read)
+                                                        if (file.type === "text/plain" || file.name.endsWith(".md") || file.name.endsWith(".tex") || file.name.endsWith(".txt")) {
+                                                            setCurrentStep('READING_TEXT');
+                                                            const reader = new FileReader();
+                                                            reader.onload = async (event) => {
+                                                                const text = event.target?.result as string;
+                                                                setPaperInput(text);
+
+                                                                // Capture Filename
+                                                                syncSession({
+                                                                    ...session!,
+                                                                    data: {
+                                                                        ...session!.data,
+                                                                        context: {
+                                                                            ...session!.data.context,
+                                                                            originalFilename: file.name
+                                                                        }
+                                                                    }
+                                                                });
+
+                                                                setIsProcessing(false);
+                                                                setCurrentStep('IDLE');
+                                                                alert(`Text Loaded Successfully! (${text.length} chars)`);
+                                                            };
+                                                            reader.readAsText(file);
+                                                            return;
                                                         }
 
-                                                        // [NEW] Capture Filename for Audit
-                                                        syncSession({
-                                                            ...session!, // Session definitely exists here if we are uploading
-                                                            data: {
-                                                                ...session!.data,
-                                                                context: {
-                                                                    ...session!.data.context,
-                                                                    originalFilename: file.name
-                                                                }
+                                                        // B. PDF FILES (Server-Side Parse)
+                                                        setCurrentStep('PARSING_PDF');
+
+                                                        try {
+                                                            const formData = new FormData();
+                                                            formData.append('file', file);
+
+                                                            const res = await fetch('/api/parse-pdf', {
+                                                                method: 'POST',
+                                                                body: formData
+                                                            });
+
+                                                            if (!res.ok) {
+                                                                const errData = await res.json().catch(() => ({}));
+                                                                throw new Error(errData.error || `Upload failed with status ${res.status}`);
                                                             }
-                                                        });
 
-                                                        alert(`PDF Parsed Successfully! extracted ${data.text.length} characters.`);
+                                                            const data = await res.json();
+                                                            setPaperInput(data.text); // Auto-fill textarea
 
-                                                    } catch (err) {
-                                                        console.error(err);
-                                                        alert("Failed to parse PDF. Please copy-paste text manually.");
-                                                    } finally {
-                                                        setIsProcessing(false);
-                                                        setCurrentStep('IDLE');
-                                                        // Reset input
-                                                        e.target.value = '';
+                                                            // [NEW] Visual Essence
+                                                            if (data.images && data.images.length > 0) {
+                                                                setPaperImages(data.images);
+                                                            }
+
+                                                            // [NEW] Capture Filename for Audit
+                                                            syncSession({
+                                                                ...session!, // Session definitely exists here if we are uploading
+                                                                data: {
+                                                                    ...session!.data,
+                                                                    context: {
+                                                                        ...session!.data.context,
+                                                                        originalFilename: file.name
+                                                                    }
+                                                                }
+                                                            });
+
+                                                            alert(`PDF Parsed Successfully! extracted ${data.text.length} characters.`);
+
+                                                        } catch (err) {
+                                                            console.error(err);
+                                                            alert("Failed to parse PDF. Please copy-paste text manually.");
+                                                        } finally {
+                                                            setIsProcessing(false);
+                                                            setCurrentStep('IDLE');
+                                                            // Reset input
+                                                            e.target.value = '';
+                                                        }
                                                     }
-                                                }
-                                            }}
+                                                }}
+                                            />
+                                            <label htmlFor="pdf-upload" className="cursor-pointer flex flex-col items-center gap-2">
+                                                {isProcessing && currentStep === 'PARSING_PDF' ? (
+                                                    <>
+                                                        <ScanSearch className="h-8 w-8 text-zinc-400 animate-pulse" />
+                                                        <div className="flex flex-col items-center">
+                                                            <span className="text-xs font-mono uppercase tracking-widest text-zinc-400">Constructing V-Thesis...</span>
+                                                            <span className="text-[10px] text-zinc-400 font-mono mt-1 anim-fade-in">Scanning for visual evidence (10 pages)</span>
+                                                        </div>
+                                                    </>
+                                                ) : (
+                                                    <>
+                                                        <Download className="h-8 w-8 text-zinc-300" />
+                                                        <span className="text-sm font-bold text-zinc-600">Click to Upload Manuscript</span>
+                                                        <span className="text-xs text-zinc-500 font-mono">Max 10MB. Text-selectable PDFs only.</span>
+                                                    </>
+                                                )}
+                                            </label>
+                                        </div>
+                                    </TabsContent>
+
+                                    <TabsContent value="text">
+                                        <div className="flex justify-between items-center bg-zinc-50 p-2 rounded-t-lg border border-zinc-200 border-b-0">
+                                            <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-tighter">Editor</span>
+                                            <Button
+                                                variant="ghost"
+                                                size="sm"
+                                                className="h-6 text-[10px] text-zinc-500 hover:text-zinc-800"
+                                                onClick={() => setIsPreviewOpen(true)}
+                                            >
+                                                <ScanSearch className="h-3 w-3 mr-1" /> Fullscreen Review
+                                            </Button>
+                                        </div>
+                                        <Textarea
+                                            placeholder="Paste your abstract or hypothesis here..."
+                                            className="min-h-[300px] max-h-[600px] font-serif text-base resize-y bg-white border-zinc-200 focus-visible:ring-zinc-400 placeholder:text-zinc-400 overflow-y-auto overflow-x-auto whitespace-pre rounded-t-none"
+                                            value={paperInput}
+                                            onChange={(e) => setPaperInput(e.target.value)}
+                                            disabled={session?.data.claims.length > 0} // Lock input after scan
                                         />
-                                        <label htmlFor="pdf-upload" className="cursor-pointer flex flex-col items-center gap-2">
-                                            {isProcessing && currentStep === 'PARSING_PDF' ? (
-                                                <>
-                                                    <ScanSearch className="h-8 w-8 text-zinc-400 animate-pulse" />
-                                                    <div className="flex flex-col items-center">
-                                                        <span className="text-xs font-mono uppercase tracking-widest text-zinc-400">Constructing V-Thesis...</span>
-                                                        <span className="text-[10px] text-zinc-400 font-mono mt-1 anim-fade-in">Scanning for visual evidence (10 pages)</span>
-                                                    </div>
-                                                </>
-                                            ) : (
-                                                <>
-                                                    <Download className="h-8 w-8 text-zinc-300" />
-                                                    <span className="text-sm font-bold text-zinc-600">Upload Manuscript (PDF)</span>
-                                                    <span className="text-xs text-zinc-500 font-mono">Max 10MB. Text-selectable PDFs only.</span>
-                                                </>
-                                            )}
-                                        </label>
-                                    </div>
+                                    </TabsContent>
 
-                                    <div className="relative">
-                                        <div className="absolute inset-0 flex items-center">
-                                            <span className="w-full border-t border-zinc-200" />
+                                    <TabsContent value="url">
+                                        <div className="h-32 flex items-center justify-center border border-dashed border-zinc-200 rounded text-zinc-400 text-sm">
+                                            URL Fetching Coming Soon (ArXiv / DOI)
                                         </div>
-                                        <div className="relative flex justify-center text-xs uppercase">
-                                            <span className="bg-white px-2 text-zinc-400 font-mono">Or Paste Text</span>
-                                        </div>
-                                    </div>
-
-                                    <div className="flex justify-between items-center bg-zinc-50 p-2 rounded-t-lg border border-zinc-200 border-b-0">
-                                        <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-tighter">Editor</span>
-                                        <Button
-                                            variant="ghost"
-                                            size="sm"
-                                            className="h-6 text-[10px] text-zinc-500 hover:text-zinc-800"
-                                            onClick={() => setIsPreviewOpen(true)}
-                                        >
-                                            <ScanSearch className="h-3 w-3 mr-1" /> Fullscreen Review
-                                        </Button>
-                                    </div>
-                                    <Textarea
-                                        placeholder="Paste your abstract or hypothesis here..."
-                                        className="min-h-[300px] max-h-[600px] font-serif text-base resize-y bg-white border-zinc-200 focus-visible:ring-zinc-400 placeholder:text-zinc-400 overflow-y-auto overflow-x-auto whitespace-pre rounded-t-none"
-                                        value={paperInput}
-                                        onChange={(e) => setPaperInput(e.target.value)}
-                                        disabled={session?.data.claims.length > 0} // Lock input after scan
-                                    />
-                                </div>
+                                    </TabsContent>
+                                </Tabs>
 
                                 {/* FULLSCREEN REVIEW MODAL */}
                                 {isPreviewOpen && (
@@ -976,9 +1016,17 @@ export default function ArgusDashboard() {
                                     </div>
                                 </CardContent>
                                 <CardFooter className="bg-zinc-50 p-3 border-t border-zinc-100 flex flex-col gap-2">
-                                    <Button variant="outline" size="sm" className="w-full text-xs" onClick={() => robustDownloader(session)}>
-                                        <Download className="h-3 w-3 mr-2" /> Download Consultant Report
-                                    </Button>
+                                    <div className="flex gap-2">
+                                        <Button variant="outline" size="sm" className="flex-1 text-xs" onClick={() => robustDownloader(session)}>
+                                            <Download className="h-3 w-3 mr-2" /> PDF Report
+                                        </Button>
+                                        <Button variant="outline" size="sm" className="flex-1 text-xs" onClick={() => {
+                                            const blob = new Blob([JSON.stringify(session.data, null, 2)], { type: "application/json" });
+                                            saveAs(blob, `Argus_Data_${session.id}.json`);
+                                        }}>
+                                            <span className="font-mono">{`{}`}</span>JSON
+                                        </Button>
+                                    </div>
 
                                     {/* VIRAL CERTIFICATE - Only for High Scores */}
                                     {(session.data.report?.readinessScore || 0) >= 80 && (
@@ -1120,6 +1168,8 @@ export default function ArgusDashboard() {
                         </Card>
                     </div>
                 </div>
+                {/* SYSTEM LOGS (The Matrix View) */}
+                <GovernanceLogViewer logs={logs} isProcessing={isProcessing} currentStep={currentStep} />
             </main >
         </div >
     )
