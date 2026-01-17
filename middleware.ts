@@ -39,8 +39,10 @@ export async function middleware(request: NextRequest) {
         const { data: { user }, error } = await supabase.auth.getUser()
 
         if (error) {
-            console.error("Middleware Auth Verification Error:", error.message)
-            // If auth verification fails, treat as unauthenticated
+            // Only log actual system errors, not "Auth session missing" which is normal for anon users
+            if (error.message !== 'Auth session missing!') {
+                console.warn("Middleware Auth Warning:", error.message)
+            }
         }
 
         // ROUTE PROTECTION LOGIC

@@ -46,35 +46,38 @@ export async function POST(req: Request) {
 
             let authorized = false;
 
-            if (profile?.org_id) {
-                // ENTERPRISE PATH: Atomic Decrement
+            let quotaConsumed = false;
+
+            // 1. Try Enterprise Credit First (If Org exists)
+            if (profile?.org_id && !quotaConsumed) {
+                console.log(`[QUOTA] Enterprise Check for Org: ${profile.org_id}`);
                 const { data: success, error: rpcError } = await supabaseAdmin.rpc('consume_credit', { p_org_id: profile.org_id });
                 if (success) {
+                    quotaConsumed = true;
                     authorized = true;
-                    // console.debug(`[QUOTA] Enterprise Credit Consumed for Org ${profile.org_id}`);
+                    console.log(`[QUOTA] Enterprise Credit Consumed.`);
                 } else {
-                    console.error(`[QUOTA] Enterprise Limit Reached for Org ${profile.org_id}`);
+                    console.warn(`[QUOTA] Enterprise Limit Reached or Error:`, rpcError);
+                    // Fall through to Individual Check
                 }
-            } else {
-                // INDIVIDUAL PATH: Atomic Decrement (Using same RPC, assuming user has a personal_org or we adapt the logic)
-                // For V1.0, we will assume individual users ALSO track balance in 'organizations' or 'profiles'.
-                // If the current system uses 'transactions' table for balance, we need a Ledger approach.
-                // Reverting to calculating balance but enforcing a stricter check.
+            }
 
-                // Real Product Fix: All users should have a shadow org_id.
-                // Project Fix: We will stick to the Ledger count but add a "Pending" transaction to lock it?
-                // No, standard transactions insert is safer.
-
-                // We'll trust the Ledger for now but block if < 1.
+            // 2. Fallback to Individual Credit Logic (Ledger)
+            if (!quotaConsumed) {
                 const { count: credits } = await supabaseAdmin.from('transactions').select('*', { count: 'exact', head: true }).eq('user_id', user.id).eq('status', 'success');
                 const { count: usage } = await supabaseAdmin.from('audit_logs').select('*', { count: 'exact', head: true }).eq('user_id', user.id).eq('action', 'THESIS_CONSTRUCTOR');
 
+                console.log(`[QUOTA] Individual Check: Credits=${credits}, Usage=${usage}, Authorized=${(credits || 0) > (usage || 0)}`);
+
                 if ((credits || 0) > (usage || 0)) {
                     authorized = true;
+                    // Note: We don't have an atomic "consume" RPC for individual yet, 
+                    // relying on the next audit_log insertion to increase 'usage' count.
                 }
             }
 
             if (!authorized) {
+                console.warn(`[QUOTA_FAIL] User ${user.id} denied.`);
                 return NextResponse.json({
                     error: "Quota Exceeded. Please top up your credits or contact your administrator."
                 }, { status: 402 });
