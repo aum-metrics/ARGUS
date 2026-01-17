@@ -161,19 +161,26 @@ export const generateManuscriptPDF = (session: ArgusSession) => {
     const timestamp = new Date().toISOString().split('T')[0];
     const filename = `Argus_Governance_Report_${session.id}_${timestamp}.pdf`;
 
-    // Manual Download with Timeout (Robust Fix)
-    const pdfBlob = doc.output('blob');
-    const url = URL.createObjectURL(pdfBlob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = filename;
-    link.style.display = "none";
-    document.body.appendChild(link);
-    link.click();
+    // NUCLEAR OPTION: Server-Side Proxy
+    // Forces the browser to detect a real file download via Content-Disposition
+    const dataUri = doc.output('datauristring');
 
-    // Delay cleanup to ensure browser captures the download
-    setTimeout(() => {
-        document.body.removeChild(link);
-        URL.revokeObjectURL(url);
-    }, 500);
+    const form = document.createElement('form');
+    form.method = 'POST';
+    form.action = '/api/download-proxy';
+    form.style.display = 'none';
+
+    const nameInput = document.createElement('input');
+    nameInput.name = 'filename';
+    nameInput.value = filename;
+    form.appendChild(nameInput);
+
+    const dataInput = document.createElement('input');
+    dataInput.name = 'fileData';
+    dataInput.value = dataUri;
+    form.appendChild(dataInput);
+
+    document.body.appendChild(form);
+    form.submit();
+    document.body.removeChild(form);
 };
