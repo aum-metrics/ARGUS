@@ -14,7 +14,7 @@ import { cn } from "@/lib/utils"
 // Strictly hardcoded to prevent prompt injection or logic leaks.
 // Returns ready-made answers based on scenario IDs.
 
-type ScenarioId = 'ROOT' | 'PRICING' | 'PRIVACY' | 'REFUNDS' | 'TECH_SUPPORT' | 'ENTERPRISE';
+type ScenarioId = 'ROOT' | 'PRICING' | 'PRIVACY' | 'REFUNDS' | 'TECH_SUPPORT' | 'ENTERPRISE' | 'REPORT_HELP';
 
 interface BotMessage {
     id: string;
@@ -28,6 +28,7 @@ const SCENARIOS: Record<ScenarioId, BotMessage> = {
         text: "Hello! I'm the Argus Support Assistant. I can help with non-technical inquiries. What would you like to know about?",
         options: [
             { label: "Pricing & Plans", nextId: 'PRICING' },
+            { label: "How to Read Report", nextId: 'REPORT_HELP' },
             { label: "Data Privacy", nextId: 'PRIVACY' },
             { label: "Refunds", nextId: 'REFUNDS' },
             { label: "Enterprise / Labs", nextId: 'ENTERPRISE' },
@@ -71,9 +72,25 @@ const SCENARIOS: Record<ScenarioId, BotMessage> = {
     },
     ENTERPRISE: {
         id: 'ENTERPRISE',
-        text: "For University Departments and Labs, we offer bulk licensing with centralized dashboards. Please visit the Enterprise page to book a demo.",
+        text: "For University Departments and Labs, we offer bulk licensing with centralized dashboards. Visit the Enterprise page or contact sales@argus.ac.",
         options: [
-            { label: "Go to Enterprise Page", nextId: 'ROOT' }, // Could link, but keeping it simple
+            { label: "Back to Menu", nextId: 'ROOT' }
+        ]
+    },
+    REPORT_HELP: {
+        id: 'REPORT_HELP',
+        text: (
+            <div className="space-y-2">
+                <p><strong>How to Read the Report:</strong></p>
+                <ul className="list-disc pl-4 text-sm space-y-1">
+                    <li><strong>Executive Summary:</strong> High-level check of structure and coherency.</li>
+                    <li><strong>Claims Analysis:</strong> We extract key claims and cross-reference them with AI knowledge.</li>
+                    <li><strong>Visual Integrity:</strong> We check if figures match their captions.</li>
+                </ul>
+                <p className="text-xs mt-2 text-zinc-500">Note: 'Unverified' means the AI could not firmly confirm or deny.</p>
+            </div>
+        ),
+        options: [
             { label: "Back to Menu", nextId: 'ROOT' }
         ]
     },
