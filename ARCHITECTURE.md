@@ -1,95 +1,113 @@
-# ARGUS System Architecture (Technical Whitepaper)
+# ARGUS System Architecture (Technical Whitepaper V2.0)
 
-## Core Philosophy: "The Adversarial Compiler"
-Argus differs from standard "GenAI Wrappers" by implementing a **Multi-Agent Consensus Protocol**. Instead of asking one model to "critique" a paper (which leads to hallucinated praise), Argus spins up **6 conflicting agents** with opposing system prompts.
-
-This is modeled after the **Adversarial Training** concept in ML, but applied to semantic logic.
+## Executive Summary
+ARGUS is a **Multi-Agent Governance Engine** designed to validate the logical coherence, methodological integrity, and novelty of academic research *before* peer review. Unlike standard "GenAI Wrappers" that rely on a single model to "critique" text, ARGUS implements a **Consensus Protocol** involving six diverse, adversarial AI agents. This architecture eliminates "hallucinated praise" and enforcing a rigorous, compiler-like validation loop.
 
 ---
 
-## 1. The Swarm Controller (`useGovernance.ts`)
-The governance engine is a client-side orchestrator that manages the state of the 6 agents.
+## 1. System Design Philosophy
 
-### The Agent Roster
-| Agent ID | Role | System Prompt Objective |
-| :--- | :--- | :--- |
-| **Thesis Constructor** | `STRUCTURALIST` | Extract the Abstract Syntax Tree (AST) of the argument. Ignore rhetoric. |
-| **Thesis Destroyer** | `ADVERSARY` | Find the weakest link in the AST. Attack premises, not conclusions. |
-| **Methodology Analyst** | `STATISTICIAN` | Scan for p-hacking, sample bias, and metric misalignment. |
-| **Reviewer Simulator** | `GATEKEEPER` | Predict the likely outcome (Accept/Reject) based on top-tier journal patterns. |
-| **Formalism Auditor** | `MATHEMATICIAN` | Check definitions and equation balance. |
-| **Literature Reviewer** | `HISTORIAN` | Check novelty against internal knowledge base embeddings. |
+### 1.1 The "Adversarial Compiler" Paradigm
+Traditional LLM interactions are chat-based and prone to sycophancy. ARGUS treats research manuscripts as "source code" and the validation process as "compilation".
+*   **Parsing**: The manuscript is parsed into an Abstract Syntax Tree (AST) of atomic claims.
+*   **Unit Testing**: Each claim is subjected to "attacks" by adversarial agents.
+*   **Compilation Error**: If a claim fails the attack, the "build" fails (Validation score drops).
 
-### System Data Flow (The "Swarm Protocol")
+### 1.2 "Privacy by Physics" (Ephemeral Architecture)
+To serve institutional clients (Universities, R&D Labs), ARGUS enforces **Data Sovereignty**.
+*   **RAM-Only Processing**: Ingested PDFs and extracted claims exist *only* in the ephemeral memory (RAM) of the active session.
+*   **No Persistence**: The content of the manuscript is **NEVER** written to a long-term database (SQL or Vector).
+*   **Deletion Certificate**: Upon session termination, a cryptographic proof of memory clearing is generated.
 
+---
+
+## 2. The Multi-Agent Swarm (Core Logic)
+
+The heart of ARGUS is the **Governance/Validation Engine** (`argus/governance.ts`), which orchestrates a synchronized "Six-Adversary Protocol".
+
+### 2.1 Agent Roster
+| Agent ID | Archetype | System Prompt Objective | Model |
+| :--- | :--- | :--- | :--- |
+| **Thesis Constructor** | `STRUCTURALIST` | Deconstruct text into atomic Claims. Ignore rhetoric. | Gemini 1.5 Pro |
+| **Thesis Destroyer** | `ADVERSARY` | Attack premises. Find logical fallacies. Ignore tone. | GPT-4o / Gemini Ultra |
+| **Methodology Analyst** | `STATISTICIAN` | Scan for p-hacking, sample bias, and metric errors. | Gemini 1.5 Pro |
+| **Literature Reviewer** | `HISTORIAN` | Check novelty against internal/external embeddings. | Perplexity (Online) |
+| **Formalism Auditor** | `MATHEMATICIAN` | Verify equation balance and definitional recursion. | Gemini 1.5 Pro |
+| **Reviewer Simulator** | `GATEKEEPER` | Synthesize attacks into a final Accept/Reject verdict. | Gemini 1.5 Pro |
+
+### 2.2 The Consensus Graph (Mermaid)
 ```mermaid
 graph TD
-    User([User]) -->|Upload PDF| RAM[Ephemeral RAM]
-    RAM -->|Parse Text| Parser[Text Parser]
-    
-    subgraph "The Adversarial Swarm"
-        Parser -->|Raw Claims| Const[Thesis Constructor]
-        Const -->|AST Nodes| Dist[Distributor]
+    User([User Input]) -->|PDF/Text| RAM[Ephemeral Session RAM]
+    RAM -->|Atomization| Claims[Atomic Claims List]
+
+    subgraph "Adversarial Loop (Per Claim)"
+        Claims -->|Claim C1| Dist[Distributor]
         
-        Dist -->|Attack| Dest[Thesis Destroyer]
-        Dist -->|Verify| Meth[Methodology Analyst]
-        Dist -->|Check| Form[Formalism Auditor]
-        Dist -->|Scan| Lit[Literature Reviewer]
+        Dist -->|Attack| Destroyer[Thesis Destroyer]
+        Dist -->|Scrutinize| Analyst[Methodology Analyst]
+        Dist -->|Check| Formalist[Formalism Auditor]
         
-        Dest -->|Vectors| Syn[Synthesizer]
-        Meth -->|Vectors| Syn
-        Form -->|Vectors| Syn
-        Lit -->|Vectors| Syn
+        Destroyer -->|Attack Vectors| Syn[Synthesizer]
+        Analyst -->|Flaws| Syn
+        Formalist -->|Errors| Syn
+        
+        Syn -->|Verdict| Score[Confidence Score 0-100]
     end
-    
-    Syn -->|0-100 Score| Report[Audit Artifact]
-    Report -->|Display| User
-    
-    style RAM fill:#f9f,stroke:#333
-    style Syn fill:#bbf,stroke:#333
-    style Dest fill:#faa,stroke:#333
+
+    Score -->|Aggregate| Report[Final Governance Report]
 ```
 
-### The "Loop"
-1.  **Ingestion**: PDF is parsed into raw text.
-2.  **Atomization**: The `Constructor` breaks text into Claims (Nodes).
-3.  **Attack Phase**: The `Destroyer` and `Analyst` run in parallel against each Claim Node.
-4.  **Consensus**: The `Simulator` aggregates the attack vectors into a final `0-100` score.
+---
+
+## 3. Technical Stack & Infrastructure
+
+### 3.1 Frontend & Orchestration
+*   **Framework**: Next.js 14+ (App Router).
+*   **State Management**: React Context (Session State).
+*   **Styling**: Tailwind CSS + Shadcn/UI (The "Academic Light" Design System).
+*   **PDF Handling**: `pdf-parse` (Server-side extraction), `jsPDF` (Report generation).
+
+### 3.2 Backend Services (Serverless)
+*   **API Runtime**: Vercel Edge Functions (for low latency) / Node.js Serverless.
+*   **Model Gateway**: A robust **Tiered Fallback Router** (`lib/llm_router.ts`) managing quotas across Gemini, OpenAI, and Perplexity.
+    *   *Tier 1 (High Reasoning)*: Gemini 1.5 Pro.
+    *   *Tier 2 await (Speed)*: Gemini 1.5 Flash.
+    *   *Tier 3 (Web)*: Perplexity Sonar.
+
+### 3.3 Database & Storage (Supabase)
+ARGUS follows a "Metadata Only" storage policy.
+*   **`profiles`**: User identity, Organization linkage, Credit balance.
+*   **`organizations`**: Enterprise entities (Universities) managing seats and credits.
+*   **`usage_logs`**: An immutable ledger of *transactions* (e.g., "User X validated 5 claims"), but **NOT** the claims themselves.
+*   **`sessions`**: Temporary session state (optional persistence for "Game Save" functionality, encrypted).
+
+### 3.4 Security & Compliance
+*   **Authentication**: Supabase Auth (Email/Password, Magic Link, SSO for Enterprise).
+*   **RLS (Row Level Security)**: Strict PostgreSQL polices ensuring Users can only access their own metadata.
+*   **Payment**: Razorpay integration for "Pay-as-you-go" credits.
 
 ---
 
-## 2. Ephemeral Data Pipeline (Privacy)
-A critical selling point for institutional clients is **Data Sovereignty**.
+## 4. Organization vs. Individual Architecture
 
-*   **No Database Persistence**: The manuscript text is NEVER stored in Supabase or any vector DB.
-*   **RAM-Only Processing**: Text exists only in the active browser session and the stateless API request payload.
-*   **Deletion Certificate**: On session close, the client clears the React state tree, effectively "shredding" the document.
+### 4.1 The Hub-and-Spoke Model
+*   **Individual**: A standard user (`profiles.org_id = null`). Purchases credits personally.
+*   **Organization**: An entity (`organizations` table) that owns a pool of credits.
+*   **Member**: A user linked to an organization (`profiles.org_id = UUID`). Inherits the Org's credit pool.
 
----
-
-## 3. Tech Stack Deep Dive
-
-### Backend (Next.js API Routes)
-*   **Runtime**: Edge / Node.js
-*   **Model Routing**: `api/gemini/route.ts` implements a "Tiered Fallback" router.
-    *   *Primary*: `gemini-1.5-pro` (Reasoning Agents)
-    *   *Secondary*: `gemini-1.5-flash` (Fast Agents)
-    *   *Fallback*: `gemini-2.0-flash-exp` (Experimental/Free Tier overflow)
-
-### Database (Supabase)
-*   **`profiles`**: User metadata, billing tier, institution.
-*   **`audit_logs`**: Immutable ledger of *actions* (e.g., "User X scanned 5000 chars"), but NOT the content.
-*   **`transactions`**: Razorpay payment records linked to audit sessions.
-
-### Security (RLS)
-*   **Policy**: `auth.uid() = user_id`. Strict ownership.
-*   **Admin Bypass**: Only the `verify-payment` webhook has Service Role access to unlock features.
+### 4.2 Onboarding Flows
+1.  **Individual**: Self-service Sign Up. Immediate access.
+2.  **Organization**: Admin-provisioned. The Admin invites uses via email.
+    *   *Why?* prevents fraud and ensures proper domain verification for University licenses.
 
 ---
 
-## 4. Scalability Note
-The current implementation is **Stateless**. Scaling is purely a function of API Quota (Gemini) and Database Connections (Supabase). There are no stateful servers or queues to manage.
+## 5. Deployment & CI/CD
+*   **Repo**: GitHub (Monorepo).
+*   **Verifications**: `scripts/verify_system.ts` runs E2E safety checks on every commit.
+*   **Environment**: Vercel Production.
 
 ---
 
-**© 2024 Argus Governance** coverage of System V2.0.
+**© 2024 ARGUS Governance.**
