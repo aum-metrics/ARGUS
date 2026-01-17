@@ -147,8 +147,8 @@ export function useGovernance() {
                         1. Do NOT just extract sentences. Merge related points into strong, standalone assertions.
                         2. If images are present (charts/graphs/tables), incorporate their implications into the relevant textual claim.
                         3. For each claim, if it is supported by one or more of the attached images, include the indices of those images in a "evidenceIndices" array.
-                        4. Focus on *causal* claims ("X leads to Y") and *normative* claims ("We should do X").
-                        5. Aim for 5-8 high-quality, distinct theses rather than 20+ granular sentences.
+                        4. Extract specific claims across ALL categories: Problem, Contribution, Comparative, Performance, and Causal.
+                        5. Aim for the **Top 15 atomic, falsifiable claims**. Do not exceed this limit. Prioritize impact and logical centrality.
                         
                         OUTPUT: JSON array of objects { "id": "C1", "statement": "...", "evidenceIndices": [number, ...] }
                         
@@ -394,14 +394,18 @@ FULL CONTEXT: ${currentSession.data.originalText.substring(0, 5000)}...`); // Gi
                 
                 OUTPUT FORMAT: Strict JSON Object
                 {
-                    "readinessScore": number, // 0-100 (where >85 is Publishable)
-                    "trinityScore": {
-                        "coherence": number, // 0-100 (Logical flow)
-                        "empirical": number, // 0-100 (Data density)
-                        "novelty": number    // 0-100 (Originality)
+                    "readinessScore": number, // 0-100
+                    "sixAdversaryScore": {
+                        "thesisClarity": number,
+                        "argumentRobustness": number,
+                        "methodologyRigor": number,
+                        "noveltyPositioning": number,
+                        "formalismPrecision": number,
+                        "overall": number
                     },
                     "verdict": "PUBLISHABLE" | "REVISE_MAJOR" | "REJECT",
-                    "executiveSummary": "Short 2-sentence summary for the Department Head.",
+                    "executiveSummary": "Short 2-sentence summary.",
+                    "truthStatement": "Brutally honest one-sentence truth.",
                     "actionItems": [
                         { "priority": "HIGH" | "MED", "layer": "Methodology", "suggestion": "Specific fix required..." }
                     ],

@@ -18,3 +18,15 @@
 [2026-01-17T08:40:29.211Z] [QUOTA] Enterprise Limit Reached or Error: {"code":"42703","details":null,"hint":"Perhaps you meant to reference the column \"organizations.credits_balance\".","message":"column \"credit_balance\" does not exist"}
 [2026-01-17T08:40:29.211Z] [QUOTA] Checking Individual for User: 49388465-7b6e-47fa-b829-6263c0920f50
 [2026-01-17T08:40:29.738Z] [QUOTA] Individual Check: Credits=11 (Real=1, Virtual=10), Usage=7, Authorized=true
+[2026-01-17T13:07:21.226Z] [QUOTA] Enterprise Check for Org: ebd6b408-fb84-4c0b-88f2-75e9ab3d7d02
+[2026-01-17T13:07:21.418Z] [QUOTA] Enterprise Limit Reached or Error: {"code":"42703","details":null,"hint":"Perhaps you meant to reference the column \"organizations.credits_balance\".","message":"column \"credit_balance\" does not exist"}
+[2026-01-17T13:07:21.418Z] [QUOTA] Checking Individual for User: 54005f3a-3587-4e2c-a096-cfcd703493eb
+[2026-01-17T13:07:21.966Z] [QUOTA] Individual Check: Credits=10 (Real=0, Virtual=10), Usage=0, Authorized=true
+[2026-01-17T13:10:30.904Z] [QUOTA] Enterprise Check for Org: ebd6b408-fb84-4c0b-88f2-75e9ab3d7d02
+[2026-01-17T13:10:31.102Z] [QUOTA] Enterprise Limit Reached or Error: {"code":"42703","details":null,"hint":"Perhaps you meant to reference the column \"organizations.credits_balance\".","message":"column \"credit_balance\" does not exist"}
+[2026-01-17T13:10:31.103Z] [QUOTA] Checking Individual for User: 54005f3a-3587-4e2c-a096-cfcd703493eb
+[2026-01-17T13:10:31.618Z] [QUOTA] Individual Check: Credits=10 (Real=0, Virtual=10), Usage=1, Authorized=true
+[2026-01-17T13:13:13.106Z] [QUOTA] Enterprise Check for Org: ebd6b408-fb84-4c0b-88f2-75e9ab3d7d02
+[2026-01-17T13:13:13.318Z] [QUOTA] Enterprise Limit Reached or Error: {"code":"42703","details":null,"hint":"Perhaps you meant to reference the column \"organizations.credits_balance\".","message":"column \"credit_balance\" does not exist"}
+[2026-01-17T13:13:13.318Z] [QUOTA] Checking Individual for User: 54005f3a-3587-4e2c-a096-cfcd703493eb
+[2026-01-17T13:13:13.839Z] [QUOTA] Individual Check: Credits=10 (Real=0, Virtual=10), Usage=2, Authorized=true

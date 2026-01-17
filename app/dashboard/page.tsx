@@ -984,34 +984,52 @@ export default function ArgusDashboard() {
                                                 </div>
                                             </div>
 
-                                            {/* TRINITY VECTORS (IP V1.5) */}
-                                            {session.data.report.trinityScore && (
-                                                <div className="w-48 space-y-3">
+                                            {/* 6-ADVERSARY SCOREBOARD (V2.0) */}
+                                            {session.data.report.sixAdversaryScore && (
+                                                <div className="w-56 space-y-3 font-mono">
                                                     <div className="space-y-1">
-                                                        <div className="flex justify-between text-[10px] uppercase font-bold text-zinc-500">
-                                                            <span>Logical Coherence</span>
-                                                            <span className="text-zinc-900">{session.data.report.trinityScore.coherence}%</span>
+                                                        <div className="flex justify-between text-[9px] uppercase font-bold text-zinc-400">
+                                                            <span>Thesis Clarity</span>
+                                                            <span className="text-zinc-100">{session.data.report.sixAdversaryScore.thesisClarity}%</span>
                                                         </div>
-                                                        <div className="h-1.5 w-full bg-zinc-100 rounded-full overflow-hidden">
-                                                            <div className="h-full bg-blue-500 rounded-full" style={{ width: `${session.data.report.trinityScore.coherence}%` }}></div>
+                                                        <div className="h-1 w-full bg-zinc-100/10 rounded-full overflow-hidden">
+                                                            <div className="h-full bg-blue-500 rounded-full" style={{ width: `${session.data.report.sixAdversaryScore.thesisClarity}%` }}></div>
                                                         </div>
                                                     </div>
                                                     <div className="space-y-1">
-                                                        <div className="flex justify-between text-[10px] uppercase font-bold text-zinc-500">
-                                                            <span>Empirical Density</span>
-                                                            <span className="text-zinc-900">{session.data.report.trinityScore.empirical}%</span>
+                                                        <div className="flex justify-between text-[9px] uppercase font-bold text-zinc-400">
+                                                            <span>Robustness</span>
+                                                            <span className="text-zinc-100">{session.data.report.sixAdversaryScore.argumentRobustness}%</span>
                                                         </div>
-                                                        <div className="h-1.5 w-full bg-zinc-100 rounded-full overflow-hidden">
-                                                            <div className="h-full bg-purple-500 rounded-full" style={{ width: `${session.data.report.trinityScore.empirical}%` }}></div>
+                                                        <div className="h-1 w-full bg-zinc-100/10 rounded-full overflow-hidden">
+                                                            <div className="h-full bg-red-500 rounded-full" style={{ width: `${session.data.report.sixAdversaryScore.argumentRobustness}%` }}></div>
                                                         </div>
                                                     </div>
                                                     <div className="space-y-1">
-                                                        <div className="flex justify-between text-[10px] uppercase font-bold text-zinc-500">
-                                                            <span>Novelty Index</span>
-                                                            <span className="text-zinc-900">{session.data.report.trinityScore.novelty}%</span>
+                                                        <div className="flex justify-between text-[9px] uppercase font-bold text-zinc-400">
+                                                            <span>Methodology</span>
+                                                            <span className="text-zinc-100">{session.data.report.sixAdversaryScore.methodologyRigor}%</span>
                                                         </div>
-                                                        <div className="h-1.5 w-full bg-zinc-100 rounded-full overflow-hidden">
-                                                            <div className="h-full bg-amber-500 rounded-full" style={{ width: `${session.data.report.trinityScore.novelty}%` }}></div>
+                                                        <div className="h-1 w-full bg-zinc-100/10 rounded-full overflow-hidden">
+                                                            <div className="h-full bg-cyan-500 rounded-full" style={{ width: `${session.data.report.sixAdversaryScore.methodologyRigor}%` }}></div>
+                                                        </div>
+                                                    </div>
+                                                    <div className="space-y-1">
+                                                        <div className="flex justify-between text-[9px] uppercase font-bold text-zinc-400">
+                                                            <span>Novelty</span>
+                                                            <span className="text-zinc-100">{session.data.report.sixAdversaryScore.noveltyPositioning}%</span>
+                                                        </div>
+                                                        <div className="h-1 w-full bg-zinc-100/10 rounded-full overflow-hidden">
+                                                            <div className="h-full bg-amber-500 rounded-full" style={{ width: `${session.data.report.sixAdversaryScore.noveltyPositioning}%` }}></div>
+                                                        </div>
+                                                    </div>
+                                                    <div className="space-y-1">
+                                                        <div className="flex justify-between text-[9px] uppercase font-bold text-zinc-400">
+                                                            <span>Formalism</span>
+                                                            <span className="text-zinc-100">{session.data.report.sixAdversaryScore.formalismPrecision}%</span>
+                                                        </div>
+                                                        <div className="h-1 w-full bg-zinc-100/10 rounded-full overflow-hidden">
+                                                            <div className="h-full bg-purple-500 rounded-full" style={{ width: `${session.data.report.sixAdversaryScore.formalismPrecision}%` }}></div>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -1025,6 +1043,17 @@ export default function ArgusDashboard() {
                                                 <p className="text-sm italic text-zinc-700 font-serif leading-relaxed">
                                                     "{session.data.report.executiveSummary}"
                                                 </p>
+                                                {/* ONE-SENTENCE TRUTH */}
+                                                {session.data.report.truthStatement && (
+                                                    <div className="mt-4 pt-4 border-t border-zinc-200">
+                                                        <h4 className="text-[10px] font-bold text-zinc-400 uppercase mb-1 flex items-center gap-1">
+                                                            <ScanSearch className="h-3 w-3" /> The Unvarnished Truth
+                                                        </h4>
+                                                        <p className="text-xs font-mono text-zinc-600 bg-zinc-100 p-2 rounded border border-zinc-200/50">
+                                                            "{session.data.report.truthStatement}"
+                                                        </p>
+                                                    </div>
+                                                )}
                                             </div>
 
                                             {/* ACTION ITEMS PREVIEW */}

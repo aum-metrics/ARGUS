@@ -5,14 +5,18 @@ import { v4 as uuidv4 } from 'uuid';
 
 export interface ArgusReport {
     readinessScore: number; // 0-100
-    // [NEW] V1.5 Trinity Score
-    trinityScore?: {
-        coherence: number;
-        empirical: number;
-        novelty: number;
+    // [NEW] V2.0 6-Adversary Consensus Score
+    sixAdversaryScore?: {
+        thesisClarity: number;
+        argumentRobustness: number;
+        methodologyRigor: number;
+        noveltyPositioning: number;
+        formalismPrecision: number;
+        overall: number;
     };
     verdict: 'PUBLISHABLE' | 'REVISE_MAJOR' | 'REJECT';
     executiveSummary: string;
+    truthStatement?: string; // [NEW] "One-Sentence Truth"
     keyStrengths?: string[];
     weaknesses?: string[];
     actionItems: {
