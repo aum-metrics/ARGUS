@@ -46,8 +46,8 @@ export async function middleware(request: NextRequest) {
         }
 
         // ROUTE PROTECTION LOGIC
-        // If user is NOT logged in and trying to access /dashboard
-        if ((!user || error) && request.nextUrl.pathname.startsWith('/dashboard')) {
+        // If user is NOT logged in and trying to access /dashboard OR /admin
+        if ((!user || error) && (request.nextUrl.pathname.startsWith('/dashboard') || request.nextUrl.pathname.startsWith('/admin'))) {
             const url = request.nextUrl.clone()
             url.pathname = '/login'
             return NextResponse.redirect(url)
@@ -64,9 +64,9 @@ export async function middleware(request: NextRequest) {
 
     } catch (e) {
         console.error("Critical Middleware Exception:", e)
-        // Fail Safe: If something breaks, prevent access to dashboard or allow?
+        // Fail Safe: If something breaks, prevent access to dashboard/admin
         // Secure Default: Block Access -> Redirect to Login
-        if (request.nextUrl.pathname.startsWith('/dashboard')) {
+        if (request.nextUrl.pathname.startsWith('/dashboard') || request.nextUrl.pathname.startsWith('/admin')) {
             const url = request.nextUrl.clone()
             url.pathname = '/login'
             return NextResponse.redirect(url)
