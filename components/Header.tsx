@@ -16,6 +16,7 @@ export function Header() {
             </div>
             <nav className="hidden md:flex gap-6 text-sm font-medium text-zinc-600 font-sans">
                 <Link href="/protocol" className="hover:text-black hover:underline underline-offset-4 decoration-zinc-300">Protocol</Link>
+                <Link href="/faq" className="hover:text-black hover:underline underline-offset-4 decoration-zinc-300">FAQ</Link>
                 <Link href="/pricing" className="hover:text-black hover:underline underline-offset-4 decoration-zinc-300">Pricing</Link>
                 <Link href="/enterprise" className="hover:text-black hover:underline underline-offset-4 decoration-zinc-300">Enterprise</Link>
             </nav>

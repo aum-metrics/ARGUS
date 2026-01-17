@@ -160,23 +160,23 @@ export default function Home() {
               <div className="grid md:grid-cols-3 gap-8 pt-8">
                 {/* Step 1 */}
                 <div className="relative p-8 rounded-2xl bg-zinc-50 border border-zinc-100">
-                  <h3 className="text-lg font-bold font-serif text-zinc-900 mb-2">1. AST Parsing</h3>
+                  <h3 className="text-lg font-bold font-serif text-zinc-900 mb-2">1. Structural Extraction</h3>
                   <p className="text-base text-zinc-600 leading-relaxed">
-                    Decomposing text into an Abstract Syntax Tree of core claims, evidence, and logical connectives.
+                    Decomposing text into a map of core claims, evidence, and logical connectives.
                   </p>
                 </div>
                 {/* Step 2 */}
                 <div className="relative p-8 rounded-2xl bg-zinc-50 border border-zinc-100">
-                  <h3 className="text-lg font-bold font-serif text-zinc-900 mb-2">2. Agent Swarm</h3>
+                  <h3 className="text-lg font-bold font-serif text-zinc-900 mb-2">2. Adversarial Logic Engine</h3>
                   <p className="text-base text-zinc-600 leading-relaxed">
-                    Six specialized agents (The Auditor, The Reviewer, The Statistician) attack the AST from conflicting perspectives.
+                    A proprietary multi-model system attacks the argument structure from conflicting perspectives to expose fallacies.
                   </p>
                 </div>
                 {/* Step 3 */}
                 <div className="relative p-8 rounded-2xl bg-zinc-50 border border-zinc-100">
-                  <h3 className="text-lg font-bold font-serif text-zinc-900 mb-2">3. Consensus</h3>
+                  <h3 className="text-lg font-bold font-serif text-zinc-900 mb-2">3. Consensus Verification</h3>
                   <p className="text-base text-zinc-600 leading-relaxed">
-                    Only claims that survive multi-agent convergence are stamped with a Validity Key.
+                    Only claims that survive the adversarial convergence process are stamped with a Validity Key.
                   </p>
                 </div>
               </div>
@@ -189,7 +189,7 @@ export default function Home() {
               <div>
                 <h3 className="text-3xl font-bold font-serif text-zinc-900 mb-4">Zero-Retention Protocol.</h3>
                 <p className="text-lg text-zinc-500 font-serif leading-relaxed mb-6">
-                  Your intellectual property is ephemeral. The system processes the AST in volatile memory and purposefully destroys the session data post-audit.
+                  Your intellectual property is ephemeral. The system processes the signal in volatile memory and purposefully destroys the session data post-audit.
                 </p>
                 <ul className="space-y-4 font-sans text-sm">
                   <li className="flex items-center gap-3 text-zinc-700">
@@ -209,14 +209,15 @@ export default function Home() {
                   <div className="w-3 h-3 rounded-full bg-red-500"></div>
                   <div className="w-3 h-3 rounded-full bg-yellow-500"></div>
                   <div className="w-3 h-3 rounded-full bg-green-500"></div>
-                  <span className="text-xs text-zinc-500 font-mono ml-2">audit_core.py</span>
+                  <span className="text-xs text-zinc-500 font-mono ml-2">core_logic.rs</span>
                 </div>
                 <div className="space-y-2 font-mono text-xs text-zinc-400">
-                  <p><span className="text-purple-400">def</span> <span className="text-blue-400">verify_integrity</span>(claim):</p>
-                  <p className="pl-4">consensus = agents.swarm(claim)</p>
-                  <p className="pl-4"><span className="text-purple-400">if</span> consensus.score &lt; <span className="text-orange-400">0.85</span>:</p>
-                  <p className="pl-8"><span className="text-purple-400">raise</span> <span className="text-yellow-400">LogicalFallacyError</span></p>
-                  <p className="pl-4"><span className="text-purple-400">return</span> consensus.signed_packet()</p>
+                  <p><span className="text-purple-400">fn</span> <span className="text-blue-400">verify_signal</span>(input: Signal) -{'>'} Result:</p>
+                  <p className="pl-4">let vectors = engine.extract(input);</p>
+                  <p className="pl-4"><span className="text-purple-400">match</span> engine.adversarial_check(vectors) {'{'}</p>
+                  <p className="pl-8">Ok(score) ={'>'} sign_certificate(score),</p>
+                  <p className="pl-8">Err(e) ={'>'} reject_with_trace(e),</p>
+                  <p className="pl-4">{'}'}</p>
                 </div>
               </div>
             </div>
