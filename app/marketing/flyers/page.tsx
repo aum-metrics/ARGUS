@@ -67,10 +67,13 @@ export default function FlyersPage() {
                 </div>
 
                 <div className="absolute bottom-8 right-8">
-                    <div className="w-24 h-24 bg-zinc-900 p-2 rounded-lg">
-                        <div className="w-full h-full bg-white flex items-center justify-center">
-                            <span className="text-[10px] font-bold text-zinc-900 text-center leading-tight">SCAN FOR<br />DEMO</span>
+                    <div className="flex flex-col items-end gap-2">
+                        <div className="w-24 h-24 bg-zinc-900 p-2 rounded-lg shadow-xl">
+                            <div className="w-full h-full bg-white flex items-center justify-center">
+                                <span className="text-[10px] font-bold text-zinc-900 text-center leading-tight">SCAN FOR<br />DEMO</span>
+                            </div>
                         </div>
+                        <p className="text-[10px] text-zinc-400 font-bold uppercase tracking-widest">www.ARGUS-Thesis.com</p>
                     </div>
                 </div>
 
@@ -144,29 +147,32 @@ export default function FlyersPage() {
                     </div>
                 </div>
 
-                <div className="mt-auto pt-16 border-t border-slate-800 flex justify-between items-end">
+                {/* Footer Area with QR Code avoiding overlap */}
+                <div className="mt-auto pt-16 border-t border-slate-800 flex justify-between items-end relative">
                     <div className="text-slate-500 font-mono text-sm">
                         help@argus-thesis.com
                     </div>
-                    <div className="flex items-center gap-4">
-                        {/* LOGO INTEGRATION */}
-                        <div className="h-12 w-12 rounded-lg overflow-hidden opacity-80">
-                            <img src="/logo.jpg" alt="ARGUS Logo" className="w-full h-full object-contain" />
-                        </div>
-                        <div className="text-4xl font-bold text-white tracking-tighter">
-                            ARGUS-Thesis
-                        </div>
-                    </div>
-                </div>
 
-                <div className="absolute bottom-16 right-16">
-                    <div className="w-24 h-24 bg-white p-2 rounded-lg shadow-xl">
-                        <div className="w-full h-full border-2 border-dashed border-zinc-300 flex items-center justify-center">
-                            <span className="text-[10px] font-bold text-zinc-900 text-center leading-tight">SCAN FOR<br />DEMO</span>
+                    <div className="flex items-center gap-8">
+                        {/* QR Code Block */}
+                        <div className="flex flex-col items-center gap-1">
+                            <div className="w-16 h-16 bg-white p-1 rounded-lg shadow-xl">
+                                <div className="w-full h-full border border-dashed border-zinc-400 flex items-center justify-center">
+                                    <span className="text-[8px] font-bold text-zinc-900 text-center leading-tight">SCAN<br />ME</span>
+                                </div>
+                            </div>
+                            <p className="text-indigo-400 text-[10px] font-mono">argus-thesis.com</p>
                         </div>
-                    </div>
-                    <div className="text-right mt-2">
-                        <p className="text-white font-mono text-xs">www.ARGUS-Thesis.com</p>
+
+                        {/* Logo Block */}
+                        <div className="flex items-center gap-4">
+                            <div className="h-12 w-12 rounded-lg overflow-hidden opacity-80">
+                                <img src="/logo.jpg" alt="ARGUS Logo" className="w-full h-full object-contain" />
+                            </div>
+                            <div className="text-4xl font-bold text-white tracking-tighter">
+                                ARGUS-Thesis
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
