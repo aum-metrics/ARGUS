@@ -164,7 +164,7 @@ export async function POST(req: Request) {
             // We inject a condensed version of the User Guide to save tokens/latency vs reading full file
             // Or we could read the file. Let's start with a high-quality condensed context.
             const SUPPORT_CONTEXT = `
-             SYSTEM_ROLE: You are the Argus Support Assistant.
+             SYSTEM_ROLE: You are the ARGUS-Thesis Assistant.
              CONTEXT:
              - Argus is an Adversarial Governance Engine for academic research.
              - "Privacy by Physics": Data is processed in ephemeral RAM only, never stored.

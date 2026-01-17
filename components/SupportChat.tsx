@@ -198,7 +198,7 @@ export function SupportChat() {
             <div className="bg-zinc-900 p-4 flex items-center justify-between text-white">
                 <div className="flex items-center gap-2">
                     <div className="bg-green-500 h-2 w-2 rounded-full animate-pulse"></div>
-                    <span className="font-bold font-serif">Argus Support</span>
+                    <span className="font-bold font-serif">ARGUS-Thesis</span>
                 </div>
                 <div className="flex items-center gap-2">
                     {isQaMode && (

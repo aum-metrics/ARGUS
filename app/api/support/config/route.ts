@@ -8,7 +8,7 @@ export async function GET() {
     const SCENARIOS = {
         ROOT: {
             id: 'ROOT',
-            text: "Hello! I'm the Argus Support Assistant. I can help with general questions. How can I assist you today?",
+            text: "Hello! I'm the ARGUS-Thesis Assistant. I can help with general questions. How can I assist you today?",
             options: [
                 { label: "Pricing & Plans", nextId: 'PRICING' },
                 { label: "Data Privacy", nextId: 'PRIVACY' },
