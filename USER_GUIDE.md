@@ -57,6 +57,7 @@ Once you are satisfied:
 
 *   **Pricing**: $15 (approx ₹1,249) per Credit.
 *   **Purchasing**: Click the "Top Up" button in the Dashboard. Secure payment via Razorpay.
+    *   *Note*: If you are an **Organization Admin**, any credits you purchase will automatically be added to your **Organization's Shared Pool**, not your personal account.
 *   **Refunds**: Failed technical executions are refunded automatically. "Low quality" papers are not grounds for refunds—the tool's job is to critique.
 
 ---

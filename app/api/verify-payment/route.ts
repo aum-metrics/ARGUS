@@ -49,9 +49,52 @@ export async function POST(req: NextRequest) {
                 // as payment *was* technically verified by Razorpay signature.
                 // However, the "Unlock" might fail if it depends on this DB state.
             } else {
-                // 2. Create Audit Log Entry (Admin)
-                // We use the user_id found in the transaction row
-                // This records the "credit" being added to the system
+                // 2. CHECK ROLE & ROUTE CREDITS
+                // Fetch Profile to see if it's an Org Admin
+                const { data: profile } = await supabaseAdmin
+                    .from('profiles')
+                    .select('role, org_id')
+                    .eq('id', transactionData.user_id)
+                    .single();
+
+                let metadataUpdate = {};
+
+                // If Admin, route to Org
+                if (profile?.role === 'ORG_ADMIN' && profile?.org_id) {
+                    // Update Organization Balance
+                    // Note: We use rpc() or simple update if no concurrency risk.
+                    // Ideally: update organizations set credits_balance = credits_balance + X
+                    // But here we do read-modify-write (fine for MVP low traffic)
+                    const { data: org } = await supabaseAdmin
+                        .from('organizations')
+                        .select('credits_balance')
+                        .eq('id', profile.org_id)
+                        .single();
+
+                    if (org) {
+                        await supabaseAdmin
+                            .from('organizations')
+                            .update({
+                                credits_balance: (org.credits_balance || 0) + 1 // Assuming 1 Credit per Transaction
+                            })
+                            .eq('id', profile.org_id);
+
+                        metadataUpdate = { target: 'ORG', org_id: profile.org_id };
+                        console.log(`[PAYMENT] Routed credit to Org ${profile.org_id}`);
+                    }
+                } else {
+                    metadataUpdate = { target: 'PERSONAL' };
+                }
+
+                // Update Transaction Metadata
+                await supabaseAdmin
+                    .from('transactions')
+                    .update({
+                        metadata: { ...transactionData.metadata, ...metadataUpdate }
+                    })
+                    .eq('id', transactionData.id);
+
+                // 3. Create Audit Log Entry (Admin)
                 await supabaseAdmin.from("audit_logs").insert({
                     user_id: transactionData.user_id,
                     session_id: orderCreationId,
@@ -59,7 +102,8 @@ export async function POST(req: NextRequest) {
                     metadata: {
                         amount: transactionData.amount,
                         currency: transactionData.currency,
-                        method: 'RAZORPAY'
+                        method: 'RAZORPAY',
+                        credit_target: metadataUpdate
                     },
                     claim_count: 0,
                     tier: "standard"

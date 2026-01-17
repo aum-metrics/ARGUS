@@ -80,7 +80,8 @@ export default function ArgusDashboard() {
                     .from('transactions')
                     .select('*', { count: 'exact', head: true })
                     .eq('user_id', user.id)
-                    .eq('status', 'success');
+                    .eq('status', 'success')
+                    .not('metadata->>target', 'eq', 'ORG'); // Exclude Org purchases
 
                 // Usage: Total number of 'THESIS_CONSTRUCTOR' (Extraction) events.
                 const { count: usage } = await supabase
