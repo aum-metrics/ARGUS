@@ -62,6 +62,15 @@ export default function FlyersPage() {
                         <p className="text-sm font-bold text-zinc-900">CERTIFICATE OF DEFENSIBILITY</p>
                         <p className="text-xs text-zinc-400 font-mono">ENGINEERING-GRADE VALIDATION</p>
                         <p className="text-[10px] text-zinc-300 font-mono mt-1 lowercase">help@argus-thesis.com</p>
+                        <p className="text-[10px] text-indigo-600 font-bold mt-2">www.ARGUS-Thesis.com</p>
+                    </div>
+                </div>
+
+                <div className="absolute bottom-8 right-8">
+                    <div className="w-24 h-24 bg-zinc-900 p-2 rounded-lg">
+                        <div className="w-full h-full bg-white flex items-center justify-center">
+                            <span className="text-[10px] font-bold text-zinc-900 text-center leading-tight">SCAN FOR<br />DEMO</span>
+                        </div>
                     </div>
                 </div>
 
@@ -149,8 +158,19 @@ export default function FlyersPage() {
                         </div>
                     </div>
                 </div>
+
+                <div className="absolute bottom-16 right-16">
+                    <div className="w-24 h-24 bg-white p-2 rounded-lg shadow-xl">
+                        <div className="w-full h-full border-2 border-dashed border-zinc-300 flex items-center justify-center">
+                            <span className="text-[10px] font-bold text-zinc-900 text-center leading-tight">SCAN FOR<br />DEMO</span>
+                        </div>
+                    </div>
+                    <div className="text-right mt-2">
+                        <p className="text-white font-mono text-xs">www.ARGUS-Thesis.com</p>
+                    </div>
+                </div>
             </div>
 
-        </div>
+        </div >
     );
 }

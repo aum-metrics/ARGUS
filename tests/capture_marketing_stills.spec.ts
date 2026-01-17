@@ -167,4 +167,20 @@ test.describe('Marketing Asset Generation', () => {
         await flyer.screenshot({ path: 'marketing_assets/Flyer_03_Enterprise.png' });
     });
 
+    test('08. Playground - Hero', async ({ page }) => {
+        await page.goto('/playground');
+        await page.setViewportSize({ width: 1440, height: 1080 });
+        await page.waitForLoadState('networkidle');
+        await expect(page.getByText('Public Research Playground')).toBeVisible();
+        await page.screenshot({ path: 'marketing_assets/Playground_Hero.png' });
+
+        // Simulate Input
+        await page.getByPlaceholder('Paste your abstract here').fill('This thesis argues that AI will replace all developers.');
+        await page.getByRole('button', { name: /Run Logic Scan/ }).click();
+
+        // Wait for Result
+        await expect(page.getByText('Defensibility Assessment:')).toBeVisible({ timeout: 10000 });
+        await page.screenshot({ path: 'marketing_assets/Playground_Result.png' });
+    });
+
 });
