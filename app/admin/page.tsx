@@ -74,23 +74,23 @@ export default function AdminDashboard() {
     }
 
     return (
-        <div className="min-h-screen bg-zinc-950 text-zinc-100 font-sans selection:bg-indigo-500/30">
-            {/* DARK MODE ADMIN HEADER */}
-            <header className="border-b border-zinc-800 bg-zinc-950 px-6 py-4 flex justify-between items-center sticky top-0 z-50">
+        <div className="min-h-screen bg-zinc-50 font-serif">
+            {/* LIGHT THEME ADMIN HEADER */}
+            <header className="border-b border-zinc-200 bg-white px-6 py-4 flex justify-between items-center sticky top-0 z-50 shadow-sm">
                 <div className="flex items-center gap-3">
                     <div className="h-8 w-8 bg-indigo-600 rounded flex items-center justify-center font-bold text-white">
                         A
                     </div>
                     <div>
-                        <h1 className="text-lg font-bold tracking-tight text-white leading-none">System Command</h1>
+                        <h1 className="text-lg font-bold tracking-tight text-zinc-900 leading-none">System Command</h1>
                         <span className="text-xs text-zinc-500 font-mono">SUPER_ADMIN::ACTIVE</span>
                     </div>
                 </div>
                 <div className="flex items-center gap-4">
-                    <span className="flex items-center gap-2 text-xs font-mono text-emerald-500 bg-emerald-500/10 px-2 py-1 rounded">
+                    <span className="flex items-center gap-2 text-xs font-mono text-emerald-600 bg-emerald-50 px-2 py-1 rounded border border-emerald-200">
                         <Activity className="h-3 w-3" /> LIVE
                     </span>
-                    <Button size="sm" variant="outline" className="border-zinc-700 hover:bg-zinc-800 text-zinc-400" onClick={fetchStats}>
+                    <Button size="sm" variant="outline" className="border-zinc-300 hover:bg-zinc-100 text-zinc-700" onClick={fetchStats}>
                         <RefreshCcw className={`h-4 w-4 mr-2 ${loading ? 'animate-spin' : ''}`} /> Sync
                     </Button>
                 </div>
@@ -100,43 +100,43 @@ export default function AdminDashboard() {
 
                 {/* 1. METRICS GRID */}
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                    <Card className="bg-zinc-900 border-zinc-800 text-zinc-100">
+                    <Card className="bg-white border-zinc-200">
                         <CardHeader className="flex flex-row items-center justify-between pb-2">
-                            <CardTitle className="text-sm font-medium text-zinc-400">Total Users</CardTitle>
+                            <CardTitle className="text-sm font-medium text-zinc-600">Total Users</CardTitle>
                             <Users className="h-4 w-4 text-indigo-500" />
                         </CardHeader>
                         <CardContent>
-                            <div className="text-2xl font-bold">{data?.metrics.totalUsers || '-'}</div>
+                            <div className="text-2xl font-bold text-zinc-900">{data?.metrics.totalUsers || '-'}</div>
                             <p className="text-xs text-zinc-500">Registered across all tiers</p>
                         </CardContent>
                     </Card>
-                    <Card className="bg-zinc-900 border-zinc-800 text-zinc-100">
+                    <Card className="bg-white border-zinc-200">
                         <CardHeader className="flex flex-row items-center justify-between pb-2">
-                            <CardTitle className="text-sm font-medium text-zinc-400">Organizations</CardTitle>
+                            <CardTitle className="text-sm font-medium text-zinc-600">Organizations</CardTitle>
                             <Building2 className="h-4 w-4 text-purple-500" />
                         </CardHeader>
                         <CardContent>
-                            <div className="text-2xl font-bold">{data?.metrics.totalOrgs || '-'}</div>
+                            <div className="text-2xl font-bold text-zinc-900">{data?.metrics.totalOrgs || '-'}</div>
                             <p className="text-xs text-zinc-500">Labs & Departments</p>
                         </CardContent>
                     </Card>
-                    <Card className="bg-zinc-900 border-zinc-800 text-zinc-100">
+                    <Card className="bg-white border-zinc-200">
                         <CardHeader className="flex flex-row items-center justify-between pb-2">
-                            <CardTitle className="text-sm font-medium text-zinc-400">Total Audits</CardTitle>
+                            <CardTitle className="text-sm font-medium text-zinc-600">Total Audits</CardTitle>
                             <Database className="h-4 w-4 text-emerald-500" />
                         </CardHeader>
                         <CardContent>
-                            <div className="text-2xl font-bold">{data?.metrics.totalAudits || '-'}</div>
+                            <div className="text-2xl font-bold text-zinc-900">{data?.metrics.totalAudits || '-'}</div>
                             <p className="text-xs text-zinc-500">Claims Computed</p>
                         </CardContent>
                     </Card>
-                    <Card className="bg-zinc-900 border-zinc-800 text-zinc-100">
+                    <Card className="bg-white border-zinc-200">
                         <CardHeader className="flex flex-row items-center justify-between pb-2">
-                            <CardTitle className="text-sm font-medium text-zinc-400">System Status</CardTitle>
+                            <CardTitle className="text-sm font-medium text-zinc-600">System Status</CardTitle>
                             <Server className="h-4 w-4 text-blue-500" />
                         </CardHeader>
                         <CardContent>
-                            <div className="text-2xl font-bold text-emerald-400">{data?.metrics.systemHealth || '...'}</div>
+                            <div className="text-2xl font-bold text-emerald-600">{data?.metrics.systemHealth || '...'}</div>
                             <p className="text-xs text-zinc-500">Latency: 42ms</p>
                         </CardContent>
                     </Card>
@@ -144,7 +144,7 @@ export default function AdminDashboard() {
 
                 {/* 2. DATA TABS */}
                 <Tabs defaultValue="feed" className="w-full">
-                    <TabsList className="bg-zinc-900 border border-zinc-800 text-zinc-400">
+                    <TabsList className="bg-white border border-zinc-200 text-zinc-700">
                         <TabsTrigger value="feed">Global Pulse</TabsTrigger>
                         <TabsTrigger value="orgs">Organizations</TabsTrigger>
                         <TabsTrigger value="users">User Directory</TabsTrigger>
@@ -152,27 +152,27 @@ export default function AdminDashboard() {
 
                     {/* FEED */}
                     <TabsContent value="feed" className="mt-4">
-                        <Card className="bg-zinc-900 border-zinc-800 text-zinc-100">
+                        <Card className="bg-white border-zinc-200">
                             <CardHeader>
-                                <CardTitle className="text-sm font-mono uppercase tracking-widest text-zinc-500">Live Audit Stream</CardTitle>
+                                <CardTitle className="text-sm font-mono uppercase tracking-widest text-zinc-600">Live Audit Stream</CardTitle>
                             </CardHeader>
                             <CardContent className="space-y-4">
                                 {data?.feed.length === 0 && <div className="text-zinc-500 text-sm">No recent activity.</div>}
                                 {data?.feed.map((log: any) => (
-                                    <div key={log.id} className="flex flex-col md:flex-row gap-4 border-b border-zinc-800 pb-3 last:border-0 hover:bg-zinc-800/50 p-2 rounded transition-colors">
+                                    <div key={log.id} className="flex flex-col md:flex-row gap-4 border-b border-zinc-200 pb-3 last:border-0 hover:bg-zinc-50 p-2 rounded transition-colors">
                                         <div className="min-w-[140px] text-xs font-mono text-zinc-500">
                                             {new Date(log.created_at).toLocaleString()}
                                         </div>
                                         <div className="flex-1 space-y-1">
                                             <div className="flex items-center gap-2">
-                                                <Badge variant="outline" className="text-xs font-mono border-zinc-700 text-zinc-300">
+                                                <Badge variant="outline" className="text-xs font-mono border-zinc-300 text-zinc-700">
                                                     {log.action}
                                                 </Badge>
                                                 <span className="text-xs text-zinc-500 font-mono">{log.user_id.slice(0, 8)}...</span>
                                             </div>
-                                            <div className="text-sm text-zinc-300">
-                                                Target: <span className="font-bold text-indigo-400">{log.metadata?.model || 'Unknown Model'}</span>
-                                                <span className="mx-2 text-zinc-600">|</span>
+                                            <div className="text-sm text-zinc-700">
+                                                Target: <span className="font-bold text-indigo-600">{log.metadata?.model || 'Unknown Model'}</span>
+                                                <span className="mx-2 text-zinc-400">|</span>
                                                 IO: {log.metadata?.input_chars} / {log.metadata?.output_chars} chars
                                             </div>
                                         </div>
@@ -185,14 +185,14 @@ export default function AdminDashboard() {
                     {/* ORGS */}
                     <TabsContent value="orgs" className="mt-4 space-y-4">
                         {/* CREATE PILOT BUTTON */}
-                        <Card className="bg-zinc-900 border-zinc-800">
+                        <Card className="bg-white border-zinc-200">
                             <CardHeader>
-                                <CardTitle className="text-sm text-zinc-400">University Pilot Program</CardTitle>
+                                <CardTitle className="text-sm text-zinc-700">University Pilot Program</CardTitle>
                             </CardHeader>
                             <CardContent>
                                 <Button
                                     size="sm"
-                                    className="bg-indigo-600 hover:bg-indigo-700"
+                                    className="bg-indigo-600 hover:bg-indigo-700 text-white"
                                     onClick={() => {
                                         const name = prompt("University Name:");
                                         const email = prompt("Contact Email:");
@@ -218,9 +218,9 @@ export default function AdminDashboard() {
                             </CardContent>
                         </Card>
 
-                        <div className="rounded-md border border-zinc-800 bg-zinc-900">
-                            <table className="w-full text-sm text-left text-zinc-400">
-                                <thead className="bg-zinc-950 text-zinc-500 font-mono uppercase text-xs">
+                        <div className="rounded-md border border-zinc-200 bg-white">
+                            <table className="w-full text-sm text-left text-zinc-700">
+                                <thead className="bg-zinc-50 text-zinc-600 font-mono uppercase text-xs border-b border-zinc-200">
                                     <tr>
                                         <th className="px-4 py-3">Name</th>
                                         <th className="px-4 py-3">Tier</th>
@@ -228,14 +228,14 @@ export default function AdminDashboard() {
                                         <th className="px-4 py-3">Created</th>
                                     </tr>
                                 </thead>
-                                <tbody className="divide-y divide-zinc-800">
+                                <tbody className="divide-y divide-zinc-200">
                                     {data?.data.organizations.map((org: any) => (
-                                        <tr key={org.id} className="hover:bg-zinc-800/50">
-                                            <td className="px-4 py-3 font-medium text-zinc-200">{org.name}</td>
+                                        <tr key={org.id} className="hover:bg-zinc-50">
+                                            <td className="px-4 py-3 font-medium text-zinc-900">{org.name}</td>
                                             <td className="px-4 py-3">
-                                                <Badge className="bg-zinc-800 text-zinc-300 hover:bg-zinc-700">{org.tier || org.subscription_tier || 'N/A'}</Badge>
+                                                <Badge className="bg-zinc-100 text-zinc-700 hover:bg-zinc-200 border border-zinc-300">{org.tier || org.subscription_tier || 'N/A'}</Badge>
                                             </td>
-                                            <td className="px-4 py-3 font-mono text-emerald-400 font-bold">{org.credits_balance}</td>
+                                            <td className="px-4 py-3 font-mono text-emerald-600 font-bold">{org.credits_balance}</td>
                                             <td className="px-4 py-3 text-xs">{new Date(org.created_at).toLocaleDateString()}</td>
                                         </tr>
                                     ))}
@@ -246,9 +246,9 @@ export default function AdminDashboard() {
 
                     {/* USERS */}
                     <TabsContent value="users" className="mt-4">
-                        <div className="rounded-md border border-zinc-800 bg-zinc-900">
-                            <table className="w-full text-sm text-left text-zinc-400">
-                                <thead className="bg-zinc-950 text-zinc-500 font-mono uppercase text-xs">
+                        <div className="rounded-md border border-zinc-200 bg-white">
+                            <table className="w-full text-sm text-left text-zinc-700">
+                                <thead className="bg-zinc-50 text-zinc-600 font-mono uppercase text-xs border-b border-zinc-200">
                                     <tr>
                                         <th className="px-4 py-3">Full Name</th>
                                         <th className="px-4 py-3">Role</th>
@@ -256,19 +256,19 @@ export default function AdminDashboard() {
                                         <th className="px-4 py-3">Joined</th>
                                     </tr>
                                 </thead>
-                                <tbody className="divide-y divide-zinc-800">
+                                <tbody className="divide-y divide-zinc-200">
                                     {data?.data.users.map((u: any) => (
-                                        <tr key={u.id} className="hover:bg-zinc-800/50">
-                                            <td className="px-4 py-3 font-medium text-zinc-200">
+                                        <tr key={u.id} className="hover:bg-zinc-50">
+                                            <td className="px-4 py-3 font-medium text-zinc-900">
                                                 {u.full_name || 'Anonymous'}
-                                                <div className="text-[10px] text-zinc-600 font-mono">{u.email}</div>
+                                                <div className="text-[10px] text-zinc-500 font-mono">{u.email}</div>
                                             </td>
                                             <td className="px-4 py-3">
                                                 {u.role === 'SUPER_ADMIN' ? (
-                                                    <span className="text-purple-400 font-bold flex items-center gap-1"><Lock className="w-3 h-3" /> ROOT</span>
+                                                    <span className="text-purple-600 font-bold flex items-center gap-1"><Lock className="w-3 h-3" /> ROOT</span>
                                                 ) : u.role}
                                             </td>
-                                            <td className="px-4 py-3 font-mono text-xs">{u.org_id ? u.org_id.slice(0, 8) + '...' : '-'}</td>
+                                            <td className="px-4 py-3 font-mono text-xs text-zinc-600">{u.org_id ? u.org_id.slice(0, 8) + '...' : '-'}</td>
                                             <td className="px-4 py-3 text-xs">{new Date(u.created_at).toLocaleDateString()}</td>
                                         </tr>
                                     ))}
