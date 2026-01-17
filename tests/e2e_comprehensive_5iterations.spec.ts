@@ -46,12 +46,28 @@ async function registerIndividualUser(page: Page, user: typeof INDIVIDUAL_USER) 
     await page.goto(`${BASE_URL}/register`);
     await page.waitForLoadState('networkidle');
 
-    await page.fill('input[type="email"]', user.email);
-    await page.fill('input[type="password"]', user.password);
-    await page.fill('input[placeholder*="name" i], input[name="fullName"]', user.fullName);
+    // Fill form with correct IDs from new registration page
+    await page.fill('input[id="fullName"]', user.fullName);
+    await page.fill('input[id="email"]', user.email);
+    await page.fill('input[id="password"]', user.password);
 
-    await page.click('button[type="submit"]');
-    // Increased timeout and better wait strategy for slow dashboard initialization
+    await page.click('button[type="submit"]:has-text("Create Account")');
+
+    // Handle dev bypass if available
+    try {
+        await page.waitForSelector('button:has-text("Dev: Force Activate")', { timeout: 3000 });
+        await page.click('button:has-text("Dev: Force Activate")');
+        await page.waitForURL('**/login', { timeout: 5000 });
+
+        // Login with new account
+        await page.fill('input[id="signin-email"]', user.email);
+        await page.fill('input[id="signin-password"]', user.password);
+        await page.click('button[type="submit"]:has-text("Sign In")');
+    } catch (e) {
+        console.log('  ℹ Dev bypass not available, waiting for email verification');
+    }
+
+    // Wait for dashboard
     await page.waitForURL('**/dashboard', { timeout: 30000, waitUntil: 'domcontentloaded' });
 }
 
@@ -73,11 +89,11 @@ async function login(page: Page, email: string, password: string) {
     await page.goto(`${BASE_URL}/login`);
     await page.waitForLoadState('networkidle');
 
-    await page.fill('input[type="email"]', email);
-    await page.fill('input[type="password"]', password);
+    // Use correct signin field IDs
+    await page.fill('input[id="signin-email"]', email);
+    await page.fill('input[id="signin-password"]', password);
 
-    await page.click('button[type="submit"]');
-    // Increased timeout and better wait strategy for slow dashboard initialization
+    await page.click('button[type="submit"]:has-text("Sign In")');
     await page.waitForURL('**/dashboard', { timeout: 30000, waitUntil: 'domcontentloaded' });
 }
 
