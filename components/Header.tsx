@@ -26,9 +26,9 @@ export function Header() {
                         Sign In
                     </Button>
                 </Link>
-                <Link href="/dashboard">
+                <Link href="/playground">
                     <Button className="bg-zinc-900 text-white hover:bg-zinc-800 shadow-sm px-6">
-                        Launch Argus
+                        Try Logic Scan
                     </Button>
                 </Link>
             </div>

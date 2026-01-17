@@ -48,13 +48,13 @@ export default function FAQPage() {
                             </ul>
                             <div className="mt-6 bg-zinc-50 p-4 border-l-4 border-zinc-900 rounded-r">
                                 <p className="text-zinc-800 italic">
-                                    "ARGUS can't make your paper innovative. But it CAN prevent rejection due to careless mistakes or logical inconsistency."
+                                    "ARGUS-Thesis can't make your paper innovative. But it CAN prevent rejection due to careless mistakes or logical inconsistency."
                                 </p>
                             </div>
                         </div>
 
                         <div className="border-t border-zinc-100 pt-8">
-                            <h3 className="text-xl font-bold font-serif mb-3">What if ARGUS doesn't find any problems?</h3>
+                            <h3 className="text-xl font-bold font-serif mb-3">What if ARGUS-Thesis doesn't find any problems?</h3>
                             <p className="text-zinc-700 leading-relaxed text-lg">
                                 That's good news. It means:
                             </p>
@@ -64,28 +64,28 @@ export default function FAQPage() {
                                 <li>You're ready for peer review</li>
                             </ul>
                             <p className="text-zinc-700 leading-relaxed mt-4 text-lg">
-                                ARGUS isn't a rubber stamp. If it passes your work, you can defend every claim.
+                                ARGUS-Thesis isn't a rubber stamp. If it passes your work, you can defend every claim.
                             </p>
                         </div>
 
                         <div className="border-t border-zinc-100 pt-8">
-                            <h3 className="text-xl font-bold font-serif mb-3">What if ARGUS REJECTS all my claims?</h3>
+                            <h3 className="text-xl font-bold font-serif mb-3">What if ARGUS-Thesis REJECTS all my claims?</h3>
                             <p className="text-zinc-700 leading-relaxed text-lg">
                                 This happens occasionally with overstated claims. It's actually valuable—better to know before journal submission.
                             </p>
                             <div className="mt-4 bg-red-50 p-6 rounded-lg border border-red-100">
                                 <p className="font-bold text-red-900 mb-2">Typical Turnaround Path:</p>
                                 <ol className="list-decimal pl-5 space-y-2 text-red-800">
-                                    <li>Run ARGUS, get REJECTED verdicts</li>
+                                    <li>Run audit, get REJECTED verdicts</li>
                                     <li>Revise claims (narrow scope, add evidence)</li>
-                                    <li>Re-run ARGUS, get ACCEPTED or REVISE</li>
+                                    <li>Re-run ARGUS-Thesis, get ACCEPTED or REVISE</li>
                                     <li>Iterate until confidence is high</li>
                                 </ol>
                             </div>
                         </div>
 
                         <div className="border-t border-zinc-100 pt-8">
-                            <h3 className="text-xl font-bold font-serif mb-3">How many times should I run ARGUS on my paper?</h3>
+                            <h3 className="text-xl font-bold font-serif mb-3">How many times should I run ARGUS-Thesis on my paper?</h3>
                             <p className="text-zinc-700 leading-relaxed text-lg">
                                 We recommend a 3-stage process:
                             </p>
