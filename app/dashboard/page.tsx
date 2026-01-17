@@ -77,32 +77,43 @@ export default function ArgusDashboard() {
                 setUserId(user.id)
                 setUserEmail(user.email || "Research Account")
 
-                // 1b. BACKEND ACCESS CHECK (Consumable Credits)
-                // Credits: Number of successful payments (Individual)
-                const { count: individualCredits } = await supabase
-                    .from('transactions')
-                    .select('*', { count: 'exact', head: true })
-                    .eq('user_id', user.id)
-                    .eq('status', 'success')
-                    .not('metadata->>target', 'eq', 'ORG'); // Exclude Org purchases
+                // PERFORMANCE OPTIMIZATION: Parallelize all database queries
+                const [
+                    { count: individualCredits },
+                    { count: usage },
+                    { data: profile },
+                ] = await Promise.all([
+                    // Credits: Number of successful payments (Individual)
+                    supabase
+                        .from('transactions')
+                        .select('*', { count: 'exact', head: true })
+                        .eq('user_id', user.id)
+                        .eq('status', 'success')
+                        .not('metadata->target', 'eq', 'ORG'),
 
-                // Usage: Total number of 'THESIS_CONSTRUCTOR' (Extraction) events.
-                const { count: usage } = await supabase
-                    .from('audit_logs')
-                    .select('*', { count: 'exact', head: true })
-                    .eq('user_id', user.id)
-                    .eq('action', 'THESIS_CONSTRUCTOR');
+                    // Usage: Total number of 'THESIS_CONSTRUCTOR' (Extraction) events
+                    supabase
+                        .from('audit_logs')
+                        .select('*', { count: 'exact', head: true })
+                        .eq('user_id', user.id)
+                        .eq('action', 'THESIS_CONSTRUCTOR'),
 
-                // 2. CHECK ORGANIZATION & TRIAL STATUS
-                const { data: profile } = await supabase
-                    .from('profiles')
-                    .select('is_trial_used, org_id')
-                    .eq('id', user.id)
-                    .single();
+                    // Profile and trial status
+                    supabase
+                        .from('profiles')
+                        .select('is_trial_used, org_id')
+                        .eq('id', user.id)
+                        .single()
+                ]);
 
+                // Get organization credits if user belongs to org
                 let orgCredits = 0;
                 if (profile?.org_id) {
-                    const { data: org } = await supabase.from('organizations').select('credits_balance').eq('id', profile.org_id).single();
+                    const { data: org } = await supabase
+                        .from('organizations')
+                        .select('credits_balance')
+                        .eq('id', profile.org_id)
+                        .single();
                     if (org) orgCredits = org.credits_balance || 0;
                 }
 
@@ -120,8 +131,7 @@ export default function ArgusDashboard() {
                 setAvailableCredits(totalCredits);
                 setUsedCredits(usage || 0);
 
-                // [NEW] PERSISTENCE LOGIC
-                // 1. Try to load *ACTIVE* session from DB first
+                // [NEW] PERSISTENCE LOGIC - Load session in parallel with credit checks
                 const { data: dbSessions } = await supabase
                     .from('sessions')
                     .select('*')
@@ -292,7 +302,7 @@ export default function ArgusDashboard() {
     // RENDER: Main Dashboard
     // ------------------------------------------------------------------
     return (
-        <div className="flex flex-col min-h-screen bg-white text-zinc-900 font-serif selection:bg-zinc-100 selection:text-zinc-900">
+        <div className="flex flex-col min-h-screen bg-white text-zinc-900 font-serif selection:bg-zinc-100 selection:text-zinc-900" data-testid="dashboard-ready">
             {/* HEADER */}
             <header className="px-6 h-16 flex items-center justify-between border-b border-zinc-200 bg-white sticky top-0 z-50">
                 <div className="flex items-center gap-2">
