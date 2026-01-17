@@ -29,9 +29,9 @@ export const metadata: Metadata = {
   keywords: ["Academic", "SaaS", "Research", "Governance", "Review", "Thesis", "Audit", "Adversarial", "AI"],
   authors: [{ name: "ARGUS-Thesis Governance" }],
   icons: {
-    icon: "/favicon.ico?v=2",
-    shortcut: "/favicon.ico?v=2",
-    apple: "/favicon.ico?v=2",
+    icon: "/logo.jpg?v=3",
+    shortcut: "/logo.jpg?v=3",
+    apple: "/logo.jpg?v=3",
   },
 };
 
