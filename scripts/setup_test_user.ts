@@ -123,7 +123,7 @@ async function setup() {
         .upsert({
             id: userId,
             org_id: orgData.id,
-            role: 'ORG_USER',
+            role: 'ORG_ADMIN', // Promoted to Admin for E2E testing
             email: email // Ensure email is set
         })
 

@@ -1,8 +1,9 @@
-import { createClient } from '@supabase/supabase-js'
+import { createClient } from '@/lib/supabase/server'
+import { createClient as createAdminClient } from '@supabase/supabase-js'
 import { NextResponse } from 'next/server'
 
 // Service Role Client for Admin Ops
-const supabaseAdmin = createClient(
+const supabaseAdmin = createAdminClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.SUPABASE_SERVICE_ROLE_KEY!,
     {
@@ -15,37 +16,44 @@ const supabaseAdmin = createClient(
 
 export async function POST(req: Request) {
     try {
-        const { orgName, userId } = await req.json()
+        const { orgName } = await req.json()
 
-        if (!orgName || !userId) {
-            return NextResponse.json({ error: "Missing Name or UserID" }, { status: 400 })
+        // 1. Authenticate User
+        const supabase = await createClient()
+        const { data: { user }, error: authError } = await supabase.auth.getUser()
+
+        if (authError || !user) {
+            return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
         }
 
-        // 1. Create Organization
+        if (!orgName) {
+            return NextResponse.json({ error: "Missing Name" }, { status: 400 })
+        }
+
+        // 2. Create Organization
         const { data: org, error: orgError } = await supabaseAdmin
             .from('organizations')
             .insert({
                 name: orgName,
                 credits_balance: 5, // Default Start credits
                 credits_total: 5,
-                owner_id: userId
+                owner_id: user.id
             })
             .select()
             .single()
 
         if (orgError) throw orgError
 
-        // 2. Link User to Org as Admin
+        // 3. Link User to Org as Admin
         const { error: profileError } = await supabaseAdmin
             .from('profiles')
             .update({
                 org_id: org.id,
                 role: 'ORG_ADMIN' // Set role
             })
-            .eq('id', userId)
+            .eq('id', user.id)
 
         if (profileError) {
-            // Rollback org creation? technically yes, but for now just error
             console.error("Profile Link Error", profileError)
             return NextResponse.json({ error: "Failed to link profile" }, { status: 500 })
         }

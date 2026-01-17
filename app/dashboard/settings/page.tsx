@@ -13,7 +13,7 @@ import { Shield, History, Building2, Users, Plus, AlertCircle } from "lucide-rea
 import { useState, useEffect } from "react"
 import Link from "next/link"
 import { createClient } from "@/lib/supabase/client"
-import { toast } from "sonner" // Assuming sonner or use alert
+
 
 export default function SettingsPage() {
     const supabase = createClient()
@@ -228,7 +228,8 @@ export default function SettingsPage() {
                                     </div>
                                     <div className="text-right">
                                         <div className="text-3xl font-bold font-mono">{org.credits_balance}</div>
-                                        <div className="text-xs text-zinc-500 uppercase tracking-wider">Shared Credits</div>
+                                        <div className="text-xs text-zinc-500 uppercase tracking-wider">Enterprise Credits</div>
+                                        <Badge variant="outline" className="mt-2 text-[10px] border-zinc-200">Subscription Active</Badge>
                                     </div>
                                 </CardHeader>
                                 <CardContent>
