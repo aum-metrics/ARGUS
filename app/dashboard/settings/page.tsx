@@ -95,7 +95,12 @@ export default function SettingsPage() {
             const data = await res.json()
             if (data.error) throw new Error(data.error)
 
-            alert("User added to Organization!")
+            if (data.created) {
+                alert(`New Account Auto-Provisioned!\n\nEmail: ${data.user.email}\nTemporary Password: ${data.tempPassword}\n\nPlease share these credentials with the user safely. They can change their password after logging in.`)
+            } else {
+                alert("Existing User successfully added to the Organization!")
+            }
+
             setInviteEmail("")
             // Refresh members
             const { data: members } = await supabase

@@ -42,15 +42,29 @@ export async function POST(req: Request) {
             return NextResponse.json({ error: "Forbidden: You are not an Admin of this organization" }, { status: 403 })
         }
 
-        // 3. Find Target User by Email (Admin API)
+        // 3. Find OR CREATE Target User
         const { data: { users }, error: listError } = await supabaseAdmin.auth.admin.listUsers()
         if (listError) throw listError
 
-        const targetUser = users.find(u => u.email?.toLowerCase() === email.toLowerCase())
+        let targetUser = users.find(u => u.email?.toLowerCase() === email.toLowerCase())
+        let createdNew = false;
+        const tempPassword = "TempPassword123!"
 
         if (!targetUser) {
-            return NextResponse.json({ error: "User not found. Ask them to sign up first as Individual." }, { status: 404 })
+            // Auto-provision logic requested by user
+            const { data: newUser, error: createError } = await supabaseAdmin.auth.admin.createUser({
+                email,
+                password: tempPassword,
+                email_confirm: true, // Auto-confirm for enterprise speed
+                user_metadata: { source: 'org_invite', org_id: orgId }
+            })
+
+            if (createError) throw createError
+            targetUser = newUser.user
+            createdNew = true
         }
+
+        if (!targetUser) throw new Error("Failed to find or create user")
 
         // 4. Link User to Org
         const { error: profileError } = await supabaseAdmin
@@ -63,7 +77,12 @@ export async function POST(req: Request) {
 
         if (profileError) throw profileError
 
-        return NextResponse.json({ success: true, user: { id: targetUser.id, email: targetUser.email } })
+        return NextResponse.json({
+            success: true,
+            user: { id: targetUser.id, email: targetUser.email },
+            created: createdNew,
+            tempPassword: createdNew ? tempPassword : null
+        })
 
     } catch (error: any) {
         return NextResponse.json({ error: error.message }, { status: 500 })

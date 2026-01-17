@@ -160,14 +160,6 @@ export const generateManuscriptPDF = (session: ArgusSession) => {
     const timestamp = new Date().toISOString().split('T')[0];
     const filename = `Argus_Governance_Report_${session.id}_${timestamp}.pdf`;
 
-    // Use output with explicit type to ensure proper download
-    const pdfBlob = doc.output('blob');
-    const url = URL.createObjectURL(pdfBlob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = filename;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    URL.revokeObjectURL(url);
+    // Use save() for better browser compatibility
+    doc.save(filename);
 };
