@@ -38,7 +38,7 @@ async function runTest() {
     try {
         // Use dynamic import to avoid require() lint error and handle types better
         // @ts-ignore - Importing pdf-parse might be tricky with types
-        const pdflibModule = await import('pdf-parse');
+        const pdflibModule = await import('pdf-parse') as any;
 
         let parser;
         if (typeof pdflibModule.default === 'function') {
