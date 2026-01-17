@@ -216,7 +216,42 @@ export default function ArgusDashboard() {
 
     const handleAudit = (claimId: string) => {
         if (session) {
-            runAdversaryOnClaim(claimId, session, (newData: any) => syncSession({ ...session, data: newData }));
+            runAdversaryOnClaim(claimId, session, async (newData: any) => {
+                // 1. Sync Session
+                syncSession({ ...session, data: newData });
+
+                // 2. [NEW] Log Data Asset (The Pulse of Science)
+                // We asynchronously log anonymity-preserved metrics to the public dashboard
+                const updatedClaim = newData.claims.find((c: any) => c.id === claimId);
+                if (updatedClaim && updatedClaim.status !== 'PENDING') {
+                    const verdictLog = updatedClaim.governanceLog.find((l: any) => l.role === 'JOURNAL_REVIEWER_SIMULATOR');
+                    if (verdictLog) {
+                        try {
+                            let verdictJson: any = {};
+                            // Robust JSON Parse (matching hook logic)
+                            let cleanJson = verdictLog.content;
+                            if (cleanJson.includes("```json")) cleanJson = cleanJson.replace(/```json/g, "").replace(/```/g, "");
+                            else if (cleanJson.includes("```")) cleanJson = cleanJson.replace(/```/g, "");
+                            const jsonMatch = cleanJson.match(/\{[\s\S]*\}/);
+                            verdictJson = jsonMatch ? JSON.parse(jsonMatch[0]) : {};
+
+                            const classification = verdictJson.noveltyClassification || [];
+                            const derivedField = classification.length > 0 ? classification[0].toUpperCase() : "ACADEMIC RESEARCH";
+
+                            await supabase.from('metadata_logs').insert({
+                                field: derivedField,
+                                failure_mode: verdictJson.reasons?.[0] || "Methodology Gaps",
+                                score: verdictJson.readinessScore || 0,
+                                verdict: verdictJson.verdict === 'PUBLISHABLE' ? 'PUBLISHABLE' : 'REJECT', // Map to strict enum
+                                org_id: session.data.context.orgId
+                            });
+                            console.log("[DATA ASSET] Logged audit metric to global pulse.");
+                        } catch (e) {
+                            console.error("Failed to log metadata", e);
+                        }
+                    }
+                }
+            });
         }
     }
 
