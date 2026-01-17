@@ -69,14 +69,14 @@ const SCENARIOS: Record<ScenarioId, BotMessage> = {
     },
     REFUNDS: {
         id: 'REFUNDS',
-        text: "If the system failed to generate a report due to a technical error, we issue full refunds. Please email support@argus.ac with your Session ID.",
+        text: "If the system failed to generate a report due to a technical error, we issue full refunds. Please email help@argus-thesis.com with your Session ID.",
         options: [
             { label: "Back to Menu", nextId: 'ROOT' }
         ]
     },
     ENTERPRISE: {
         id: 'ENTERPRISE',
-        text: "For University Departments and Labs, we offer bulk licensing with centralized dashboards. Visit the Enterprise page or contact sales@argus.ac.",
+        text: "For University Departments and Labs, we offer bulk licensing with centralized dashboards. Visit the Enterprise page or contact help@argus-thesis.com.",
         options: [
             { label: "Back to Menu", nextId: 'ROOT' }
         ]

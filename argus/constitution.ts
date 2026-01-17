@@ -85,8 +85,8 @@ export const ARGUS_CONSTITUTION = {
         }
     },
     pricing: {
-        currency: "INR",
-        amount: 124900, // ₹1,249 in paise ($14.99 USD)
+        currency: "USD",
+        amount: 1499, // $14.99 USD in cents
         model: "PAY_PER_VALIDATION",
         refundPolicy: "No refunds once governance starts. Charges for effort, not success."
     },

@@ -29,9 +29,9 @@ export const metadata: Metadata = {
   keywords: ["Academic", "SaaS", "Research", "Governance", "Review", "Thesis", "Audit", "Adversarial", "AI"],
   authors: [{ name: "ARGUS-Thesis Governance" }],
   icons: {
-    icon: "/logo.jpg?v=3",
-    shortcut: "/logo.jpg?v=3",
-    apple: "/logo.jpg?v=3",
+    icon: "/favicon.ico",
+    shortcut: "/favicon.ico",
+    apple: "/logo.jpg", // Keep apple touch icon as high-res jpg if needed, or use favicon if suitable
   },
 };
 

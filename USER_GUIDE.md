@@ -52,10 +52,10 @@ Once you are satisfied:
 ---
 
 ## 4. Credits & Billing
-*   **Individual Accounts**: Operate on a **Pay-Per-Use** model. You buy credits as you need them ($15/audit).
+*   **Individual Accounts**: Operate on a **Pay-Per-Use** model. You buy credits as you need them ($14.99/audit).
 *   **Organizations**: Operate on an **Enterprise Subscription** model. The Admin manages a central pool of credits, and we offer annual licensing for unlimited usage (Contact Sales). Currently, the system shows your "Enterprise Credit Balance."
 
-*   **Pricing**: $15 (approx ₹1,249) per Credit.
+*   **Pricing**: $14.99 per Credit.
 *   **Purchasing**: Click the "Top Up" button in the Dashboard. Secure payment via Razorpay.
     *   *Note*: If you are an **Organization Admin**, any credits you purchase will automatically be added to your **Organization's Shared Pool**, not your personal account.
 *   **Refunds**: Failed technical executions are refunded automatically. "Low quality" papers are not grounds for refunds—the tool's job is to critique.

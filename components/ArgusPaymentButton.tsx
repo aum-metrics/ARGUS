@@ -44,7 +44,7 @@ export function ArgusPaymentButton({ onSuccess, disabled }: ArgusPaymentProps) {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     amount: ARGUS_CONSTITUTION.pricing.amount,
-                    currency: 'INR'
+                    currency: 'USD'
                 })
             });
 
@@ -58,7 +58,7 @@ export function ArgusPaymentButton({ onSuccess, disabled }: ArgusPaymentProps) {
             const options = {
                 key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID!,
                 amount: amount,
-                currency: 'INR',
+                currency: 'USD',
                 name: 'ARGUS Governance',
                 description: 'Research Audit Credit',
                 order_id: order_id,
@@ -94,9 +94,10 @@ export function ArgusPaymentButton({ onSuccess, disabled }: ArgusPaymentProps) {
             onClick={handlePayment}
             disabled={disabled}
             className="bg-zinc-900 hover:bg-zinc-800 text-white w-full h-10"
+            suppressHydrationWarning
         >
             <CreditCard className="mr-2 h-4 w-4" />
-            Pay ₹{ARGUS_CONSTITUTION.pricing.amount / 100} to Validate
+            Buy Credit (${ARGUS_CONSTITUTION.pricing.amount / 100})
         </Button>
     );
 }

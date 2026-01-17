@@ -3,7 +3,7 @@
 > **Standard Operating Procedures (SOP 101)**
 
 ## Code Style
-*   **Framework**: Next.js 14 (App Router).
+*   **Framework**: Next.js 16+ (App Router).
 *   **Language**: TypeScript (Strict Mode).
 *   **Styling**: Tailwind CSS (pixel-perfect).
 *   **Linting**: Run `npm run lint` before commit.

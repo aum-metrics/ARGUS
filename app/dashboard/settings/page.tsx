@@ -287,7 +287,17 @@ export default function SettingsPage() {
                                                         <div className="text-xs text-zinc-500">{m.role}</div>
                                                     </div>
                                                 </div>
-                                                {m.role === 'ORG_ADMIN' && <Badge variant="secondary">Admin</Badge>}
+                                                {m.role === 'ORG_ADMIN' ? (
+                                                    <Badge variant="secondary">Admin</Badge>
+                                                ) : profile?.role === 'ORG_ADMIN' && (
+                                                    <Button variant="ghost" size="sm" className="h-6 text-[10px]" onClick={async () => {
+                                                        if (!confirm(`Promote ${m.email} to Admin? They will be able to spend credits.`)) return;
+                                                        await supabase.from('profiles').update({ role: 'ORG_ADMIN' }).eq('id', m.id);
+                                                        window.location.reload();
+                                                    }}>
+                                                        Promote
+                                                    </Button>
+                                                )}
                                             </div>
                                         ))}
                                     </div>

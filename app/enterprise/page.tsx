@@ -90,25 +90,25 @@ export default function EnterprisePage() {
                         </div>
 
                         <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
-                            {/* Department License */}
+                            {/* Lab Pack */}
                             <div className="border-2 border-zinc-200 rounded-2xl p-8 bg-white hover:border-zinc-300 transition-all">
-                                <h3 className="text-2xl font-bold mb-2">Department License</h3>
+                                <h3 className="text-2xl font-bold mb-2">Lab Starter Pack</h3>
                                 <div className="flex items-baseline gap-2 mb-6">
-                                    <span className="text-5xl font-bold">$249.99</span>
-                                    <span className="text-zinc-500">/mo</span>
+                                    <span className="text-5xl font-bold">$299</span>
+                                    <span className="text-zinc-500">/one-time</span>
                                 </div>
                                 <ul className="space-y-3 mb-8">
                                     <li className="flex items-start gap-2">
                                         <CheckCircle2 className="h-5 w-5 text-green-600 shrink-0 mt-0.5" />
-                                        <span>Up to 10 Researcher Seats</span>
+                                        <span>20 Full Audit Credits</span>
                                     </li>
                                     <li className="flex items-start gap-2">
                                         <CheckCircle2 className="h-5 w-5 text-green-600 shrink-0 mt-0.5" />
-                                        <span>20 Full Audits / Month</span>
+                                        <span>Credits Never Expire</span>
                                     </li>
                                     <li className="flex items-start gap-2">
                                         <CheckCircle2 className="h-5 w-5 text-green-600 shrink-0 mt-0.5" />
-                                        <span>$12.50 per audit (17% savings)</span>
+                                        <span>Share with up to 10 Researchers</span>
                                     </li>
                                     <li className="flex items-start gap-2">
                                         <CheckCircle2 className="h-5 w-5 text-green-600 shrink-0 mt-0.5" />
@@ -117,41 +117,41 @@ export default function EnterprisePage() {
                                 </ul>
                                 <Link href="/login" className="block">
                                     <Button className="w-full bg-zinc-900 text-white hover:bg-zinc-800 h-12">
-                                        Start Trial
+                                        Creates Lab Account
                                     </Button>
                                 </Link>
                             </div>
 
-                            {/* University License */}
+                            {/* Department Pack */}
                             <div className="border-2 border-zinc-900 rounded-2xl p-8 bg-zinc-50 relative">
                                 <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-zinc-900 text-white px-4 py-1 rounded-full text-sm font-bold">
                                     MOST POPULAR
                                 </div>
-                                <h3 className="text-2xl font-bold mb-2">University License</h3>
+                                <h3 className="text-2xl font-bold mb-2">Department Scale</h3>
                                 <div className="flex items-baseline gap-2 mb-6">
-                                    <span className="text-5xl font-bold">$499.99</span>
-                                    <span className="text-zinc-500">/mo</span>
+                                    <span className="text-5xl font-bold">$1,499</span>
+                                    <span className="text-zinc-500">/one-time</span>
                                 </div>
                                 <ul className="space-y-3 mb-8">
                                     <li className="flex items-start gap-2">
                                         <CheckCircle2 className="h-5 w-5 text-green-600 shrink-0 mt-0.5" />
-                                        <span>Unlimited Seats (SSO)</span>
+                                        <span>100 Full Audit Credits</span>
                                     </li>
                                     <li className="flex items-start gap-2">
                                         <CheckCircle2 className="h-5 w-5 text-green-600 shrink-0 mt-0.5" />
-                                        <span>50 Full Audits / Month</span>
+                                        <span>Credits Never Expire</span>
                                     </li>
                                     <li className="flex items-start gap-2">
                                         <CheckCircle2 className="h-5 w-5 text-green-600 shrink-0 mt-0.5" />
-                                        <span>$10 per audit (33% savings)</span>
-                                    </li>
-                                    <li className="flex items-start gap-2">
-                                        <CheckCircle2 className="h-5 w-5 text-green-600 shrink-0 mt-0.5" />
-                                        <span>Custom Agent Configurations</span>
+                                        <span>Unlimited Researcher Seats</span>
                                     </li>
                                     <li className="flex items-start gap-2">
                                         <CheckCircle2 className="h-5 w-5 text-green-600 shrink-0 mt-0.5" />
                                         <span>Dedicated Account Manager</span>
+                                    </li>
+                                    <li className="flex items-start gap-2">
+                                        <CheckCircle2 className="h-5 w-5 text-green-600 shrink-0 mt-0.5" />
+                                        <span>Custom Agent Configurations</span>
                                     </li>
                                 </ul>
                                 <Link href="/login" className="block">

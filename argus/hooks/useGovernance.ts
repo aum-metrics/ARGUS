@@ -137,6 +137,9 @@ export function useGovernance() {
                         
                         Attempt to extract claims from ANY text provided below OR from the visual inputs (charts/graphs/tables) attached to this request.
                         
+                        CRITICAL INSTRUCTION FOR IMAGES:
+                        If an image contains a chart, graph, or data table, you MUST extract the claim it is making (e.g., "Figure 1 demonstrates a linear relationship between X and Y"). Treat these visual claims as first-class citizens.
+                        
                         IMAGE INDEX REFERENCE:
                         The images attached are indexed from 0 to ${images.length - 1}.
                         

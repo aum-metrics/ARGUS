@@ -63,7 +63,7 @@ graph TD
 ## 3. Technical Stack & Infrastructure
 
 ### 3.1 Frontend & Orchestration
-*   **Framework**: Next.js 14+ (App Router).
+*   **Framework**: Next.js 16+ (App Router).
 *   **State Management**: React Context (Session State).
 *   **Styling**: Tailwind CSS + Shadcn/UI (The "Academic Light" Design System).
 *   **PDF Handling**: `pdf-parse` (Server-side extraction), `jsPDF` (Report generation).
@@ -100,6 +100,23 @@ ARGUS follows a "Metadata Only" storage policy.
 1.  **Individual**: Self-service Sign Up. Immediate access.
 2.  **Organization**: Admin-provisioned. The Admin invites uses via email.
     *   *Why?* prevents fraud and ensures proper domain verification for University licenses.
+
+---
+
+## 6. Enterprise Payment & Credit Flow (Two-Level)
+ARGUS uses a hierarchical billing model to support University Departments.
+
+1.  **Level 1: The Organization (Payer)**
+    *   The **Department Head** (Org Admin) buys a "Credit Pack" (e.g., $1,499 for 100 Audits).
+    *   These credits are stored in the `organizations` table (`credits_balance`).
+    *   Payment Gateway: Razorpay -> `api/verify-payment` -> Updates `organizations`.
+
+2.  **Level 2: The Researcher (Consumer)**
+    *   Students/Researchers join the Organization via Invite Code.
+    *   When they run an audit, the system checks `profiles.org_id`.
+    *   If present, it calls `consume_credit(org_id)` RPC.
+    *   Credits are deducted from the **Organization's Pool**, not the user's personal wallet.
+    *   *Analogy*: Similar to a Corporate Uber account. The company pays, the employee rides.
 
 ---
 

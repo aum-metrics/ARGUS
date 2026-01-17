@@ -27,7 +27,7 @@ export async function POST(req: Request) {
         // Create order
         const order = await razorpay.orders.create({
             amount: amount, // Amount in paise
-            currency: currency || 'INR',
+            currency: currency || 'USD',
             receipt: `receipt_${Date.now()}`,
             notes: {
                 product: 'ARGUS Audit Credit'
