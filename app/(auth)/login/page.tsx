@@ -252,7 +252,13 @@ export default function LoginPage() {
                     )}
                 </CardContent>
 
-                <CardFooter className="flex justify-center border-t border-zinc-100 pt-4">
+                <CardFooter className="flex flex-col gap-4 border-t border-zinc-100 pt-4">
+                    <p className="text-sm text-center text-zinc-600">
+                        Don't have an account?{" "}
+                        <Link href="/register" className="font-semibold text-zinc-900 hover:underline">
+                            Create Account
+                        </Link>
+                    </p>
                     <p className="text-xs text-center text-zinc-500 font-sans">
                         Protected by ARGUS-Thesis Governance. <br />
                         <Link href="/terms" className="underline hover:text-zinc-900">Terms</Link> & <Link href="/privacy" className="underline hover:text-zinc-900">Privacy</Link>.
