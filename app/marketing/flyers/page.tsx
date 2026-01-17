@@ -1,0 +1,145 @@
+"use client";
+
+import React from 'react';
+import { ShieldCheck, AlertTriangle, Scale, Network } from 'lucide-react';
+
+export default function FlyersPage() {
+    return (
+        <div className="min-h-screen bg-zinc-100 p-8 space-y-16">
+
+            {/* DESIGN 1: THE FEAR (Red/Black) */}
+            <div id="flyer-fear" className="w-[794px] h-[1123px] bg-zinc-900 mx-auto relative overflow-hidden flex flex-col items-center justify-center text-center shadow-2xl p-16 border-8 border-zinc-900">
+                {/* Background Texture */}
+                <div className="absolute inset-0 z-0 opacity-20" style={{ backgroundImage: "radial-gradient(#3f3f46 1px, transparent 1px)", backgroundSize: "24px 24px" }}></div>
+
+                <div className="z-10 relative space-y-8">
+                    <div className="w-24 h-24 bg-red-600 rounded-full flex items-center justify-center mx-auto animate-pulse">
+                        <AlertTriangle className="h-12 w-12 text-white" />
+                    </div>
+
+                    <h1 className="text-8xl font-black text-white leading-none tracking-tighter">
+                        REJECTED.
+                    </h1>
+
+                    <div className="h-1 w-32 bg-red-600 mx-auto"></div>
+
+                    <p className="text-3xl font-serif text-zinc-400 max-w-2xl leading-snug">
+                        <span className="text-white font-bold">60% of papers fail</span> not because of bad data,<br /> but because of <span className="text-red-500">weak logic</span>.
+                    </p>
+
+                    <div className="pt-12">
+                        <p className="text-zinc-500 uppercase tracking-widest text-sm mb-4">Don't let Reviewer #2 kill your tenure.</p>
+                        <div className="text-5xl font-bold text-white bg-zinc-800 py-4 px-12 rounded-full border border-zinc-700">
+                            ARGUS-THESIS
+                        </div>
+                        <p className="text-zinc-600 mt-4 font-mono text-sm">The Adversarial Pre-Flight Check.</p>
+                    </div>
+                </div>
+
+                {/* Footer */}
+                <div className="absolute bottom-12 text-zinc-700 text-xs tracking-[0.2em]">
+                    SYSTEM V2.0 // ADVERSARIAL GOVERNANCE
+                </div>
+            </div>
+
+            {/* DESIGN 2: THE SOLUTION (Clean/White) */}
+            <div id="flyer-solution" className="w-[794px] h-[1123px] bg-white mx-auto relative overflow-hidden flex flex-col p-16 shadow-2xl border border-zinc-200">
+                <div className="flex justify-between items-start border-b border-zinc-100 pb-8 mb-16">
+                    <div className="flex items-center gap-4">
+                        <div className="h-12 w-12 bg-zinc-900 rounded-full flex items-center justify-center">
+                            <ShieldCheck className="h-6 w-6 text-white" />
+                        </div>
+                        <div>
+                            <h2 className="text-2xl font-bold text-zinc-900 tracking-tight">ARGUS</h2>
+                            <p className="text-xs text-zinc-500 uppercase tracking-widest">Validation System</p>
+                        </div>
+                    </div>
+                    <div className="text-right">
+                        <p className="text-sm font-bold text-zinc-900">CERTIFICATE OF DEFENSIBILITY</p>
+                        <p className="text-xs text-zinc-400 font-mono">ISO-9001 FOR ARGUMENTS</p>
+                    </div>
+                </div>
+
+                <div className="flex-1 flex flex-col justify-center space-y-12">
+                    <h1 className="text-7xl font-serif font-medium text-zinc-900 leading-[0.9]">
+                        Don't Submit.<br />
+                        <span className="italic text-zinc-400">Verify.</span>
+                    </h1>
+
+                    <div className="space-y-6 max-w-lg">
+                        <div className="flex items-start gap-4">
+                            <div className="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center mt-1"><span className="text-green-700 font-bold">1</span></div>
+                            <p className="text-lg text-zinc-600"><strong>Upload Draft.</strong> Our 6-agent swarm attacks your thesis seeking logical fallacies.</p>
+                        </div>
+                        <div className="flex items-start gap-4">
+                            <div className="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center mt-1"><span className="text-green-700 font-bold">2</span></div>
+                            <p className="text-lg text-zinc-600"><strong>Fix Flaws.</strong> Get a brutal, honest roadmap to bulletproof your argument.</p>
+                        </div>
+                        <div className="flex items-start gap-4">
+                            <div className="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center mt-1"><span className="text-green-700 font-bold">3</span></div>
+                            <p className="text-lg text-zinc-600"><strong>Certify.</strong> Attach the <i>Verified Certificate</i> to your submission.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div className="bg-zinc-50 p-8 rounded-xl border border-zinc-100 mt-16">
+                    <p className="text-center font-serif text-xl italic text-zinc-800">
+                        "The only tool that checks your thinking, not just your grammar."
+                    </p>
+                </div>
+            </div>
+
+            {/* DESIGN 3: THE INSTITUTION (Blue/Academic) */}
+            <div id="flyer-institution" className="w-[794px] h-[1123px] bg-slate-900 mx-auto relative overflow-hidden flex flex-col p-16 shadow-2xl border-t-8 border-indigo-500">
+                <div className="absolute top-0 right-0 p-16 opacity-10">
+                    <Network className="w-96 h-96 text-indigo-300" />
+                </div>
+
+                <div className="z-10 relative">
+                    <div className="inline-block px-4 py-2 bg-indigo-500/20 text-indigo-300 rounded-full text-sm font-bold uppercase tracking-widest mb-8 border border-indigo-500/30">
+                        For Lab Directors
+                    </div>
+
+                    <h1 className="text-6xl font-bold text-white mb-6 leading-tight">
+                        Standardize Your<br />Lab's <span className="text-indigo-400">Intellectual Output.</span>
+                    </h1>
+
+                    <p className="text-xl text-slate-400 max-w-xl leading-relaxed mb-16">
+                        You generate data at world-class speed. <br />
+                        Don't let structural fragility slow down publication.
+                    </p>
+
+                    <div className="grid grid-cols-2 gap-8 mb-16">
+                        <div className="bg-slate-800/50 p-6 rounded-lg border border-slate-700 backdrop-blur-sm">
+                            <h3 className="text-indigo-400 font-bold text-lg mb-2">Zero Retention</h3>
+                            <p className="text-slate-400 text-sm">We process claims in volatile memory. Your IP never touches a disk.</p>
+                        </div>
+                        <div className="bg-slate-800/50 p-6 rounded-lg border border-slate-700 backdrop-blur-sm">
+                            <h3 className="text-indigo-400 font-bold text-lg mb-2">Audit Trails</h3>
+                            <p className="text-slate-400 text-sm">Monitor the "Defensibility Score" of every student in your cohort.</p>
+                        </div>
+                    </div>
+
+                    <div className="border-l-4 border-indigo-500 pl-8 py-2">
+                        <p className="text-white text-2xl font-serif">
+                            "Nature-Ready Engineering."
+                        </p>
+                        <p className="text-slate-500 mt-2">
+                            — The Argus Standard
+                        </p>
+                    </div>
+                </div>
+
+                <div className="mt-auto pt-16 border-t border-slate-800 flex justify-between items-end">
+                    <div className="text-slate-500 font-mono text-sm">
+                        enterprise@argus-thesis.com
+                    </div>
+                    <div className="text-4xl font-bold text-white tracking-tighter">
+                        ARGUS
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    );
+}

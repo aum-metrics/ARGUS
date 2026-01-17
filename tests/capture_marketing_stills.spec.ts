@@ -143,4 +143,28 @@ test.describe('Marketing Asset Generation', () => {
         await page.screenshot({ path: 'marketing_assets/04_Mobile_Landing.png', fullPage: true });
     });
 
+    test('05. Flyer - The Fear (Red)', async ({ page }) => {
+        await page.goto('/marketing/flyers');
+        await page.waitForLoadState('networkidle');
+        const flyer = page.locator('#flyer-fear');
+        await expect(flyer).toBeVisible();
+        await flyer.screenshot({ path: 'marketing_assets/Flyer_01_Fear.png' });
+    });
+
+    test('06. Flyer - The Solution (White)', async ({ page }) => {
+        await page.goto('/marketing/flyers');
+        await page.waitForLoadState('networkidle');
+        const flyer = page.locator('#flyer-solution');
+        await expect(flyer).toBeVisible();
+        await flyer.screenshot({ path: 'marketing_assets/Flyer_02_Solution.png' });
+    });
+
+    test('07. Flyer - The Institution (Blue)', async ({ page }) => {
+        await page.goto('/marketing/flyers');
+        await page.waitForLoadState('networkidle');
+        const flyer = page.locator('#flyer-institution');
+        await expect(flyer).toBeVisible();
+        await flyer.screenshot({ path: 'marketing_assets/Flyer_03_Enterprise.png' });
+    });
+
 });
