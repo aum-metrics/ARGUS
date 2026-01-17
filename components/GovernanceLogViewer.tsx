@@ -1,5 +1,5 @@
-import React, { useEffect, useRef } from 'react';
-import { ScrollText, Terminal, CheckCircle2, Loader2, XCircle } from 'lucide-react';
+import React, { useEffect, useRef, useState } from 'react';
+import { Terminal, Loader2, Cpu, ShieldAlert, BookOpen, Scale } from 'lucide-react';
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 
 interface GovernanceLogViewerProps {
@@ -10,6 +10,7 @@ interface GovernanceLogViewerProps {
 
 export function GovernanceLogViewer({ logs, isProcessing, currentStep }: GovernanceLogViewerProps) {
     const scrollRef = useRef<HTMLDivElement>(null);
+    const [dots, setDots] = useState('');
 
     // Auto-scroll to bottom
     useEffect(() => {
@@ -18,49 +19,72 @@ export function GovernanceLogViewer({ logs, isProcessing, currentStep }: Governa
         }
     }, [logs]);
 
+    // Blinking dots animation
+    useEffect(() => {
+        if (!isProcessing) return;
+        const interval = setInterval(() => {
+            setDots(prev => prev.length >= 3 ? '' : prev + '.');
+        }, 500);
+        return () => clearInterval(interval);
+    }, [isProcessing]);
+
     if (logs.length === 0 && !isProcessing) return null;
 
     return (
-        <Card className="bg-zinc-950 border-zinc-800 shadow-2xl mt-8 animate-in slide-in-from-bottom-4">
-            <CardHeader className="border-b border-zinc-800 py-3 bg-zinc-900/50">
-                <CardTitle className="text-xs font-mono uppercase tracking-widest text-zinc-400 flex items-center gap-2">
-                    <Terminal className="h-4 w-4 text-green-500" />
-                    System Kernel Ops
+        <Card className="bg-black border-zinc-800 shadow-2xl mt-8 animate-in slide-in-from-bottom-4 overflow-hidden relative group">
+            {/* CRT Scanline Effect */}
+            <div className="absolute inset-0 pointer-events-none z-20 bg-[linear-gradient(rgba(18,16,16,0)_50%,rgba(0,0,0,0.25)_50%),linear-gradient(90deg,rgba(255,0,0,0.06),rgba(0,255,0,0.02),rgba(0,0,255,0.06))] bg-[length:100%_2px,3px_100%] bg-repeat opacity-20"></div>
+
+            <CardHeader className="border-b border-zinc-900 py-3 bg-zinc-950/90 relative z-30">
+                <CardTitle className="text-xs font-mono uppercase tracking-[0.2em] text-zinc-500 flex items-center gap-2">
+                    <Terminal className="h-4 w-4 text-green-500 animate-pulse" />
+                    ARGUS_OS KERNEL V1.4
                     {isProcessing && (
-                        <span className="ml-auto inline-flex items-center gap-2 text-green-400 animate-pulse">
-                            <span className="w-2 h-2 bg-green-500 rounded-full"></span>
-                            Running: {currentStep}
+                        <span className="ml-auto inline-flex items-center gap-2 text-green-400">
+                            <span className="w-1.5 h-1.5 bg-green-500 rounded-full animate-ping"></span>
+                            PROCESS: {currentStep}
                         </span>
                     )}
                 </CardTitle>
             </CardHeader>
-            <CardContent className="p-0">
+            <CardContent className="p-0 relative z-10 font-mono text-xs">
+                {/* Vintage Screen Glow */}
+                <div className="absolute inset-0 pointer-events-none shadow-[inset_0_0_100px_rgba(0,0,0,0.9)] z-20"></div>
+
                 <div
                     ref={scrollRef}
-                    className="h-64 overflow-y-auto p-4 space-y-2 font-mono text-xs bg-black/40"
+                    className="h-72 overflow-y-auto p-4 space-y-1.5 bg-black/90 text-zinc-300 font-mono"
                 >
                     {logs.map((log, i) => {
-                        const isSystem = log.startsWith("[SYSTEM]");
-                        const isError = log.includes("[ERROR]");
-                        const isSwarm = log.startsWith("[SWARM]") || log.startsWith("[ORCHESTRATOR]");
+                        // Role Detection & Coloring
+                        let roleColor = 'text-zinc-400';
+                        let Icon = Cpu;
+                        let prefix = '';
+
+                        if (log.includes("[SYSTEM]")) { roleColor = 'text-blue-400'; Icon = Terminal; }
+                        else if (log.includes("[ERROR]")) { roleColor = 'text-red-500 font-bold'; Icon = ShieldAlert; }
+                        else if (log.includes("THESIS_DESTROYER")) { roleColor = 'text-red-400'; Icon = ShieldAlert; prefix = 'ADVERSARY'; }
+                        else if (log.includes("METHODOLOGY")) { roleColor = 'text-cyan-400'; Icon = Scale; prefix = 'METHOD'; }
+                        else if (log.includes("LITERATURE")) { roleColor = 'text-yellow-400'; Icon = BookOpen; prefix = 'LIBRARY'; }
+                        else if (log.includes("[SWARM]")) { roleColor = 'text-purple-400'; Icon = Cpu; }
 
                         return (
-                            <div key={i} className="flex items-start gap-3 border-l-2 border-transparent hover:bg-white/5 p-1 rounded transition-colors group">
-                                <span className="text-zinc-600 select-none w-6 text-right opacity-50">{i + 1}</span>
-                                <span className={`break-words flex-1 ${isError ? 'text-red-400 font-bold border-l-red-500 pl-2' :
-                                        isSystem ? 'text-blue-400' :
-                                            isSwarm ? 'text-purple-400' :
-                                                'text-zinc-300'
-                                    }`}>
-                                    {log}
+                            <div key={i} className="flex items-start gap-3 p-0.5 animate-in fade-in duration-300">
+                                <span className="text-zinc-700 select-none w-8 text-right font-light text-[10px] pt-0.5 opacity-50">
+                                    {(i + 1).toString().padStart(3, '0')}
                                 </span>
+                                <div className={`flex-1 break-words leading-relaxed ${roleColor}`}>
+                                    {prefix && <span className="opacity-80 font-bold mr-2 text-[10px] border border-current px-1 rounded-sm">{prefix}</span>}
+                                    <span className="font-medium tracking-wide">{log.replace(/\[.*?\]/g, '').trim()}</span>
+                                </div>
                             </div>
                         );
                     })}
+
                     {isProcessing && (
-                        <div className="flex items-center gap-2 text-zinc-500 animate-pulse pl-9 pt-2">
-                            <Loader2 className="h-3 w-3 animate-spin" />
-                            <span>Processing stream...</span>
+                        <div className="flex items-center gap-2 text-green-500 pl-11 pt-2 animate-pulse">
+                            <span className="w-2 h-4 bg-green-500 block animate-[cursor-blink_1s_steps(2)_infinite]"></span>
+                            <span className="tracking-widest">AWAITING_INPUT{dots}</span>
                         </div>
                     )}
                 </div>

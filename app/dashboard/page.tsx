@@ -964,22 +964,58 @@ export default function ArgusDashboard() {
                                     </div>
                                 </CardHeader>
                                 <CardContent className="p-6">
-                                    <div className="flex flex-col md:flex-row gap-8 items-center">
-                                        {/* GAUGE */}
-                                        <div className="relative w-32 h-32 flex-shrink-0 flex items-center justify-center">
-                                            <svg className="w-full h-full transform -rotate-90">
-                                                <circle cx="64" cy="64" r="56" stroke="gray" strokeWidth="8" fill="transparent" className="text-zinc-100" />
-                                                <circle cx="64" cy="64" r="56" stroke="currentColor" strokeWidth="8" fill="transparent"
-                                                    strokeDasharray={351}
-                                                    strokeDashoffset={351 - (351 * session.data.report.readinessScore) / 100}
-                                                    className={session.data.report.readinessScore > 80 ? "text-green-500" : session.data.report.readinessScore > 50 ? "text-yellow-500" : "text-red-500"}
-                                                    strokeLinecap="round"
-                                                />
-                                            </svg>
-                                            <div className="absolute flex flex-col items-center">
-                                                <span className="text-3xl font-bold font-sans">{session.data.report.readinessScore}</span>
-                                                <span className="text-[10px] text-zinc-400 font-mono">SCORE</span>
+                                    <div className="flex flex-col md:flex-row gap-8 items-start">
+                                        {/* LEFT: GAUGE & TRINITY */}
+                                        <div className="flex flex-col gap-6 shrink-0">
+                                            {/* MAIN GAUGE */}
+                                            <div className="relative w-32 h-32 flex-shrink-0 flex items-center justify-center mx-auto">
+                                                <svg className="w-full h-full transform -rotate-90">
+                                                    <circle cx="64" cy="64" r="56" stroke="gray" strokeWidth="8" fill="transparent" className="text-zinc-100" />
+                                                    <circle cx="64" cy="64" r="56" stroke="currentColor" strokeWidth="8" fill="transparent"
+                                                        strokeDasharray={351}
+                                                        strokeDashoffset={351 - (351 * session.data.report.readinessScore) / 100}
+                                                        className={session.data.report.readinessScore > 80 ? "text-green-500" : session.data.report.readinessScore > 50 ? "text-yellow-500" : "text-red-500"}
+                                                        strokeLinecap="round"
+                                                    />
+                                                </svg>
+                                                <div className="absolute flex flex-col items-center">
+                                                    <span className="text-3xl font-bold font-sans">{session.data.report.readinessScore}</span>
+                                                    <span className="text-[10px] text-zinc-400 font-mono">SCORE</span>
+                                                </div>
                                             </div>
+
+                                            {/* TRINITY VECTORS (IP V1.5) */}
+                                            {session.data.report.trinityScore && (
+                                                <div className="w-48 space-y-3">
+                                                    <div className="space-y-1">
+                                                        <div className="flex justify-between text-[10px] uppercase font-bold text-zinc-500">
+                                                            <span>Logical Coherence</span>
+                                                            <span className="text-zinc-900">{session.data.report.trinityScore.coherence}%</span>
+                                                        </div>
+                                                        <div className="h-1.5 w-full bg-zinc-100 rounded-full overflow-hidden">
+                                                            <div className="h-full bg-blue-500 rounded-full" style={{ width: `${session.data.report.trinityScore.coherence}%` }}></div>
+                                                        </div>
+                                                    </div>
+                                                    <div className="space-y-1">
+                                                        <div className="flex justify-between text-[10px] uppercase font-bold text-zinc-500">
+                                                            <span>Empirical Density</span>
+                                                            <span className="text-zinc-900">{session.data.report.trinityScore.empirical}%</span>
+                                                        </div>
+                                                        <div className="h-1.5 w-full bg-zinc-100 rounded-full overflow-hidden">
+                                                            <div className="h-full bg-purple-500 rounded-full" style={{ width: `${session.data.report.trinityScore.empirical}%` }}></div>
+                                                        </div>
+                                                    </div>
+                                                    <div className="space-y-1">
+                                                        <div className="flex justify-between text-[10px] uppercase font-bold text-zinc-500">
+                                                            <span>Novelty Index</span>
+                                                            <span className="text-zinc-900">{session.data.report.trinityScore.novelty}%</span>
+                                                        </div>
+                                                        <div className="h-1.5 w-full bg-zinc-100 rounded-full overflow-hidden">
+                                                            <div className="h-full bg-amber-500 rounded-full" style={{ width: `${session.data.report.trinityScore.novelty}%` }}></div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            )}
                                         </div>
 
                                         {/* EXECUTIVE SUMMARY */}

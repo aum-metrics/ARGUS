@@ -395,6 +395,11 @@ FULL CONTEXT: ${currentSession.data.originalText.substring(0, 5000)}...`); // Gi
                 OUTPUT FORMAT: Strict JSON Object
                 {
                     "readinessScore": number, // 0-100 (where >85 is Publishable)
+                    "trinityScore": {
+                        "coherence": number, // 0-100 (Logical flow)
+                        "empirical": number, // 0-100 (Data density)
+                        "novelty": number    // 0-100 (Originality)
+                    },
                     "verdict": "PUBLISHABLE" | "REVISE_MAJOR" | "REJECT",
                     "executiveSummary": "Short 2-sentence summary for the Department Head.",
                     "actionItems": [

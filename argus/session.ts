@@ -3,6 +3,28 @@
  */
 import { v4 as uuidv4 } from 'uuid';
 
+export interface ArgusReport {
+    readinessScore: number; // 0-100
+    // [NEW] V1.5 Trinity Score
+    trinityScore?: {
+        coherence: number;
+        empirical: number;
+        novelty: number;
+    };
+    verdict: 'PUBLISHABLE' | 'REVISE_MAJOR' | 'REJECT';
+    executiveSummary: string;
+    keyStrengths?: string[];
+    weaknesses?: string[];
+    actionItems: {
+        id?: string;
+        priority: 'HIGH' | 'MED' | 'LOW' | 'MEDIUM';
+        layer: string;
+        suggestion: string;
+        status?: 'OPEN' | 'FIXED';
+        issue: string; // Add issue field for compatibility
+    }[];
+}
+
 export interface ArgusSession {
     id: string; // ARGUS-S-YYYY-MM-DD-XXXX
     startTime: string;
@@ -20,18 +42,7 @@ export interface ArgusSession {
         };
 
         // [NEW] Enhanced Actionable Output
-        report?: {
-            readinessScore: number; // 0-100
-            verdict: 'PUBLISHABLE' | 'REVISE_MAJOR' | 'REJECT';
-            executiveSummary: string;
-            actionItems: {
-                id: string;
-                priority: 'HIGH' | 'MED' | 'LOW';
-                layer: string; // e.g. "Methodology"
-                suggestion: string;
-                status: 'OPEN' | 'FIXED';
-            }[];
-        };
+        report?: ArgusReport;
 
         claims: {
             id: string;
