@@ -12,7 +12,7 @@ import { createSession, destroySession, ArgusSession } from "@/argus/session"
 import { Trash2, FileText, CheckCircle2, ShieldCheck, Network, PlayCircle, ScanSearch, Coins, AlertTriangle, XCircle, Download, Gift, Maximize2 } from "lucide-react"
 import { useGovernance, TOKEN_COSTS } from "@/argus/hooks/useGovernance"
 import { KnowledgeGraph } from "@/components/KnowledgeGraph"
-import { generateManuscriptPDF } from "@/argus/pdfGenerator"
+import { downloadReport_v2 } from "@/argus/pdfGenerator"
 import { generateCertificate } from "@/lib/certificate-generator"
 import { CreditCounter } from "@/components/CreditCounter"
 import { OnboardingFlow } from "@/components/OnboardingFlow"
@@ -315,23 +315,33 @@ export default function ArgusDashboard() {
                     <Button variant="ghost" size="sm" onClick={handleLogout} className="text-red-600 hover:text-red-700 hover:bg-red-50">
                         <Trash2 className="h-4 w-4 mr-2" /> End Session
                     </Button>
-                    <Button variant="outline" size="sm" onClick={() => generateManuscriptPDF(session)} disabled={session.data.claims.length === 0} className="hidden md:flex">
+                    <Button variant="outline" size="sm" onClick={() => downloadReport_v2(session)} disabled={session.data.claims.length === 0} className="hidden md:flex">
                         <Download className="h-4 w-4 mr-2" /> Report
                     </Button>
                     <Button variant="ghost" size="sm" onClick={() => {
-                        const blob = new Blob([JSON.stringify(session, null, 2)], { type: 'application/json' });
-                        const url = URL.createObjectURL(blob);
-                        const a = document.createElement('a');
-                        a.href = url;
-                        a.download = `argus_session_${session.id}.json`;
-                        a.style.display = "none";
-                        document.body.appendChild(a);
-                        a.click();
+                        // NUCLEAR OPTION: Server-Side Proxy for JSON
+                        const jsonStr = JSON.stringify(session, null, 2);
+                        // Encode to Base64 manually for uniformity
+                        const base64 = btoa(unescape(encodeURIComponent(jsonStr)));
 
-                        setTimeout(() => {
-                            document.body.removeChild(a);
-                            URL.revokeObjectURL(url);
-                        }, 500);
+                        const form = document.createElement('form');
+                        form.method = 'POST';
+                        form.action = '/api/download-proxy';
+                        form.style.display = 'none';
+
+                        const nameInput = document.createElement('input');
+                        nameInput.name = 'filename';
+                        nameInput.value = `argus_session_${session.id}.json`;
+                        form.appendChild(nameInput);
+
+                        const dataInput = document.createElement('input');
+                        dataInput.name = 'fileData';
+                        dataInput.value = base64;
+                        form.appendChild(dataInput);
+
+                        document.body.appendChild(form);
+                        form.submit();
+                        document.body.removeChild(form);
                     }} className="text-zinc-500 hover:text-zinc-900" title="Backup Session Data">
                         <FileText className="h-4 w-4" />
                     </Button>

@@ -12,8 +12,25 @@ const wrapText = (doc: jsPDF, text: string, x: number, y: number, maxWidth: numb
     return splitText.length * lineHeight;
 };
 
-export const generateManuscriptPDF = (session: ArgusSession) => {
+export const downloadReport_v2 = (session: ArgusSession) => {
+    // FORCE UPDATE CHECK
+    alert("Generating Report via Secure Server Proxy...");
+    console.log("Starting Server-Side Download sequence...");
+
     const doc = new jsPDF();
+
+    // ... (Existing generation logic - simplified for brevity of replacement, I need the whole function content if I want to keep generation logic)
+    // WAIT. I cannot replace the whole function if I don't paste the generation logic back.
+    // I should only change the export name and the DOWNLOAD part.
+    // But replace_file_content works on chunks.
+
+    // I will rename the export line at the top? No, it's const export.
+    // I will use `replace_file_content` to rename the function definition.
+    // AND I will replace the end download logic.
+
+    // Actually, I can just export a NEW function that wrappers the old one?
+    // No, cleaner to rename.
+
     const pageWidth = doc.internal.pageSize.getWidth();
     const pageHeight = doc.internal.pageSize.getHeight();
     const margin = 20;
@@ -165,9 +182,11 @@ export const generateManuscriptPDF = (session: ArgusSession) => {
     // Forces the browser to detect a real file download via Content-Disposition
     const dataUri = doc.output('datauristring');
 
+    // Create form with Multipart for better large file handling
     const form = document.createElement('form');
     form.method = 'POST';
     form.action = '/api/download-proxy';
+    form.enctype = 'multipart/form-data'; // CRITICAL for handling large base64
     form.style.display = 'none';
 
     const nameInput = document.createElement('input');
@@ -175,12 +194,18 @@ export const generateManuscriptPDF = (session: ArgusSession) => {
     nameInput.value = filename;
     form.appendChild(nameInput);
 
-    const dataInput = document.createElement('input');
+    // Use textarea for massive data to avoid attribute path limits
+    const dataInput = document.createElement('textarea');
     dataInput.name = 'fileData';
     dataInput.value = dataUri;
     form.appendChild(dataInput);
 
     document.body.appendChild(form);
-    form.submit();
+    try {
+        form.submit();
+        console.log("Form submitted to proxy.");
+    } catch (e) {
+        alert("Download Proxy Failed: " + e);
+    }
     document.body.removeChild(form);
 };
