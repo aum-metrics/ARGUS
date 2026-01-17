@@ -128,7 +128,7 @@ export default function FlyersPage() {
                             "Engineering reliability for academic claims."
                         </p>
                         <p className="text-slate-500 mt-2">
-                            — The Argus Standard
+                            — The ARGUS-Thesis Standard
                         </p>
                     </div>
                 </div>
