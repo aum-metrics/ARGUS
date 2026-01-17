@@ -67,10 +67,10 @@ export async function GET(req: Request) {
                 totalAudits: totalAudits || 0,
                 systemHealth: "OPTIMAL" // Mock, could hook into infra later
             },
-            feed: recentAudits,
+            feed: recentAudits || [],
             data: {
-                organizations,
-                users
+                organizations: organizations || [],
+                users: users || []
             }
         });
 
