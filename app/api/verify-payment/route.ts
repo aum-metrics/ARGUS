@@ -75,7 +75,7 @@ export async function POST(req: NextRequest) {
                         await supabaseAdmin
                             .from('organizations')
                             .update({
-                                credits_balance: (org.credits_balance || 0) + 1 // Assuming 1 Credit per Transaction
+                                credits_balance: (org.credits_balance || 0) + (transactionData.metadata?.credits || 1)
                             })
                             .eq('id', profile.org_id);
 

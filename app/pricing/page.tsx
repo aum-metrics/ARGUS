@@ -78,9 +78,9 @@ export default function PricingPage() {
                                     Equip your entire research cohort with ARGUS-Thesis. Standardize pre-submission rigor, reduce desk rejections, and track output quality with our unified dashboard.
                                 </p>
                                 <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                                    <Link href="/enterprise">
+                                    <Link href="/register/organization">
                                         <Button className="bg-white text-zinc-950 hover:bg-zinc-200 h-12 px-8 font-bold">
-                                            View Institutional Tiers
+                                            Create Lab Account
                                         </Button>
                                     </Link>
                                     <Link href="/contact">

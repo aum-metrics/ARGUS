@@ -91,8 +91,8 @@ export async function POST(req: Request) {
 
                 const { count: usage } = await supabase.from('audit_logs').select('*', { count: 'exact', head: true }).eq('user_id', user.id).eq('action', 'THESIS_CONSTRUCTOR');
 
-                // [BETA BYPASS] Grant 10 Virtual Credits to all users due to DB Migration Issues
-                const VIRTUAL_CREDITS = 10;
+                // [PRODUCTION] Strict Quota - No Virtual Credits
+                const VIRTUAL_CREDITS = 0;
                 const creditVal = (credits || 0) + VIRTUAL_CREDITS;
                 const rawVal = rawCredits || 0;
                 const usageVal = usage || 0;
