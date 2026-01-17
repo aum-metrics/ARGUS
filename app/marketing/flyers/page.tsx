@@ -39,8 +39,9 @@ export default function FlyersPage() {
                 </div>
 
                 {/* Footer */}
-                <div className="absolute bottom-12 text-zinc-700 text-xs tracking-[0.2em]">
-                    SYSTEM V2.0 // ADVERSARIAL GOVERNANCE
+                <div className="absolute bottom-12 w-full flex justify-between px-16 text-zinc-700 text-xs tracking-[0.2em]">
+                    <span>SYSTEM V2.0 // ADVERSARIAL GOVERNANCE</span>
+                    <span className="font-mono lowercase tracking-normal">help@argus-thesis.com</span>
                 </div>
             </div>
 
@@ -60,6 +61,7 @@ export default function FlyersPage() {
                     <div className="text-right">
                         <p className="text-sm font-bold text-zinc-900">CERTIFICATE OF DEFENSIBILITY</p>
                         <p className="text-xs text-zinc-400 font-mono">ENGINEERING-GRADE VALIDATION</p>
+                        <p className="text-[10px] text-zinc-300 font-mono mt-1 lowercase">help@argus-thesis.com</p>
                     </div>
                 </div>
 
