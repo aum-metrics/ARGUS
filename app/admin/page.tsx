@@ -183,7 +183,41 @@ export default function AdminDashboard() {
                     </TabsContent>
 
                     {/* ORGS */}
-                    <TabsContent value="orgs" className="mt-4">
+                    <TabsContent value="orgs" className="mt-4 space-y-4">
+                        {/* CREATE PILOT BUTTON */}
+                        <Card className="bg-zinc-900 border-zinc-800">
+                            <CardHeader>
+                                <CardTitle className="text-sm text-zinc-400">University Pilot Program</CardTitle>
+                            </CardHeader>
+                            <CardContent>
+                                <Button
+                                    size="sm"
+                                    className="bg-indigo-600 hover:bg-indigo-700"
+                                    onClick={() => {
+                                        const name = prompt("University Name:");
+                                        const email = prompt("Contact Email:");
+                                        const contactName = prompt("Contact Name:");
+                                        if (name && email && contactName) {
+                                            fetch('/api/admin/create-pilot', {
+                                                method: 'POST',
+                                                headers: { 'Content-Type': 'application/json' },
+                                                body: JSON.stringify({ universityName: name, contactEmail: email, contactName, credits: 10, durationDays: 90 })
+                                            }).then(res => res.json()).then(data => {
+                                                if (data.success) {
+                                                    alert(`Pilot created for ${name}! 10 credits, expires in 90 days.`);
+                                                    fetchStats();
+                                                } else {
+                                                    alert(data.error || 'Failed to create pilot');
+                                                }
+                                            });
+                                        }
+                                    }}
+                                >
+                                    + Create Pilot (10 Free Credits)
+                                </Button>
+                            </CardContent>
+                        </Card>
+
                         <div className="rounded-md border border-zinc-800 bg-zinc-900">
                             <table className="w-full text-sm text-left text-zinc-400">
                                 <thead className="bg-zinc-950 text-zinc-500 font-mono uppercase text-xs">
@@ -199,7 +233,7 @@ export default function AdminDashboard() {
                                         <tr key={org.id} className="hover:bg-zinc-800/50">
                                             <td className="px-4 py-3 font-medium text-zinc-200">{org.name}</td>
                                             <td className="px-4 py-3">
-                                                <Badge className="bg-zinc-800 text-zinc-300 hover:bg-zinc-700">{org.subscription_tier || 'N/A'}</Badge>
+                                                <Badge className="bg-zinc-800 text-zinc-300 hover:bg-zinc-700">{org.tier || org.subscription_tier || 'N/A'}</Badge>
                                             </td>
                                             <td className="px-4 py-3 font-mono text-emerald-400 font-bold">{org.credits_balance}</td>
                                             <td className="px-4 py-3 text-xs">{new Date(org.created_at).toLocaleDateString()}</td>
