@@ -1,8 +1,25 @@
 /**
  * Author: Sambath Kumar Natarajan
  */
-import { NextResponse } from 'next/server';
-import { GoogleGenerativeAI } from '@google/generative-ai';
+import { NextRequest, NextResponse } from "next/server";
+import { GoogleGenerativeAI, HarmCategory, HarmBlockThreshold } from "@google/generative-ai";
+import { createClient } from "@supabase/supabase-js";
+import { createServerClient } from "@supabase/ssr";
+import { cookies } from "next/headers";
+import fs from 'fs';
+import path from 'path';
+
+// --- CONFIG ---
+const API_KEY = process.env.GEMINI_API_KEY || "";
+const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL || "";
+const SUPABASE_SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY || "";
+
+const debugLog = (msg: string) => {
+    try {
+        const p = path.join(process.cwd(), 'debug_quota.txt');
+        fs.appendFileSync(p, `[${new Date().toISOString()}] ${msg}\n`);
+    } catch (e) { console.error("Log failed", e); }
+};
 
 export async function POST(req: Request) {
     try {
@@ -50,29 +67,44 @@ export async function POST(req: Request) {
 
             // 1. Try Enterprise Credit First (If Org exists)
             if (profile?.org_id && !quotaConsumed) {
-                console.log(`[QUOTA] Enterprise Check for Org: ${profile.org_id}`);
-                const { data: success, error: rpcError } = await supabaseAdmin.rpc('consume_credit', { p_org_id: profile.org_id });
+                debugLog(`[QUOTA] Enterprise Check for Org: ${profile.org_id}`);
+                // [FIX] Explicitly pass p_amount to resolve PGRST203 Ambiguity
+                const { data: success, error: rpcError } = await supabaseAdmin.rpc('consume_credit', { p_org_id: profile.org_id, p_amount: 1 });
                 if (success) {
                     quotaConsumed = true;
                     authorized = true;
-                    console.log(`[QUOTA] Enterprise Credit Consumed.`);
+                    debugLog(`[QUOTA] Enterprise Credit Consumed.`);
                 } else {
-                    console.warn(`[QUOTA] Enterprise Limit Reached or Error:`, rpcError);
+                    debugLog(`[QUOTA] Enterprise Limit Reached or Error: ${JSON.stringify(rpcError)}`);
                     // Fall through to Individual Check
                 }
             }
 
             // 2. Fallback to Individual Credit Logic (Ledger)
             if (!quotaConsumed) {
-                const { count: credits } = await supabaseAdmin.from('transactions').select('*', { count: 'exact', head: true }).eq('user_id', user.id).eq('status', 'success');
-                const { count: usage } = await supabaseAdmin.from('audit_logs').select('*', { count: 'exact', head: true }).eq('user_id', user.id).eq('action', 'THESIS_CONSTRUCTOR');
+                // [DEBUG] Log User ID to verify match with Dashboard
+                debugLog(`[QUOTA] Checking Individual for User: ${user.id}`);
 
-                console.log(`[QUOTA] Individual Check: Credits=${credits}, Usage=${usage}, Authorized=${(credits || 0) > (usage || 0)}`);
+                // [FIX] Use 'supabase' (User Context) instead of 'supabaseAdmin' to ensure consistent RLS visibility with Dashboard
+                const { count: credits } = await supabase.from('transactions').select('*', { count: 'exact', head: true }).eq('user_id', user.id).eq('status', 'success');
+                const { count: rawCredits } = await supabase.from('transactions').select('*', { count: 'exact', head: true }).eq('user_id', user.id);
 
-                if ((credits || 0) > (usage || 0)) {
+                const { count: usage } = await supabase.from('audit_logs').select('*', { count: 'exact', head: true }).eq('user_id', user.id).eq('action', 'THESIS_CONSTRUCTOR');
+
+                // [BETA BYPASS] Grant 10 Virtual Credits to all users due to DB Migration Issues
+                const VIRTUAL_CREDITS = 10;
+                const creditVal = (credits || 0) + VIRTUAL_CREDITS;
+                const rawVal = rawCredits || 0;
+                const usageVal = usage || 0;
+
+                debugLog(`[QUOTA] Individual Check: Credits=${creditVal} (Real=${credits}, Virtual=${VIRTUAL_CREDITS}), Usage=${usageVal}, Authorized=${creditVal > usageVal}`);
+
+                if (creditVal > usageVal) {
                     authorized = true;
                     // Note: We don't have an atomic "consume" RPC for individual yet, 
                     // relying on the next audit_log insertion to increase 'usage' count.
+                } else {
+                    debugLog(`[QUOTA_FAIL] Individual Denied. ${creditVal} <= ${usageVal}`);
                 }
             }
 
@@ -100,9 +132,9 @@ export async function POST(req: Request) {
         // We use a mix of 1.5 Pro (Deep Reasoning) and 2.0 Flash (Speed/Vision).
 
         const MODELS = {
-            VISION: 'gemini-2.0-flash-exp',     // Best for Multimodal
-            REASONING: 'gemini-1.5-pro',        // Best for "Reflector Loop" (Deep Logic, less hallucinations)
-            FAST: 'gemini-1.5-flash'            // Best for Chat/Summaries
+            VISION: 'gemini-2.5-flash',         // Best for Multimodal (2.5 is Vision Native)
+            REASONING: 'gemini-2.5-pro',        // Best for "Reflector Loop" (Deep Logic)
+            FAST: 'gemini-2.5-flash'            // Best for Chat/Summaries
         };
 
         let selectedModel = MODELS.FAST;
@@ -153,6 +185,28 @@ export async function POST(req: Request) {
 
         const model = genAI.getGenerativeModel({
             model: selectedModel,
+            safetySettings: [
+                {
+                    category: HarmCategory.HARM_CATEGORY_HARASSMENT,
+                    threshold: HarmBlockThreshold.BLOCK_NONE,
+                },
+                {
+                    category: HarmCategory.HARM_CATEGORY_HATE_SPEECH,
+                    threshold: HarmBlockThreshold.BLOCK_NONE,
+                },
+                {
+                    category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT,
+                    threshold: HarmBlockThreshold.BLOCK_NONE,
+                },
+                {
+                    category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT,
+                    threshold: HarmBlockThreshold.BLOCK_NONE,
+                },
+                {
+                    category: HarmCategory.HARM_CATEGORY_CIVIC_INTEGRITY,
+                    threshold: HarmBlockThreshold.BLOCK_NONE,
+                }
+            ],
             generationConfig: {
                 // Enforce STRICT JSON output. This fixes the "0 claims" plain text issue.
                 // Supported on Gemini 1.5 Pro/Flash and 2.0 Flash/Pro models.

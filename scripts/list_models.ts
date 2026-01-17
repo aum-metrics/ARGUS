@@ -1,44 +1,32 @@
-#!/usr/bin/env tsx
-/**
- * Author: Sambath Kumar Natarajan
- * 
- * List Gemini Models Script
- * Lists available models from Google Generative AI API to verify key permissions
- */
 
-import { GoogleGenerativeAI } from '@google/generative-ai';
-import * as dotenv from 'dotenv';
-dotenv.config({ path: '.env.local' });
+import { GoogleGenerativeAI } from "@google/generative-ai";
+import dotenv from "dotenv";
 
-async function listModels() {
-    const apiKey = process.env.GEMINI_API_KEY;
-    if (!apiKey) {
-        console.error('No GEMINI_API_KEY found in .env.local');
-        process.exit(1);
-    }
+dotenv.config({ path: ".env.local" });
 
-    const genAI = new GoogleGenerativeAI(apiKey);
-    // Hack to access the model listing which isn't always exposed cleanly in the high level SDK
-    // We can just try to hit a known model or use the admin API if possible, 
-    // but standard SDK doesn't always have listModels easily accessible in all versions.
-    // Actually, standard fetch is easier here to debug the raw endpoint.
+const apiKey = process.env.GEMINI_API_KEY;
 
-    const url = `https://generativelanguage.googleapis.com/v1beta/models?key=${apiKey}`;
-
-    try {
-        const response = await fetch(url);
-        const data = await response.json();
-        console.log('AVAILABLE MODELS:');
-        if (data.models) {
-            data.models.forEach((m: any) => {
-                console.log(`- ${m.name} (Supported: ${m.supportedGenerationMethods})`);
-            });
-        } else {
-            console.log('No models found or error:', data);
-        }
-    } catch (error) {
-        console.error('Error fetching models:', error);
-    }
+if (!apiKey) {
+    console.error("No API KEY found in .env.local");
+    process.exit(1);
 }
 
-listModels();
+async function main() {
+    const genAI = new GoogleGenerativeAI(apiKey);
+    // There isn't a direct listModels on genAI instance in some versions, 
+    // it's usually on the ModelManager or similar. 
+    // But let's check the error message advice: "Call ListModels".
+    // Actually, usually it's fetch based or via specific client.
+    // The node SDK might not expose listModels directly on the main class easily.
+    // Wait, check documentation?
+    // Actually, I'll try to get ANY model and see if it works, or if there is a method.
+    // But wait, the error message literally says "Call ListModels".
+
+    // Let's try raw REST call using the key, it's reliable.
+    const url = `https://generativelanguage.googleapis.com/v1beta/models?key=${apiKey}`;
+    const res = await fetch(url);
+    const data = await res.json();
+    console.log(JSON.stringify(data, null, 2));
+}
+
+main();

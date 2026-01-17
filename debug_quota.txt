@@ -1,0 +1,20 @@
+[2026-01-17T08:18:06.658Z] [QUOTA] Enterprise Check for Org: fc55feea-056a-4f64-8816-c2b38eb9b45a
+[2026-01-17T08:18:06.885Z] [QUOTA] Enterprise Limit Reached or Error: {"code":"42703","details":null,"hint":"Perhaps you meant to reference the column \"organizations.credits_balance\".","message":"column \"credit_balance\" does not exist"}
+[2026-01-17T08:18:06.885Z] [QUOTA] Checking Individual for User: 49388465-7b6e-47fa-b829-6263c0920f50
+[2026-01-17T08:18:07.439Z] [QUOTA] Individual Check: Credits=10 (Real=0, Virtual=10), Usage=3, Authorized=true
+[2026-01-17T08:28:19.100Z] [QUOTA] Enterprise Check for Org: fc55feea-056a-4f64-8816-c2b38eb9b45a
+[2026-01-17T08:28:19.320Z] [QUOTA] Enterprise Limit Reached or Error: {"code":"42703","details":null,"hint":"Perhaps you meant to reference the column \"organizations.credits_balance\".","message":"column \"credit_balance\" does not exist"}
+[2026-01-17T08:28:19.320Z] [QUOTA] Checking Individual for User: 49388465-7b6e-47fa-b829-6263c0920f50
+[2026-01-17T08:28:19.859Z] [QUOTA] Individual Check: Credits=11 (Real=1, Virtual=10), Usage=4, Authorized=true
+[2026-01-17T08:28:32.196Z] [QUOTA] Enterprise Check for Org: fc55feea-056a-4f64-8816-c2b38eb9b45a
+[2026-01-17T08:28:32.400Z] [QUOTA] Enterprise Limit Reached or Error: {"code":"42703","details":null,"hint":"Perhaps you meant to reference the column \"organizations.credits_balance\".","message":"column \"credit_balance\" does not exist"}
+[2026-01-17T08:28:32.400Z] [QUOTA] Checking Individual for User: 49388465-7b6e-47fa-b829-6263c0920f50
+[2026-01-17T08:28:32.932Z] [QUOTA] Individual Check: Credits=11 (Real=1, Virtual=10), Usage=5, Authorized=true
+[2026-01-17T08:29:00.894Z] [QUOTA] Enterprise Check for Org: fc55feea-056a-4f64-8816-c2b38eb9b45a
+[2026-01-17T08:29:01.090Z] [QUOTA] Enterprise Limit Reached or Error: {"code":"42703","details":null,"hint":"Perhaps you meant to reference the column \"organizations.credits_balance\".","message":"column \"credit_balance\" does not exist"}
+[2026-01-17T08:29:01.090Z] [QUOTA] Checking Individual for User: 49388465-7b6e-47fa-b829-6263c0920f50
+[2026-01-17T08:29:01.626Z] [QUOTA] Individual Check: Credits=11 (Real=1, Virtual=10), Usage=6, Authorized=true
+[2026-01-17T08:40:29.004Z] [QUOTA] Enterprise Check for Org: fc55feea-056a-4f64-8816-c2b38eb9b45a
+[2026-01-17T08:40:29.211Z] [QUOTA] Enterprise Limit Reached or Error: {"code":"42703","details":null,"hint":"Perhaps you meant to reference the column \"organizations.credits_balance\".","message":"column \"credit_balance\" does not exist"}
+[2026-01-17T08:40:29.211Z] [QUOTA] Checking Individual for User: 49388465-7b6e-47fa-b829-6263c0920f50
+[2026-01-17T08:40:29.738Z] [QUOTA] Individual Check: Credits=11 (Real=1, Virtual=10), Usage=7, Authorized=true
