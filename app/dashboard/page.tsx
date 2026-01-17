@@ -285,7 +285,18 @@ export default function ArgusDashboard() {
                     </Button>
                     <Button variant="ghost" size="sm" onClick={() => {
                         const blob = new Blob([JSON.stringify(session, null, 2)], { type: 'application/json' });
-                        saveAs(blob, `argus_session_${session.id}.json`);
+                        const url = URL.createObjectURL(blob);
+                        const a = document.createElement('a');
+                        a.href = url;
+                        a.download = `argus_session_${session.id}.json`;
+                        a.style.display = "none";
+                        document.body.appendChild(a);
+                        a.click();
+
+                        setTimeout(() => {
+                            document.body.removeChild(a);
+                            URL.revokeObjectURL(url);
+                        }, 500);
                     }} className="text-zinc-500 hover:text-zinc-900" title="Backup Session Data">
                         <FileText className="h-4 w-4" />
                     </Button>

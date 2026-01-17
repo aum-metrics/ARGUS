@@ -161,7 +161,19 @@ export const generateManuscriptPDF = (session: ArgusSession) => {
     const timestamp = new Date().toISOString().split('T')[0];
     const filename = `Argus_Governance_Report_${session.id}_${timestamp}.pdf`;
 
-    // Use saveAs from file-saver for maximum compatibility
+    // Manual Download with Timeout (Robust Fix)
     const pdfBlob = doc.output('blob');
-    saveAs(pdfBlob, filename);
+    const url = URL.createObjectURL(pdfBlob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = filename;
+    link.style.display = "none";
+    document.body.appendChild(link);
+    link.click();
+
+    // Delay cleanup to ensure browser captures the download
+    setTimeout(() => {
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+    }, 500);
 };
