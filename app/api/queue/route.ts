@@ -1,76 +1,72 @@
-import { NextRequest, NextResponse } from "next/server";
-import { createClient } from "@supabase/supabase-js";
+/**
+ * API: Async Job Queue
+ * Endpoint: /api/queue
+ */
+import { NextResponse } from 'next/server';
+import { createClient } from '@/lib/supabase/server';
 
-// FREE TIER LIMITS
-const MAX_CONCURRENT_USERS = 5; // Very conservative to ensure speed
-const SLOT_TIMEOUT_SECONDS = 300; // 5 Minutes auto-expiry
-
-export async function POST(req: NextRequest) {
+export async function POST(req: Request) {
     try {
+        const supabase = await createClient();
+        const { data: { user } } = await supabase.auth.getUser();
+
+        if (!user) {
+            return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+        }
+
         const body = await req.json();
-        const { action, ticketId, userId } = body;
+        const { type, payload } = body;
 
-        // Admin Client for System Operations
-        const supabase = createClient(
-            process.env.NEXT_PUBLIC_SUPABASE_URL!,
-            process.env.SUPABASE_SERVICE_ROLE_KEY!
-        );
+        // Enqueue Job
+        const { data, error } = await supabase
+            .from('job_queue')
+            .insert({
+                user_id: user.id,
+                type,
+                payload,
+                status: 'PENDING'
+            })
+            .select()
+            .single();
 
-        // 1. CLEANUP ZOMBIES (Lazy Collection)
-        // Delete any tickets older than 10 mins (Safety net)
-        await supabase
-            .from('system_semaphores')
-            .delete()
-            .lt('updated_at', new Date(Date.now() - (SLOT_TIMEOUT_SECONDS * 1000)).toISOString());
+        if (error) throw error;
 
+        // In a real Serverless setup, we would trigger an Edge Function here to *start* processing background.
+        // Or simply rely on a Cron/Worker to poll 'PENDING' jobs.
+        // For V1.0 MVP on Vercel, we can try to fire-and-forget a fetch to a processing endpoint.
+        // fetch(`${process.env.NEXT_PUBLIC_APP_URL}/api/queue/process`, { method: 'POST', body: JSON.stringify({ jobId: data.id }) });
 
-        if (action === 'RESERVE') {
-            // Check count
-            const { count } = await supabase
-                .from('system_semaphores')
-                .select('*', { count: 'exact', head: true });
-
-            const currentLoad = count || 0;
-
-            if (currentLoad >= MAX_CONCURRENT_USERS) {
-                return NextResponse.json({
-                    status: 'BUSY',
-                    message: `System at capacity (${currentLoad}/${MAX_CONCURRENT_USERS}). Please retrying...`,
-                    queuePosition: currentLoad - MAX_CONCURRENT_USERS + 1
-                }, { status: 429 });
-            }
-
-            // Grant Ticket
-            const newTicketId = crypto.randomUUID();
-            const { error } = await supabase.from('system_semaphores').insert({
-                key: newTicketId, // Using key column as Ticket ID for this generic table
-                current_count: 1, // Dummy value
-                max_count: 1, // Dummy value
-                updated_at: new Date().toISOString()
-            });
-
-            if (error) throw error;
-
-            return NextResponse.json({ status: 'GRANTED', ticketId: newTicketId });
-        }
-
-        if (action === 'RELEASE' && ticketId) {
-            await supabase.from('system_semaphores').delete().eq('key', ticketId);
-            return NextResponse.json({ status: 'RELEASED' });
-        }
-
-        if (action === 'HEARTBEAT' && ticketId) {
-            await supabase
-                .from('system_semaphores')
-                .update({ updated_at: new Date().toISOString() })
-                .eq('key', ticketId);
-            return NextResponse.json({ status: 'ALIVE' });
-        }
-
-        return NextResponse.json({ error: "Invalid Action" }, { status: 400 });
+        return NextResponse.json({ jobId: data.id, status: 'PENDING' });
 
     } catch (error: any) {
-        console.error("Queue Error:", error);
+        console.error("Queue Enqueue Error:", error);
+        return NextResponse.json({ error: error.message }, { status: 500 });
+    }
+}
+
+export async function GET(req: Request) {
+    try {
+        const supabase = await createClient();
+        const { data: { user } } = await supabase.auth.getUser();
+        const { searchParams } = new URL(req.url);
+        const jobId = searchParams.get('id');
+
+        if (!user || !jobId) {
+            return NextResponse.json({ error: 'Unauthorized or Missing ID' }, { status: 401 });
+        }
+
+        const { data, error } = await supabase
+            .from('job_queue')
+            .select('*')
+            .eq('id', jobId)
+            .eq('user_id', user.id)
+            .single();
+
+        if (error) return NextResponse.json({ error: 'Job not found' }, { status: 404 });
+
+        return NextResponse.json(data);
+
+    } catch (error: any) {
         return NextResponse.json({ error: error.message }, { status: 500 });
     }
 }
