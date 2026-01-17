@@ -32,11 +32,11 @@ export default function PlaygroundPage() {
             {/* Header */}
             <header className="fixed top-0 w-full bg-white/80 backdrop-blur-md border-b border-zinc-200 z-50">
                 <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                        <div className="w-8 h-8 bg-zinc-900 rounded-lg flex items-center justify-center">
-                            <Bot className="w-5 h-5 text-white" />
+                    <div className="flex items-center gap-4">
+                        <div className="w-10 h-10 rounded-lg overflow-hidden border border-zinc-200">
+                            <img src="/logo.jpg" alt="ARGUS Logo" className="w-full h-full object-contain" />
                         </div>
-                        <span className="font-bold text-lg tracking-tight">ARGUS-Thesis</span>
+                        <span className="font-bold text-lg tracking-tight text-zinc-900">ARGUS-Thesis</span>
                     </div>
                     <Link href="/login" className="text-sm font-medium text-zinc-600 hover:text-zinc-900">
                         Researcher Login
