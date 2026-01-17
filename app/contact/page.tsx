@@ -30,8 +30,8 @@ export default function ContactPage() {
                                 <p className="text-zinc-600 text-sm mb-2">
                                     For general inquiries, enterprise licensing, or academic partnerships.
                                 </p>
-                                <a href="mailto:hello@aumdatalabs.com" className="text-blue-600 font-mono text-sm underline hover:text-blue-800">
-                                    hello@aumdatalabs.com
+                                <a href="mailto:help@argus-thesis.com" className="text-blue-600 font-mono text-sm underline hover:text-blue-800">
+                                    help@argus-thesis.com
                                 </a>
                             </div>
                         </div>

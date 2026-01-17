@@ -59,7 +59,7 @@ export default function RefundPolicy() {
                         <section>
                             <h2 className="text-xl font-bold text-zinc-900 mb-4">Contact Support</h2>
                             <p>
-                                For billing disputes or technical failures, please email: <a href="mailto:hello@aumdatalabs.com" className="text-blue-600 underline">hello@aumdatalabs.com</a>
+                                For billing disputes or technical failures, please email: <a href="mailto:help@argus-thesis.com" className="text-blue-600 underline">help@argus-thesis.com</a>
                             </p>
                         </section>
 
