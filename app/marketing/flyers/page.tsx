@@ -56,7 +56,7 @@ export default function FlyersPage() {
                     </div>
                     <div className="text-right">
                         <p className="text-sm font-bold text-zinc-900">CERTIFICATE OF DEFENSIBILITY</p>
-                        <p className="text-xs text-zinc-400 font-mono">ISO-9001 FOR ARGUMENTS</p>
+                        <p className="text-xs text-zinc-400 font-mono">ENGINEERING-GRADE VALIDATION</p>
                     </div>
                 </div>
 
@@ -132,7 +132,7 @@ export default function FlyersPage() {
 
                 <div className="mt-auto pt-16 border-t border-slate-800 flex justify-between items-end">
                     <div className="text-slate-500 font-mono text-sm">
-                        enterprise@argus-thesis.com
+                        help@argus-thesis.com
                     </div>
                     <div className="text-4xl font-bold text-white tracking-tighter">
                         ARGUS
