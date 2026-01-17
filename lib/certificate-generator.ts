@@ -1,7 +1,8 @@
 /**
  * Author: Sambath Kumar Natarajan
  */
-import { jsPDF } from "jspdf";
+import { jsPDF } from "jspdf"
+import { saveAs } from "file-saver";
 
 interface AuditSession {
     id: string;
@@ -105,6 +106,7 @@ export const generateCertificate = (session: AuditSession, userName: string = "R
     const timestamp = new Date().toISOString().split('T')[0];
     const filename = `ARGUS_Certificate_${session.id}_${timestamp}.pdf`;
 
-    // Use save() for better browser compatibility
-    doc.save(filename);
+    // Use saveAs from file-saver for maximum compatibility
+    const pdfBlob = doc.output('blob');
+    saveAs(pdfBlob, filename);
 };

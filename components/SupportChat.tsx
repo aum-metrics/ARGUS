@@ -80,14 +80,20 @@ const SCENARIOS: Record<ScenarioId, BotMessage> = {
     REPORT_HELP: {
         id: 'REPORT_HELP',
         text: (
-            <div className="space-y-2">
-                <p><strong>How to Read the Report:</strong></p>
-                <ul className="list-disc pl-4 text-sm space-y-1">
-                    <li><strong>Executive Summary:</strong> High-level check of structure and coherency.</li>
-                    <li><strong>Claims Analysis:</strong> We extract key claims and cross-reference them with AI knowledge.</li>
-                    <li><strong>Visual Integrity:</strong> We check if figures match their captions.</li>
-                </ul>
-                <p className="text-xs mt-2 text-zinc-500">Note: 'Unverified' means the AI could not firmly confirm or deny.</p>
+            <div className="space-y-3">
+                <p><strong>Interpreting the ARGUS Report:</strong></p>
+                <div className="text-xs space-y-2">
+                    <p><strong>1. Executive Summary:</strong> The "Verdict" (Pass/Fail) is based on logical coherency. A "Fail" means the core thesis has contradictions.</p>
+                    <p><strong>2. Claims Analysis:</strong>
+                        <br />&bull; <span className="text-green-600 font-bold">Supported:</span> Claim matches known literature.
+                        <br />&bull; <span className="text-red-600 font-bold">Contradicted:</span> AI found counter-evidence.
+                        <br />&bull; <span className="text-yellow-600 font-bold">Unverified:</span> No clear evidence found (novel claim).
+                    </p>
+                    <p><strong>3. Visual Integrity:</strong> We check if figures match their captions. Look for "Hallucination Warnings".</p>
+                </div>
+                <p className="text-[10px] bg-yellow-50 p-2 rounded text-yellow-800 border border-yellow-200">
+                    <strong>Tip:</strong> An "Unverified" claim is good for a thesis! It means you might be proposing something new.
+                </p>
             </div>
         ),
         options: [

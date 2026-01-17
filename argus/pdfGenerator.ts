@@ -1,7 +1,8 @@
 /**
  * Author: Sambath Kumar Natarajan
  */
-import { jsPDF } from "jspdf";
+import { jsPDF } from "jspdf"
+import { saveAs } from "file-saver";
 import { ArgusSession } from "@/argus/session";
 
 // Helper to wrap text
@@ -160,6 +161,7 @@ export const generateManuscriptPDF = (session: ArgusSession) => {
     const timestamp = new Date().toISOString().split('T')[0];
     const filename = `Argus_Governance_Report_${session.id}_${timestamp}.pdf`;
 
-    // Use save() for better browser compatibility
-    doc.save(filename);
+    // Use saveAs from file-saver for maximum compatibility
+    const pdfBlob = doc.output('blob');
+    saveAs(pdfBlob, filename);
 };

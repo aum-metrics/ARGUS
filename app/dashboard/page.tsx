@@ -18,6 +18,7 @@ import { CreditCounter } from "@/components/CreditCounter"
 import { OnboardingFlow } from "@/components/OnboardingFlow"
 import { LoadingState, ThinkingIndicator, ProgressBar } from "@/components/LoadingStates"
 import Link from "next/link"
+import { saveAs } from "file-saver"
 
 export default function ArgusDashboard() {
     const [session, setSession] = useState<ArgusSession | null>(null)
@@ -284,12 +285,7 @@ export default function ArgusDashboard() {
                     </Button>
                     <Button variant="ghost" size="sm" onClick={() => {
                         const blob = new Blob([JSON.stringify(session, null, 2)], { type: 'application/json' });
-                        const url = URL.createObjectURL(blob);
-                        const a = document.createElement('a');
-                        a.href = url;
-                        a.download = `argus_session_${session.id}.json`;
-                        a.click();
-                        URL.revokeObjectURL(url);
+                        saveAs(blob, `argus_session_${session.id}.json`);
                     }} className="text-zinc-500 hover:text-zinc-900" title="Backup Session Data">
                         <FileText className="h-4 w-4" />
                     </Button>
