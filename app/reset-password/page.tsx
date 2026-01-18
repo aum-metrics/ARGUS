@@ -25,60 +25,102 @@ export default function ResetPasswordPage() {
     const [hasToken, setHasToken] = useState(false)
 
     useEffect(() => {
-        // Check if we have a recovery token in the URL hash
-        const hashParams = new URLSearchParams(window.location.hash.substring(1))
-        const accessToken = hashParams.get('access_token')
-        const type = hashParams.get('type')
+        // Supabase sends recovery links in different formats:
+        // Format 1: #access_token=xxx&type=recovery (full params)
+        // Format 2: #token_hash (just the hash)
 
-        if (accessToken && type === 'recovery') {
-            setHasToken(true)
-        } else {
-            setError("Invalid or expired password reset link")
+        const hash = window.location.hash.substring(1); // Remove #
+
+        if (!hash) {
+            setError("Invalid or expired password reset link");
+            return;
         }
-    }, [])
+
+        // Try to parse as URL parameters first
+        const hashParams = new URLSearchParams(hash);
+        const accessToken = hashParams.get('access_token');
+        const type = hashParams.get('type');
+        const tokenHash = hashParams.get('token_hash');
+
+        // Check if we have a valid recovery token
+        if ((accessToken && type === 'recovery') || tokenHash || hash.length > 30) {
+            // We have a token, now verify it with Supabase
+            verifyAndSetSession(hash);
+        } else {
+            setError("Invalid or expired password reset link");
+        }
+    }, []);
+
+    const verifyAndSetSession = async (hash: string) => {
+        try {
+            // Try to verify the token by exchanging it for a session
+            // Supabase will handle the token validation
+            const { error: sessionError } = await supabase.auth.verifyOtp({
+                token_hash: hash,
+                type: 'recovery'
+            });
+
+            if (sessionError) {
+                // If OTP verification fails, try getting session from URL
+                const { error: sessionFromUrlError } = await supabase.auth.getSession();
+
+                if (sessionFromUrlError) {
+                    console.error("Session verification failed:", sessionError, sessionFromUrlError);
+                    setError("Invalid or expired password reset link. Please request a new one.");
+                    return;
+                }
+            }
+
+            // Token is valid
+            setHasToken(true);
+        } catch (err: any) {
+            console.error("Token verification error:", err);
+            setError("Failed to verify reset link. Please request a new one.");
+        }
+    };
 
     const handleResetPassword = async (e: React.FormEvent) => {
-        e.preventDefault()
-        setIsLoading(true)
-        setError(null)
+        e.preventDefault();
+        setIsLoading(true);
+        setError(null);
 
         // Validation
         if (password.length < 8) {
-            setError("Password must be at least 8 characters")
-            setIsLoading(false)
-            return
+            setError("Password must be at least 8 characters");
+            setIsLoading(false);
+            return;
         }
 
         if (password !== confirmPassword) {
-            setError("Passwords do not match")
-            setIsLoading(false)
-            return
+            setError("Passwords do not match");
+            setIsLoading(false);
+            return;
         }
 
         try {
-            // Update the password
+            // Update the password using the current session
             const { error: updateError } = await supabase.auth.updateUser({
                 password: password
-            })
+            });
 
             if (updateError) {
-                throw updateError
+                throw updateError;
             }
 
-            setSuccess(true)
+            setSuccess(true);
 
             // Redirect to login after 2 seconds
             setTimeout(() => {
-                router.push('/login')
-            }, 2000)
+                router.push('/login');
+            }, 2000);
 
         } catch (err: any) {
-            console.error("Password reset error:", err)
-            setError(err.message || "Failed to reset password")
+            console.error("Password reset error:", err);
+            setError(err.message || "Failed to reset password. Please try again.");
         } finally {
-            setIsLoading(false)
+            setIsLoading(false);
         }
-    }
+    };
 
     if (success) {
         return (
