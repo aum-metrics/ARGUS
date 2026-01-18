@@ -9,7 +9,7 @@ import { Badge } from "@/components/ui/badge"
 import { createClient } from "@/lib/supabase/client"
 import { Textarea } from "@/components/ui/textarea"
 import { createSession, destroySession, ArgusSession } from "@/argus/session"
-import { Trash2, FileText, CheckCircle2, ShieldCheck, Network, PlayCircle, ScanSearch, Coins, AlertTriangle, XCircle, Download, Gift, Maximize2 } from "lucide-react"
+import { Trash2, FileText, CheckCircle2, ShieldCheck, Network, PlayCircle, ScanSearch, Coins, AlertTriangle, XCircle, Download, Gift, Maximize2, Swords } from "lucide-react"
 import { useGovernance, TOKEN_COSTS } from "@/argus/hooks/useGovernance"
 import { KnowledgeGraph } from "@/components/KnowledgeGraph"
 import { robustDownloader } from "@/argus/downloader"
@@ -1207,14 +1207,72 @@ export default function ArgusDashboard() {
                                                 </div>
 
                                                 {/* Rejection Details */}
-                                                {claim.status === 'REJECTED' && (
-                                                    <div className="bg-red-50 p-3 rounded text-xs text-red-800 border border-red-100">
-                                                        <span className="font-bold flex items-center gap-1 mb-1">
-                                                            <AlertTriangle className="h-3 w-3" /> FATAL FLAW DETECTED
-                                                        </span>
-                                                        {claim.governanceLog.find((l: any) => l.role === 'THESIS_DESTROYER')?.content}
-                                                    </div>
-                                                )}
+                                                {/* Rejection Details - Structured Visuals */}
+                                                {claim.status === 'REJECTED' && (() => {
+                                                    const rawContent = claim.governanceLog.find((l: any) => l.role === 'THESIS_DESTROYER')?.content;
+                                                    let parsed = null;
+                                                    try {
+                                                        // Attempt to parse JSON if it looks like JSON
+                                                        if (rawContent?.trim().startsWith('{')) {
+                                                            parsed = JSON.parse(rawContent);
+                                                        }
+                                                    } catch (e) { }
+
+                                                    return parsed ? (
+                                                        <div className="bg-red-50/50 rounded-lg overflow-hidden border border-red-100 mt-2">
+                                                            {/* HEADER */}
+                                                            <div className="bg-red-50 px-4 py-2 border-b border-red-100 flex items-center gap-2">
+                                                                <AlertTriangle className="h-4 w-4 text-red-600" />
+                                                                <span className="text-xs font-bold text-red-800 uppercase tracking-wide">Peer Review: Fatal Flaw</span>
+                                                            </div>
+
+                                                            <div className="p-4 space-y-4">
+                                                                {/* 1. THE ATTACK */}
+                                                                <div>
+                                                                    <div className="text-[10px] font-bold text-red-400 uppercase mb-1">The Attack Vector</div>
+                                                                    <p className="text-sm text-red-900 font-medium leading-relaxed">
+                                                                        "{parsed.ATTACK}"
+                                                                    </p>
+                                                                </div>
+
+                                                                {/* 2. COUNTEREXAMPLE */}
+                                                                {parsed.COUNTEREXAMPLE && (
+                                                                    <div className="bg-white p-3 rounded border border-red-100/50 shadow-sm">
+                                                                        <div className="text-[10px] font-bold text-zinc-400 uppercase mb-1 flex items-center gap-1">
+                                                                            <Swords className="h-3 w-3" /> Counter-Proof
+                                                                        </div>
+                                                                        <p className="text-xs text-zinc-600 font-serif italic leading-relaxed">
+                                                                            {parsed.COUNTEREXAMPLE}
+                                                                        </p>
+                                                                    </div>
+                                                                )}
+
+                                                                {/* 3. HIDDEN ASSUMPTIONS */}
+                                                                {parsed.HIDDEN_ASSUMPTIONS && parsed.HIDDEN_ASSUMPTIONS.length > 0 && (
+                                                                    <div>
+                                                                        <div className="text-[10px] font-bold text-zinc-400 uppercase mb-2">Exposed Hidden Assumptions</div>
+                                                                        <ul className="space-y-1.5">
+                                                                            {parsed.HIDDEN_ASSUMPTIONS.map((assumption: string, i: number) => (
+                                                                                <li key={i} className="flex gap-2 items-start text-xs text-zinc-500">
+                                                                                    <span className="text-red-300 font-mono mt-0.5">•</span>
+                                                                                    <span>{assumption}</span>
+                                                                                </li>
+                                                                            ))}
+                                                                        </ul>
+                                                                    </div>
+                                                                )}
+                                                            </div>
+                                                        </div>
+                                                    ) : (
+                                                        // FALLBACK: Raw Text (if not JSON)
+                                                        <div className="bg-red-50 p-3 rounded text-xs text-red-800 border border-red-100 mt-2">
+                                                            <span className="font-bold flex items-center gap-1 mb-1">
+                                                                <AlertTriangle className="h-3 w-3" /> FATAL FLAW DETECTED
+                                                            </span>
+                                                            {rawContent}
+                                                        </div>
+                                                    );
+                                                })()}
                                                 {/* Acceptance Details */}
                                                 {claim.status === 'ACCEPTED' && (
                                                     <div className="bg-green-50 p-3 rounded text-xs text-green-800 border border-green-100">
