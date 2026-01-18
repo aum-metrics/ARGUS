@@ -16,7 +16,7 @@ const SUPABASE_SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY || "";
 
 const debugLog = (msg: string) => {
     try {
-        const p = path.join(process.cwd(), 'debug_quota.txt');
+        const p = path.join('/tmp', 'debug_quota.txt');
         fs.appendFileSync(p, `[${new Date().toISOString()}] ${msg}\n`);
     } catch (e) { console.error("Log failed", e); }
 };

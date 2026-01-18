@@ -17,6 +17,10 @@ export async function POST(req: Request) {
         const body = await req.json();
         const { type, payload } = body;
 
+        if (!type) {
+            return NextResponse.json({ error: 'Missing Job Type' }, { status: 400 });
+        }
+
         // Enqueue Job
         const { data, error } = await supabase
             .from('job_queue')

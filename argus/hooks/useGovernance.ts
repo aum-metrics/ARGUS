@@ -83,7 +83,10 @@ export function useGovernance() {
             const queueRes = await fetch('/api/queue', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ action: 'RESERVE', userId: currentSession.id })
+                body: JSON.stringify({
+                    type: 'QUEUE_RESERVATION',
+                    payload: { action: 'RESERVE', userId: currentSession.id }
+                })
             });
 
             if (queueRes.status === 429) {
@@ -96,7 +99,7 @@ export function useGovernance() {
             }
 
             const ticketData = await queueRes.json();
-            ticketId = ticketData.ticketId;
+            ticketId = ticketData.jobId;
             addLog(`[SYSTEM] Slot Secured. Ticket: ${ticketId?.substring(0, 6)}...`);
             // ------------------------------------------
 
@@ -114,7 +117,11 @@ export function useGovernance() {
                 // Release ticket immediately if cached
                 fetch('/api/queue', {
                     method: 'POST',
-                    body: JSON.stringify({ action: 'RELEASE', ticketId })
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        type: 'QUEUE_RESERVATION',
+                        payload: { action: 'RELEASE', ticketId }
+                    })
                 });
                 return;
             }
@@ -219,7 +226,11 @@ export function useGovernance() {
             if (ticketId) {
                 fetch('/api/queue', {
                     method: 'POST',
-                    body: JSON.stringify({ action: 'RELEASE', ticketId })
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        type: 'QUEUE_RESERVATION',
+                        payload: { action: 'RELEASE', ticketId }
+                    })
                 }).catch(e => console.error("Failed to release lock", e));
             }
 
