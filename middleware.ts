@@ -5,6 +5,17 @@ import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
 
 export async function middleware(request: NextRequest) {
+    // Handle Supabase password recovery redirects FIRST
+    // When user clicks password reset link with #type=recovery, redirect to /reset-password
+    const url = request.nextUrl;
+    const hash = url.hash;
+
+    if (hash.includes('type=recovery') && url.pathname === '/') {
+        const redirectUrl = url.clone();
+        redirectUrl.pathname = '/reset-password';
+        return NextResponse.redirect(redirectUrl);
+    }
+
     let response = NextResponse.next({
         request: {
             headers: request.headers,
