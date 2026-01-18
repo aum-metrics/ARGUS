@@ -1,62 +1,19 @@
 /**
  * Author: Sambath Kumar Natarajan
+ * 
+ * PDF Parsing API - Production-Ready Version
+ * Uses pdfjs-dist which works in serverless environments
  */
 
 import { NextRequest, NextResponse } from 'next/server';
 
-export const dynamic = 'force-dynamic'; // CRITICAL FIX: Prevent static generation attempt which fails with pdf-parse
-
+export const dynamic = 'force-dynamic';
+export const maxDuration = 60; // Allow up to 60 seconds for large PDFs
 
 export async function POST(req: NextRequest) {
     console.log("[API] /api/parse-pdf - Request received");
 
-    // Lazy import to verify it loads
-    let parsePdfFunc: any = null;
-    let PDFParseClass: any = null;
-    let pdfParseAvailable = false;
-
     try {
-        // Stick to root package which worked previously
-        const pdfModule = require('pdf-parse');
-        console.log("[API] Loaded pdf-parse root");
-
-        // Handle various ways the function might be exported (CommonJS vs ESM Interop)
-        // 1. Check for legacy function style
-        if (typeof pdfModule === 'function') {
-            parsePdfFunc = pdfModule;
-            pdfParseAvailable = true;
-            console.log("[API] Detected legacy pdf-parse function");
-        } else if (pdfModule && typeof pdfModule.default === 'function') {
-            parsePdfFunc = pdfModule.default;
-            pdfParseAvailable = true;
-            console.log("[API] Detected legacy pdf-parse function via .default");
-        }
-        // 2. Check for modern class style (v2.x)
-        else {
-            PDFParseClass = pdfModule.PDFParse || (pdfModule.default && pdfModule.default.PDFParse);
-            if (PDFParseClass) {
-                pdfParseAvailable = true;
-                console.log("[API] Detected modern PDFParse class");
-            } else {
-                console.error("[API] pdf-parse loaded but no recognized export found. Keys:", Object.keys(pdfModule || {}));
-                // Don't fail completely - return helpful error
-                return NextResponse.json({
-                    error: "PDF parsing is temporarily unavailable. Please copy-paste your text manually.",
-                    fallback: true
-                }, { status: 503 });
-            }
-        }
-    } catch (e: any) {
-        console.error("[API] Failed to require pdf-parse:", e);
-        // Return user-friendly error instead of crashing
-        return NextResponse.json({
-            error: "PDF parsing is temporarily unavailable. Please copy-paste your text manually.",
-            fallback: true
-        }, { status: 503 });
-    }
-
-    try {
-
         const formData = await req.formData();
         const file = formData.get('file') as File;
 
@@ -72,144 +29,95 @@ export async function POST(req: NextRequest) {
             return NextResponse.json({ error: "Invalid file type. Only PDF is supported." }, { status: 400 });
         }
 
-        // Convert File to Buffer
+        // Convert File to ArrayBuffer
         const arrayBuffer = await file.arrayBuffer();
-        const buffer = Buffer.from(arrayBuffer);
-        console.log(`[API] Buffer created. Length: ${buffer.length}`);
+        const uint8Array = new Uint8Array(arrayBuffer);
 
-        // Parse PDF
-        let data: any;
-        let images: string[] = [];
+        console.log(`[API] Buffer created. Length: ${uint8Array.length}`);
 
-        if (PDFParseClass) {
-            const parser = new PDFParseClass({ data: buffer });
-            data = await parser.getText();
+        // Use pdfjs-dist (works in serverless)
+        let text = '';
 
-            // Extract visual essence
+        try {
+            // Dynamic import to avoid build issues
+            const pdfjsLib = await import('pdfjs-dist/legacy/build/pdf.mjs');
+
+            // Load the PDF
+            const loadingTask = pdfjsLib.getDocument({ data: uint8Array });
+            const pdf = await loadingTask.promise;
+
+            console.log(`[API] PDF loaded. Pages: ${pdf.numPages}`);
+
+            // Extract text from all pages
+            const textPromises = [];
+            for (let i = 1; i <= pdf.numPages; i++) {
+                textPromises.push(
+                    pdf.getPage(i).then(async (page) => {
+                        const textContent = await page.getTextContent();
+                        return textContent.items
+                            .map((item: any) => item.str)
+                            .join(' ');
+                    })
+                );
+            }
+
+            const pageTexts = await Promise.all(textPromises);
+            text = pageTexts.join('\n\n');
+
+            console.log(`[API] Extracted ${text.length} characters from ${pdf.numPages} pages`);
+
+        } catch (pdfError: any) {
+            console.error("[API] PDF parsing error:", pdfError.message);
+
+            // Fallback: Try to extract text using simple regex (for text-based PDFs)
             try {
-                console.log("[API] Attempting deep visual extraction (High-Res + Structural Path)...");
+                const decoder = new TextDecoder('utf-8');
+                const pdfText = decoder.decode(uint8Array);
 
-                // 1. High-Resolution Full Page Screenshots (Context)
-                const screenshotResult = await parser.getScreenshot({
-                    imageDataUrl: true,
-                    last: 10, // Scan deeper (first 10 pages)
-                    scale: 2.5 // High fidelity for readable charts
-                });
-                if (screenshotResult?.pages) {
-                    const pageImages = screenshotResult.pages.map((p: any) => p.dataUrl).filter(Boolean);
-                    images.push(...pageImages);
+                // Extract text between stream markers (very basic)
+                const textMatches = pdfText.match(/\(([^)]+)\)/g);
+                if (textMatches && textMatches.length > 0) {
+                    text = textMatches
+                        .map(match => match.slice(1, -1))
+                        .join(' ')
+                        .replace(/\\n/g, '\n')
+                        .replace(/\\/g, '');
+
+                    console.log(`[API] Fallback extraction: ${text.length} characters`);
                 }
-
-                // 2. Individual Images/Figures Pass
-                const imageResult = await parser.getImage({
-                    imageDataUrl: true,
-                    last: 10
-                });
-                if (imageResult?.pages) {
-                    imageResult.pages.forEach((p: any) => {
-                        if (p.images) {
-                            const detectedImages = p.images.map((img: any) => img.dataUrl).filter(Boolean);
-                            images.push(...detectedImages);
-                        }
-                    });
-                }
-
-                // 3. Structural Table Extraction Pass
-                try {
-                    const tableResult = await parser.getTable({
-                        imageDataUrl: true,
-                        last: 10
-                    });
-                    if (tableResult?.pages) {
-                        tableResult.pages.forEach((p: any) => {
-                            if (p.tables) {
-                                const tableImages = p.tables.map((t: any) => t.dataUrl).filter(Boolean);
-                                images.push(...tableImages);
-                            }
-                        });
-                    }
-                } catch (tErr) {
-                    console.log("[API] Table pass skipped or not supported for this doc");
-                }
-
-                // Dedup and limit strictly to top 10 elements to prevent payload crash
-                images = Array.from(new Set(images)).slice(0, 10);
-                console.log(`[API] Deep scan complete. Total visual elements selected: ${images.length}`);
-
-            } catch (vErr: any) {
-                console.warn("[API] Visual extraction failed:", vErr.message);
-            }
-            if (PDFParseClass) {
-                // ... (Existing visual extraction logic remains, but we add OCR trigger)
-            } else {
-                data = await parsePdfFunc(buffer);
+            } catch (fallbackError: any) {
+                console.error("[API] Fallback extraction failed:", fallbackError.message);
             }
         }
 
-        // Consolidate Data
-        // If data was populated by simple parse, use it. If detailed parse ran, text/images are already set?
-        // Actually, the structure above is:
-        // if (PDFParseClass) { ... populates images ... } else { data = await parsePdfFunc ... }
-
-        let text = data?.text || "";
-        // Note: 'images' is already declared at the top of the function. We don't redeclare it.
-
-
-        // -----------------------------------------------------
-        // INGESTION UPGRADE: HYBRID OCR FALLBACK
-        // If text is too short (likely scanned PDF), try OCR.
-        // -----------------------------------------------------
-        if (text.length < 200) {
-            console.log("[API] Text too short (<200 chars). Attempting OCR fallback...");
-            try {
-                // We need to extract images first to run OCR. 
-                // Since pdf-parse basic doesn't give images easily without the screenshot method above,
-                // we rely on the `pdf-parse` internals or `pdfjs-dist` if we had fully integrated it.
-                // For this V1.0 MVP hardener, we will use a naive warning if we can't extract images easily,
-                // OR we presume the `PDFParseClass` path above populated `images` array.
-
-                // Note: The previous block populated `images` array if PDFParseClass was found.
-                // If we are here, we might need to rely on that.
-
-                // Let's assume we have images from the visual extraction pass in the full code (which I see in context).
-                // I will inject Tesseract Logic here.
-
-                const Tesseract = require('tesseract.js');
-
-                // Quick OCR on first 3 images to salvage something
-                const ocrPromises = images.slice(0, 3).map(imgBase64 => Tesseract.recognize(imgBase64, 'eng'));
-                const ocrResults = await Promise.all(ocrPromises);
-
-                const ocrText = ocrResults.map((Res: any) => Res.data.text).join('\n\n');
-
-                if (ocrText.length > 50) {
-                    console.log(`[API] OCR Salvaged ${ocrText.length} characters.`);
-                    text += "\n\n--- [OCR EXTRACTED CONTENT] ---\n\n" + ocrText;
-                } else {
-                    console.warn("[API] OCR Failed to extract meaningful text.");
-                }
-
-            } catch (ocrErr: any) {
-                console.warn("[API] OCR Fallback Failed:", ocrErr.message);
-            }
+        // Validate we got some text
+        if (!text || text.trim().length < 50) {
+            console.warn("[API] Insufficient text extracted");
+            return NextResponse.json({
+                error: "Could not extract text from PDF. The PDF might be scanned images or encrypted. Please copy-paste your text manually.",
+                fallback: true
+            }, { status: 400 });
         }
 
-        console.log(`[API] PDF Parsed. Final Text Length: ${text?.length || 0}`);
+        // Clean up the text
+        const cleanText = text
+            .replace(/\s+/g, ' ') // Normalize whitespace
+            .replace(/\n\s*\n/g, '\n\n') // Clean up line breaks
+            .trim();
 
-        if (!text || text.length < 50) {
-            return NextResponse.json({ error: "Could not extract text. PDF might be encrypted or purely scanned images without OCR." }, { status: 400 });
-        }
-
-        // Basic Cleanup
-        const cleanText = text.replace(/\n\s*\n/g, '\n\n').trim();
+        console.log(`[API] Final text length: ${cleanText.length} characters`);
 
         return NextResponse.json({
             text: cleanText,
-            images: images // Return images for frontend visualization if needed
+            pageCount: text.split('\n\n').length,
+            characterCount: cleanText.length
         });
 
     } catch (error: any) {
         console.error("[API] Critical PDF Parse Error:", error);
-        return NextResponse.json({ error: `Failed to parse PDF: ${error.message}` }, { status: 500 });
+        return NextResponse.json({
+            error: `Failed to parse PDF: ${error.message}. Please copy-paste your text manually.`,
+            fallback: true
+        }, { status: 500 });
     }
 }
