@@ -165,3 +165,25 @@ begin
     alter table public.transactions add column report_summary jsonb default '{}'::jsonb;
   end if;
 end $$;
+
+-- 9. ASYNC JOB QUEUE (Background Processing)
+-- Essential for "Swarm" audits that take longer than 10s (Vercel timeout).
+-- Rationale: Decouples the UI from the heavy AI processing.
+
+create table public.job_queue (
+  id uuid default gen_random_uuid() primary key,
+  user_id uuid references auth.users on delete cascade,
+  type text not null, -- 'QUEUE_RESERVATION' | 'AUDIT_CLAIM' | 'GENERATE_PDF'
+  payload jsonb default '{}'::jsonb,
+  status text default 'PENDING', -- 'PENDING' | 'PROCESSING' | 'COMPLETED' | 'FAILED'
+  result jsonb, -- Stores output (e.g., the claim audit result)
+  created_at timestamp with time zone default now(),
+  updated_at timestamp with time zone
+);
+
+alter table public.job_queue enable row level security;
+
+-- Policies
+create policy "Users can view own jobs" on job_queue for select using (auth.uid() = user_id);
+create policy "Users can insert own jobs" on job_queue for insert with check (auth.uid() = user_id);
+create policy "Service role can update jobs" on job_queue for update using (true); -- Simplified for MVP
