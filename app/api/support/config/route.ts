@@ -8,7 +8,7 @@ export async function GET() {
     const SCENARIOS = {
         ROOT: {
             id: 'ROOT',
-            text: "Hello! I'm the ARGUS-Thesis Assistant. I can help with general questions. How can I assist you today?",
+            text: "Hello! I'm the ARGUS-Thesis Chatbot. I can help with general questions. How can I assist you today?",
             options: [
                 { label: "Pricing & Plans", nextId: 'PRICING' },
                 { label: "Data Privacy", nextId: 'PRIVACY' },
@@ -26,7 +26,7 @@ export async function GET() {
         },
         PRIVACY: {
             id: 'PRIVACY',
-            text: "Security is our First Law. Your manuscript data is processed in ephemeral RAM only. We strictly DO NOT train models on your data.",
+            text: "Your thesis is analyzed using Google Gemini 2.5 AI. We never store your manuscript in our database. Analysis is performed in real-time and discarded immediately after.",
             options: [
                 { label: "Back to Menu", nextId: 'ROOT' }
             ]
