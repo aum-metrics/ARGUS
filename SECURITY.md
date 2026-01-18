@@ -12,7 +12,7 @@
 Argus takes data sovereignty seriously. If you discover a vulnerability, especially regarding the **Ephemeral RAM** persistence:
 
 1.  **Do NOT** file a public GitHub issue.
-2.  Email `security@argus.ac` immediately.
+2.  Email `help@argus-thesis.com` immediately.
 3.  We will acknowledge receipt within 24 hours.
 
 ### Critical Scope

@@ -887,7 +887,7 @@ export default function ArgusDashboard() {
                                                                             },
                                                                             prefill: {
                                                                                 name: "Researcher",
-                                                                                email: "researcher@argus.protocol",
+                                                                                email: "help@argus-thesis.com",
                                                                             },
                                                                             theme: {
                                                                                 color: "#18181b", // zinc-900

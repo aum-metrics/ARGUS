@@ -30,7 +30,7 @@ test.describe('Marketing Asset Generation', () => {
                     id: 'mock-user-id',
                     aud: 'authenticated',
                     role: 'authenticated',
-                    email: 'marketing@argus-thesis.com',
+                    email: 'help@argus-thesis.com',
                     app_metadata: { provider: 'email' },
                     user_metadata: {},
                     created_at: new Date().toISOString()
