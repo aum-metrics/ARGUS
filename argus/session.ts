@@ -15,6 +15,7 @@ export interface ArgusReport {
         overall: number;
     };
     verdict: 'PUBLISHABLE' | 'REVISE_MAJOR' | 'REJECT';
+    finalVerdict?: string; // [NEW] Flexible string for LLM outputs
     executiveSummary: string;
     truthStatement?: string; // [NEW] "One-Sentence Truth"
     keyStrengths?: string[];
@@ -47,6 +48,7 @@ export interface ArgusSession {
 
         // [NEW] Enhanced Actionable Output
         report?: ArgusReport;
+        score?: number; // [NEW] Real-time session readiness score
 
         claims: {
             id: string;
