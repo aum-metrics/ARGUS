@@ -63,7 +63,7 @@ export default function EnterprisePage() {
                                 </div>
                                 <h3 className="text-xl font-bold font-serif text-zinc-900">Departmental Seats</h3>
                                 <p className="text-zinc-600 text-base leading-relaxed font-sans">
-                                    Provision access for 50-500 researchers. Centralized billing, shared credit pools, and admin oversight on usage metrics (without seeing private data).
+                                    Provision access for 50-500 researchers. Centralized billing, shared credit pools, and admin oversight on usage metrics (without accessing manuscript content).
                                 </p>
                             </div>
                             <div className="space-y-4">

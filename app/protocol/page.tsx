@@ -32,10 +32,10 @@ export default function HowItWorksPage() {
                                 <div className="bg-zinc-100 p-2 rounded">
                                     <Fingerprint className="h-6 w-6 text-zinc-900" />
                                 </div>
-                                <h2 className="text-2xl font-bold">1. Ephemeral Privacy (First Law)</h2>
+                                <h2 className="text-2xl font-bold">1. Session-Scoped Processing</h2>
                             </div>
                             <p className="text-zinc-700 leading-relaxed pl-14">
-                                All session data exists only in Random Access Memory (RAM). No inputs, claims, or generated critiques are ever written to a disk, database, or log file that persists beyond the active session window. Upon session termination (or timeout), a cryptographic deletion certificate is generated, and the memory address space is zeroed.
+                                Your manuscript is processed in real-time by our secure AI partners (Google Vertex AI). We never store your text in our own database. Once the audit session concludes, your data is discarded from our execution context.
                             </p>
                         </section>
 
