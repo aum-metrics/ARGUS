@@ -508,34 +508,23 @@ export default function ArgusDashboard() {
                                                             return;
                                                         }
 
-                                                        // B. PDF FILES (Server-Side Parse)
+                                                        // B. PDF FILES (Client-Side Parse with PDF.js)
                                                         setCurrentStep('PARSING_PDF');
 
                                                         try {
-                                                            const formData = new FormData();
-                                                            formData.append('file', file);
+                                                            // Dynamic import PDF.js to avoid SSR issues
+                                                            const { extractTextFromPDF } = await import('@/lib/pdf-parser');
+                                                            const text = await extractTextFromPDF(file);
 
-                                                            const res = await fetch('/api/parse-pdf', {
-                                                                method: 'POST',
-                                                                body: formData
-                                                            });
-
-                                                            if (!res.ok) {
-                                                                const errData = await res.json().catch(() => ({}));
-                                                                throw new Error(errData.error || `Upload failed with status ${res.status}`);
+                                                            if (text.length < 100) {
+                                                                throw new Error('Extracted text too short. PDF might be scanned or encrypted.');
                                                             }
 
-                                                            const data = await res.json();
-                                                            setPaperInput(data.text); // Auto-fill textarea
+                                                            setPaperInput(text);
 
-                                                            // [NEW] Visual Essence
-                                                            if (data.images && data.images.length > 0) {
-                                                                setPaperImages(data.images);
-                                                            }
-
-                                                            // [NEW] Capture Filename for Audit
+                                                            // Capture Filename for Audit
                                                             syncSession({
-                                                                ...session!, // Session definitely exists here if we are uploading
+                                                                ...session!,
                                                                 data: {
                                                                     ...session!.data,
                                                                     context: {
@@ -545,11 +534,11 @@ export default function ArgusDashboard() {
                                                                 }
                                                             });
 
-                                                            alert(`PDF Parsed Successfully! extracted ${data.text.length} characters.`);
+                                                            alert(`PDF Parsed Successfully! Extracted ${text.length} characters instantly.`);
 
-                                                        } catch (err) {
+                                                        } catch (err: any) {
                                                             console.error(err);
-                                                            alert("Failed to parse PDF. Please copy-paste text manually.");
+                                                            alert(err.message || "Failed to parse PDF. Please copy-paste text manually.");
                                                         } finally {
                                                             setIsProcessing(false);
                                                             setCurrentStep('IDLE');
