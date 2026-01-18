@@ -1,7 +1,8 @@
 /**
  * Author: Sambath Kumar Natarajan
  */
-import { ModelRole } from '@/orchestrator/constitution';
+
+export type ModelRole = 'chatgpt' | 'perplexity' | 'gemini';
 
 export interface ModelResponse {
     content: string;
