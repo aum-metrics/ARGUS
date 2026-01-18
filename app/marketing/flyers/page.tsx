@@ -68,10 +68,8 @@ export default function FlyersPage() {
 
                 <div className="absolute bottom-8 right-8">
                     <div className="flex flex-col items-end gap-2">
-                        <div className="w-24 h-24 bg-zinc-900 p-2 rounded-lg shadow-xl">
-                            <div className="w-full h-full bg-white flex items-center justify-center">
-                                <span className="text-[10px] font-bold text-zinc-900 text-center leading-tight">SCAN FOR<br />DEMO</span>
-                            </div>
+                        <div className="w-24 h-24 bg-white p-2 rounded-lg shadow-xl">
+                            <img src="/qr-code.png" alt="QR Code" className="w-full h-full object-contain" />
                         </div>
                         <p className="text-[10px] text-zinc-400 font-bold uppercase tracking-widest">www.ARGUS-Thesis.com</p>
                     </div>
@@ -86,7 +84,7 @@ export default function FlyersPage() {
                     <div className="space-y-6 max-w-lg">
                         <div className="flex items-start gap-4">
                             <div className="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center mt-1"><span className="text-green-700 font-bold">1</span></div>
-                            <p className="text-lg text-zinc-600"><strong>Upload Draft.</strong> Our 6-agent swarm analyzes your thesis for logical consistency.</p>
+                            <p className="text-lg text-zinc-600"><strong>Paste Text.</strong> Our AI analyzes your thesis for logical consistency using Google Gemini 2.5.</p>
                         </div>
                         <div className="flex items-start gap-4">
                             <div className="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center mt-1"><span className="text-green-700 font-bold">2</span></div>
@@ -128,8 +126,8 @@ export default function FlyersPage() {
 
                     <div className="grid grid-cols-2 gap-8 mb-16">
                         <div className="bg-slate-800/50 p-6 rounded-lg border border-slate-700 backdrop-blur-sm">
-                            <h3 className="text-indigo-400 font-bold text-lg mb-2">Zero Retention</h3>
-                            <p className="text-slate-400 text-sm">We process claims in volatile memory. Your IP never touches a disk.</p>
+                            <h3 className="text-indigo-400 font-bold text-lg mb-2">AI-Powered</h3>
+                            <p className="text-slate-400 text-sm">Powered by Google Gemini 2.5. We never store your manuscript in our database.</p>
                         </div>
                         <div className="bg-slate-800/50 p-6 rounded-lg border border-slate-700 backdrop-blur-sm">
                             <h3 className="text-indigo-400 font-bold text-lg mb-2">Audit Trails</h3>
@@ -157,9 +155,7 @@ export default function FlyersPage() {
                         {/* QR Code Block */}
                         <div className="flex flex-col items-center gap-1">
                             <div className="w-16 h-16 bg-white p-1 rounded-lg shadow-xl">
-                                <div className="w-full h-full border border-dashed border-zinc-400 flex items-center justify-center">
-                                    <span className="text-[8px] font-bold text-zinc-900 text-center leading-tight">SCAN<br />ME</span>
-                                </div>
+                                <img src="/qr-code.png" alt="QR Code" className="w-full h-full object-contain" />
                             </div>
                             <p className="text-indigo-400 text-[10px] font-mono">argus-thesis.com</p>
                         </div>
