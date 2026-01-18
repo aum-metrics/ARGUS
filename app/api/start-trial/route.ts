@@ -7,6 +7,14 @@ import { NextResponse } from "next/server";
 
 export async function POST(req: Request) {
     try {
+        // 0. Validate environment variables
+        if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.SUPABASE_SERVICE_ROLE_KEY) {
+            console.error("[TRIAL] Missing Supabase environment variables");
+            return NextResponse.json({
+                error: "Server configuration error. Please contact support."
+            }, { status: 500 });
+        }
+
         // 1. Verify Auth (User Context)
         const supabaseUser = await createServerClient();
         const { data: { user }, error: authError } = await supabaseUser.auth.getUser();
@@ -17,8 +25,8 @@ export async function POST(req: Request) {
 
         // 2. Admin Client for Privileged Operations (Bypass RLS)
         const supabaseAdmin = createClient(
-            process.env.NEXT_PUBLIC_SUPABASE_URL!,
-            process.env.SUPABASE_SERVICE_ROLE_KEY!
+            process.env.NEXT_PUBLIC_SUPABASE_URL,
+            process.env.SUPABASE_SERVICE_ROLE_KEY
         );
 
 

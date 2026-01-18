@@ -13,6 +13,7 @@ export async function POST(req: NextRequest) {
     // Lazy import to verify it loads
     let parsePdfFunc: any = null;
     let PDFParseClass: any = null;
+    let pdfParseAvailable = false;
 
     try {
         // Stick to root package which worked previously
@@ -23,27 +24,35 @@ export async function POST(req: NextRequest) {
         // 1. Check for legacy function style
         if (typeof pdfModule === 'function') {
             parsePdfFunc = pdfModule;
+            pdfParseAvailable = true;
             console.log("[API] Detected legacy pdf-parse function");
         } else if (pdfModule && typeof pdfModule.default === 'function') {
             parsePdfFunc = pdfModule.default;
+            pdfParseAvailable = true;
             console.log("[API] Detected legacy pdf-parse function via .default");
         }
         // 2. Check for modern class style (v2.x)
         else {
             PDFParseClass = pdfModule.PDFParse || (pdfModule.default && pdfModule.default.PDFParse);
             if (PDFParseClass) {
+                pdfParseAvailable = true;
                 console.log("[API] Detected modern PDFParse class");
             } else {
                 console.error("[API] pdf-parse loaded but no recognized export found. Keys:", Object.keys(pdfModule || {}));
+                // Don't fail completely - return helpful error
                 return NextResponse.json({
-                    error: "Server Error: pdf-parse library failed to load correctly.",
-                    details: `Module type: ${typeof pdfModule}, Keys: ${Object.keys(pdfModule || {})} - Restart server if this persists.`
-                }, { status: 500 });
+                    error: "PDF parsing is temporarily unavailable. Please copy-paste your text manually.",
+                    fallback: true
+                }, { status: 503 });
             }
         }
     } catch (e: any) {
         console.error("[API] Failed to require pdf-parse:", e);
-        return NextResponse.json({ error: `Server Configuration Error: ${e.message}` }, { status: 500 });
+        // Return user-friendly error instead of crashing
+        return NextResponse.json({
+            error: "PDF parsing is temporarily unavailable. Please copy-paste your text manually.",
+            fallback: true
+        }, { status: 503 });
     }
 
     try {
