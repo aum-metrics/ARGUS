@@ -18,6 +18,7 @@ import { CreditCounter } from "@/components/CreditCounter"
 import { OnboardingFlow } from "@/components/OnboardingFlow"
 import { LoadingState, ThinkingIndicator, ProgressBar } from "@/components/LoadingStates"
 import Link from "next/link"
+import { cn } from "@/lib/utils"
 import { saveAs } from "file-saver"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { GovernanceLogViewer } from "@/components/GovernanceLogViewer"
@@ -34,7 +35,7 @@ export default function ArgusDashboard() {
     const [usedCredits, setUsedCredits] = useState(0) // Credits already used
 
     // De-coupled Governance Hooks
-    const { logs, isProcessing, setIsProcessing, currentStep, setCurrentStep, tokenUsage, extractClaims, runAdversaryOnClaim, runAdversariesOnAll } = useGovernance();
+    const { logs, isProcessing, setIsProcessing, currentStep, setCurrentStep, tokenUsage, extractClaims, runAdversaryOnClaim, runAdversariesOnAll, generateFinalReport } = useGovernance();
 
     const [isPreviewOpen, setIsPreviewOpen] = useState(false); // Modal for Review
     const [selectedImage, setSelectedImage] = useState<string | null>(null); // State for Lightbox
@@ -1300,6 +1301,30 @@ export default function ArgusDashboard() {
                                     </div>
                                 )}
                             </CardContent>
+                            <CardFooter className="pt-2 pb-4 flex justify-end border-t border-zinc-100 bg-zinc-50/50">
+                                <div className="flex gap-4 items-center">
+                                    <div className="text-xs text-zinc-400 font-mono">
+                                        CLAIMS AUDITED: {session.data.claims.filter((c: any) => c.status !== 'PENDING').length} / {session.data.claims.length}
+                                    </div>
+                                    <Button
+                                        onClick={() => generateFinalReport(session, (newData: any) => syncSession({ ...session, data: newData }))}
+                                        disabled={isProcessing || session.data.claims.some((c: any) => c.status === 'PENDING')}
+                                        className={cn(
+                                            "gap-2 font-bold tracking-tight shadow-md transition-all",
+                                            !session.data.claims.some((c: any) => c.status === 'PENDING')
+                                                ? "bg-purple-600 hover:bg-purple-700 text-white shadow-purple-200"
+                                                : "bg-zinc-100 text-zinc-400 border-zinc-200"
+                                        )}
+                                    >
+                                        {isProcessing && currentStep === 'SYNTHESIZING_VERDICT' ? (
+                                            <Loader2 className="h-4 w-4 animate-spin" />
+                                        ) : (
+                                            <ShieldCheck className="h-4 w-4" />
+                                        )}
+                                        Step 3: Synthesize Final Verdict
+                                    </Button>
+                                </div>
+                            </CardFooter>
                         </Card>
                     </div>
                 </div>

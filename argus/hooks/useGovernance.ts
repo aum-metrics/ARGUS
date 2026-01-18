@@ -512,6 +512,80 @@ export function useGovernance() {
         }
     };
 
+    // [NEW] Step 3: Synthesize Final Verdict
+    const generateFinalReport = async (currentSession: ArgusSession, onUpdate: (data: any) => void) => {
+        setIsProcessing(true);
+        setCurrentStep('SYNTHESIZING_VERDICT');
+        addLog(`[ORCHESTRATOR] Initiating Final Verdict Synthesis...`);
+
+        try {
+            // 1. Compile all audit logs
+            const auditSummary = currentSession.data.claims.map((c: any, i: number) => `
+                CLAIM ${i + 1}: "${c.statement}"
+                STATUS: ${c.status}
+                SCORE: ${c.score}
+                KEY CRITIQUE: ${c.governanceLog.find((l: any) => l.role === 'THESIS_DESTROYER')?.content.substring(0, 200)}...
+            `).join('\n');
+
+            // 2. Prompt for Executive Summary
+            const synthesisPrompt = `
+                ROLE: Editor-in-Chief of a Top-Tier Scientific Journal.
+                TASK: Write the final Rejection/Acceptance Decision Letter and Executive Summary for this manuscript.
+                
+                DATA:
+                ${auditSummary}
+
+                OUTPUT FORMAT: JSON
+                {
+                    "executiveSummary": "2-3 paragraphs. Brutally honest assessment of why the paper failed or succeeded. Focus on the pattern of failures.",
+                    "truthStatement": "1 sentence. The unvarnished truth about this paper.",
+                    "actionItems": [
+                        { "layer": "METHODOLOGY", "suggestion": "..." },
+                        { "layer": "VALIDATION", "suggestion": "..." }
+                    ],
+                    "finalVerdict": "REJECT" | "REVISE" | "ACCEPT"
+                }
+            `;
+
+            addLog(`[EDITOR] Drafting final decision letter...`);
+
+            const decisionData = await fetchWithRetry('/api/gemini', {
+                method: 'POST',
+                body: JSON.stringify({ role: 'JOURNAL_REVIEWER_SIMULATOR', sessionId: currentSession.id, prompt: synthesisPrompt })
+            });
+
+            let decisionJson: any = {};
+            try {
+                const cleanJson = (decisionData.content || "{}").replace(/```json/g, "").replace(/```/g, "");
+                decisionJson = JSON.parse(cleanJson.match(/\{[\s\S]*\}/)?.[0] || "{}");
+            } catch (e) {
+                console.error("Failed to parse verdict", e);
+            }
+
+            // 3. Update Session
+            const updatedReport = {
+                ...currentSession.data.report,
+                executiveSummary: decisionJson.executiveSummary || "Failed to generate summary.",
+                truthStatement: decisionJson.truthStatement || "Analysis inconclusive.",
+                actionItems: decisionJson.actionItems || [],
+                finalVerdict: decisionJson.finalVerdict || "REJECT"
+            };
+
+            addLog(`[EDITOR] Verdict Rendered: ${updatedReport.finalVerdict}`);
+
+            onUpdate({
+                ...currentSession.data,
+                report: updatedReport
+            });
+
+        } catch (error: any) {
+            addLog(`[ERROR] Synthesis failed: ${error.message}`);
+        } finally {
+            setIsProcessing(false);
+            setCurrentStep('IDLE');
+        }
+    };
+
     return {
         logs,
         isProcessing,
@@ -521,6 +595,7 @@ export function useGovernance() {
         tokenUsage,
         extractClaims,
         runAdversaryOnClaim,
-        runAdversariesOnAll // Exported
+        runAdversariesOnAll,
+        generateFinalReport // Exported
     };
 }
