@@ -34,12 +34,35 @@ export default function LoginPage() {
     const [password, setPassword] = useState("")
     const [otp, setOtp] = useState("")
 
-    // View State: 'auth' (tabs) or 'verify' (otp input)
-    const [view, setView] = useState<"auth" | "verify">("auth")
+    // View State: 'auth' | 'verify' | 'forgot'
+    const [view, setView] = useState<"auth" | "verify" | "forgot">("auth")
     const [activeTab, setActiveTab] = useState("signin")
+
+    const handleForgotPassword = async (e: React.FormEvent) => {
+        e.preventDefault()
+        setIsLoading(true)
+        setError(null)
+        setSuccessMessage(null)
+
+        try {
+            const { error } = await supabase.auth.resetPasswordForEmail(email, {
+                redirectTo: `${getURL()}reset-password`,
+            })
+
+            if (error) throw error
+
+            setSuccessMessage("Password reset link sent! Check your email.")
+            // Optional: Switch to a confirmation view or just show success
+        } catch (err: any) {
+            setError(err.message)
+        } finally {
+            setIsLoading(false)
+        }
+    }
 
     const handleSignUp = async (e: React.FormEvent) => {
         e.preventDefault()
+        // ... (rest of handleSignUp logic unchanged) ...
         setIsLoading(true)
         setError(null)
         setSuccessMessage(null)
@@ -65,6 +88,7 @@ export default function LoginPage() {
     }
 
     const handleSignIn = async (e: React.FormEvent) => {
+        // ... (rest of handleSignIn logic unchanged) ...
         e.preventDefault()
         setIsLoading(true)
         setError(null)
@@ -82,6 +106,42 @@ export default function LoginPage() {
             setError(err.message)
         } finally {
             setIsLoading(false)
+        }
+    }
+
+    // Header Logic
+    const getHeader = () => {
+        if (view === "auth") {
+            return (
+                <>
+                    <CardTitle className="text-2xl font-bold text-center font-serif text-zinc-900">Researcher Login</CardTitle>
+                    <CardDescription className="text-center font-sans text-zinc-500">
+                        Secure Access to the Governance Engine
+                    </CardDescription>
+                </>
+            )
+        }
+        if (view === "verify") {
+            return (
+                <>
+                    <CardTitle className="text-2xl font-bold text-center flex items-center justify-center gap-2">
+                        <CheckCircle2 className="h-6 w-6 text-green-600" /> Verify Identity
+                    </CardTitle>
+                    <CardDescription className="text-center font-sans text-zinc-500">
+                        Enter the code sent to {email}
+                    </CardDescription>
+                </>
+            )
+        }
+        if (view === "forgot") {
+            return (
+                <>
+                    <CardTitle className="text-2xl font-bold text-center font-serif text-zinc-900">Reset Password</CardTitle>
+                    <CardDescription className="text-center font-sans text-zinc-500">
+                        Enter your email to receive recovery instructions
+                    </CardDescription>
+                </>
+            )
         }
     }
 
@@ -103,23 +163,7 @@ export default function LoginPage() {
                 )}
 
                 <CardHeader>
-                    {view === "auth" ? (
-                        <>
-                            <CardTitle className="text-2xl font-bold text-center font-serif text-zinc-900">Researcher Login</CardTitle>
-                            <CardDescription className="text-center font-sans text-zinc-500">
-                                Secure Access to the Governance Engine
-                            </CardDescription>
-                        </>
-                    ) : (
-                        <>
-                            <CardTitle className="text-2xl font-bold text-center flex items-center justify-center gap-2">
-                                <CheckCircle2 className="h-6 w-6 text-green-600" /> Verify Identity
-                            </CardTitle>
-                            <CardDescription className="text-center font-sans text-zinc-500">
-                                Enter the code sent to {email}
-                            </CardDescription>
-                        </>
-                    )}
+                    {getHeader()}
                 </CardHeader>
 
                 <CardContent>
@@ -129,13 +173,13 @@ export default function LoginPage() {
                         </div>
                     )}
 
-                    {successMessage && view === "auth" && (
+                    {successMessage && (
                         <div className="mb-4 p-4 rounded-lg bg-green-50 text-green-900 border border-green-200 text-sm">
                             {successMessage}
                         </div>
                     )}
 
-                    {view === "auth" ? (
+                    {view === "auth" && (
                         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
                             <TabsList className="grid w-full grid-cols-2 mb-4">
                                 <TabsTrigger value="signin">Sign In</TabsTrigger>
@@ -158,7 +202,13 @@ export default function LoginPage() {
                                     <div className="space-y-2">
                                         <div className="flex items-center justify-between">
                                             <Label htmlFor="signin-password">Password</Label>
-                                            <Link href="#" className="text-xs text-zinc-500 hover:underline">Forgot?</Link>
+                                            <button
+                                                type="button"
+                                                onClick={() => setView("forgot")}
+                                                className="text-xs text-zinc-500 hover:underline"
+                                            >
+                                                Forgot?
+                                            </button>
                                         </div>
                                         <Input
                                             id="signin-password"
@@ -204,7 +254,9 @@ export default function LoginPage() {
                                 </form>
                             </TabsContent>
                         </Tabs>
-                    ) : (
+                    )}
+
+                    {view === "verify" && (
                         <div className="space-y-6 text-center">
                             <div className="bg-zinc-50 p-6 rounded-lg border border-zinc-100">
                                 <p className="text-zinc-600 mb-4">
@@ -250,6 +302,38 @@ export default function LoginPage() {
                                 onClick={() => setView("auth")}
                             >
                                 <ArrowLeft className="h-4 w-4 mr-2" /> Back to Sign In
+                            </Button>
+                        </div>
+                    )}
+
+                    {view === "forgot" && (
+                        <div className="space-y-6">
+                            <form onSubmit={handleForgotPassword} className="space-y-4">
+                                <div className="space-y-2">
+                                    <Label htmlFor="forgot-email">Email Address</Label>
+                                    <Input
+                                        id="forgot-email"
+                                        type="email"
+                                        placeholder="researcher@university.edu"
+                                        value={email}
+                                        onChange={(e) => setEmail(e.target.value)}
+                                        required
+                                    />
+                                    <p className="text-xs text-zinc-500">
+                                        We'll send a secure password reset link to this email.
+                                    </p>
+                                </div>
+                                <Button type="submit" className="w-full bg-zinc-900 text-white hover:bg-zinc-800">
+                                    Send Reset Link
+                                </Button>
+                            </form>
+                            <Button
+                                type="button"
+                                variant="ghost"
+                                className="w-full"
+                                onClick={() => setView("auth")}
+                            >
+                                <ArrowLeft className="h-4 w-4 mr-2" /> Back to Login
                             </Button>
                         </div>
                     )}
