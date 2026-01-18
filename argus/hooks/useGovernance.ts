@@ -530,8 +530,17 @@ export function useGovernance() {
         addLog(`[ORCHESTRATOR] Initiating Final Verdict Synthesis...`);
 
         try {
-            // 1. Compile all audit logs
-            const auditSummary = currentSession.data.claims.map((c: any, i: number) => `
+            // 0. Guard Clause: Validation Required
+            const completedClaims = currentSession.data.claims.filter((c: any) => c.status !== 'PENDING');
+            if (completedClaims.length === 0) {
+                alert("Cannot synthesize verdict: No claims have been audited yet. Please run adversaries on at least one claim.");
+                setIsProcessing(false);
+                setCurrentStep('IDLE');
+                return;
+            }
+
+            // 1. Compile all audit logs (Only Completed)
+            const auditSummary = completedClaims.map((c: any, i: number) => `
                 CLAIM ${i + 1}: "${c.statement}"
                 STATUS: ${c.status}
                 SCORE: ${c.score}
