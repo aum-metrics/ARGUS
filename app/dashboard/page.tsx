@@ -9,7 +9,7 @@ import { Badge } from "@/components/ui/badge"
 import { createClient } from "@/lib/supabase/client"
 import { Textarea } from "@/components/ui/textarea"
 import { createSession, destroySession, ArgusSession } from "@/argus/session"
-import { Trash2, FileText, CheckCircle2, ShieldCheck, Network, PlayCircle, ScanSearch, Coins, AlertTriangle, XCircle, Download, Gift, Maximize2, Swords } from "lucide-react"
+import { Trash2, FileText, CheckCircle2, ShieldCheck, Network, PlayCircle, ScanSearch, Coins, AlertTriangle, XCircle, Download, Gift, Maximize2, Swords, Loader2 } from "lucide-react"
 import { useGovernance, TOKEN_COSTS } from "@/argus/hooks/useGovernance"
 import { KnowledgeGraph } from "@/components/KnowledgeGraph"
 import { robustDownloader } from "@/argus/downloader"
@@ -34,16 +34,7 @@ export default function ArgusDashboard() {
     const [usedCredits, setUsedCredits] = useState(0) // Credits already used
 
     // De-coupled Governance Hooks
-    const {
-        logs,
-        isProcessing,
-        setIsProcessing, // NOW AVAILABLE
-        currentStep,
-        setCurrentStep, // NOW AVAILABLE
-        tokenUsage,
-        extractClaims,
-        runAdversaryOnClaim
-    } = useGovernance();
+    const { logs, isProcessing, setIsProcessing, currentStep, setCurrentStep, tokenUsage, extractClaims, runAdversaryOnClaim, runAdversariesOnAll } = useGovernance();
 
     const [isPreviewOpen, setIsPreviewOpen] = useState(false); // Modal for Review
     const [selectedImage, setSelectedImage] = useState<string | null>(null); // State for Lightbox
@@ -1131,13 +1122,35 @@ export default function ArgusDashboard() {
                                     <ShieldCheck className="h-4 w-4" />
                                     Step 2: Adversarial Audit
                                     <div className="ml-auto flex items-center gap-2">
-                                        <span className="text-xs font-mono font-normal text-zinc-400 normal-case">
+                                        {/* [NEW] Parallel Audit Trigger */}
+                                        {session.data.claims.some((c: any) => c.status === 'PENDING') && (
+                                            <Button
+                                                size="sm"
+                                                variant="outline"
+                                                className="h-6 text-[10px] bg-white hover:bg-zinc-50 text-zinc-600 border-zinc-200"
+                                                onClick={() => {
+                                                    if (window.confirm("Launch parallel audit on all pending claims? This may consume significant tokens.")) {
+                                                        runAdversariesOnAll(session, (newData: any) => syncSession({ ...session, data: newData }));
+                                                    }
+                                                }}
+                                                disabled={isProcessing}
+                                            >
+                                                {isProcessing && currentStep === 'AUDITING_ALL' ? (
+                                                    <Loader2 className="h-3 w-3 animate-spin mr-1" />
+                                                ) : (
+                                                    <Swords className="h-3 w-3 mr-1" />
+                                                )}
+                                                Audit All (Parallel)
+                                            </Button>
+                                        )}
+
+                                        <span className="text-xs font-mono font-normal text-zinc-400 normal-case ml-2">
                                             Claims Detected: {session.data.claims.length} / 15
                                         </span>
-                                        <div className="group relative">
+                                        <div className="group relative ml-2">
                                             <AlertTriangle className="h-3 w-3 text-zinc-300 cursor-help" />
                                             <div className="absolute right-0 w-48 bg-zinc-800 text-zinc-100 text-[10px] p-2 rounded shadow-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50">
-                                                The 15 claim limit is a soft upper bound for V1 token governance. Complex theses may generate fewer, denser claims.
+                                                Top 10-15 critical claims targeted.
                                             </div>
                                         </div>
                                     </div>

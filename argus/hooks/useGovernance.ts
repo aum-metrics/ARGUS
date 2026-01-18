@@ -148,7 +148,7 @@ export function useGovernance() {
                         2. If images are present (charts/graphs/tables), incorporate their implications into the relevant textual claim.
                         3. For each claim, if it is supported by one or more of the attached images, include the indices of those images in a "evidenceIndices" array.
                         4. Extract specific claims across ALL categories: Problem, Contribution, Comparative, Performance, and Causal.
-                        5. Aim for the **Top 15 atomic, falsifiable claims**. Do not exceed this limit. Prioritize impact and logical centrality.
+                        5. Aim for the **Top 10-15 atomic, falsifiable claims**. Do not feel forced to find 15 if there are fewer. Prioritize the most "load-bearing" and critical assertions. Quality over quantity.
                         
                         OUTPUT: JSON array of objects { "id": "C1", "statement": "...", "evidenceIndices": [number, ...] }
                         
@@ -228,8 +228,124 @@ export function useGovernance() {
         }
     };
 
+    // ------------------------------------------------------------------
+    // CORE: Single Claim Audit Logic (Pure Function)
+    // ------------------------------------------------------------------
+    const _auditClaimCore = async (claim: any, contextText: string, sessionId: string) => {
+        // 1. Prosecution Phase
+        const attackPrompt = getRolePrompt('THESIS_DESTROYER', `CLAIM: "${claim.statement}"`);
+        const methodPrompt = getRolePrompt('METHODOLOGY_PROSECUTOR', `CLAIM: "${claim.statement}"\nFULL CONTEXT: ${contextText.substring(0, 5000)}...`);
+        const litPrompt = getRolePrompt('LITERATURE_ADVERSARY', `CLAIM: "${claim.statement}"`);
+        const formPrompt = getRolePrompt('FORMALISM_AUDITOR', `CLAIM: "${claim.statement}"`);
+
+        // Parallel Execution of Layers
+        const results = await Promise.allSettled([
+            fetchWithRetry('/api/gemini', {
+                method: 'POST',
+                body: JSON.stringify({ role: 'THESIS_DESTROYER', sessionId, prompt: attackPrompt, images: claim.visualEvidence || [], step: 'DRAFT' })
+            }),
+            fetchWithRetry('/api/gemini', {
+                method: 'POST',
+                body: JSON.stringify({ role: 'METHODOLOGY_PROSECUTOR', sessionId, prompt: methodPrompt, images: claim.visualEvidence || [] })
+            }),
+            fetchWithRetry('/api/gemini', {
+                method: 'POST',
+                body: JSON.stringify({ role: 'LITERATURE_ADVERSARY', sessionId, prompt: litPrompt, images: claim.visualEvidence || [] })
+            }),
+            fetchWithRetry('/api/gemini', {
+                method: 'POST',
+                body: JSON.stringify({ role: 'FORMALISM_AUDITOR', sessionId, prompt: formPrompt, images: claim.visualEvidence || [] })
+            })
+        ]);
+
+        const attackDraftRes = results[0].status === 'fulfilled' ? results[0].value : { content: "Logic audit unavailable.", nextStep: null };
+        const methodRes = results[1].status === 'fulfilled' ? results[1].value : { content: "Methodology audit bypassed." };
+        const litRes = results[2].status === 'fulfilled' ? results[2].value : { content: "Literature check bypassed." };
+        const formRes = results[3].status === 'fulfilled' ? results[3].value : { content: "Formalism check bypassed." };
+
+        // Optimization: Step 2 Refine (Sequential to Step 1A)
+        let attackText = attackDraftRes.content || "Logic attack failed.";
+        if (attackDraftRes.nextStep === 'REFINE') {
+            try {
+                const refineRes = await fetchWithRetry('/api/gemini', {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        role: 'THESIS_DESTROYER',
+                        sessionId,
+                        prompt: attackPrompt,
+                        context: attackDraftRes.content,
+                        images: claim.visualEvidence || [],
+                        step: 'REFINE'
+                    })
+                });
+                attackText = refineRes.content || attackText;
+            } catch (e) {
+                console.warn("Refine failed", e);
+            }
+        }
+
+        const methodText = methodRes.content || "Methodology audit inactive.";
+        const litText = litRes.content || "Literature check inactive.";
+        const formText = formRes.content || "Formalism check inactive.";
+
+        // 2. The Judge (Layer 6)
+        const verdictPrompt = getRolePrompt('JOURNAL_REVIEWER_SIMULATOR', `
+            CLAIM: "${claim.statement}"
+            
+            *** PROSECUTION DOSSIER ***
+            [LAYER 2: LOGIC] ${attackText}
+            [LAYER 3: METHODOLOGY] ${methodText}
+            [LAYER 4: NOVELTY] ${litText}
+            [LAYER 5: FORMALISM] ${formText}
+
+            *** INSTITUTIONAL CONTEXT ***
+            Candidate: Anonymous
+            Target Journal: General Academic
+            
+            TASK: Act as the Editor-in-Chief. Render a final verdict.
+            OUTPUT FORMAT: Strict JSON Object { "readinessScore": number, "sixAdversaryScore": { ... }, "verdict": "PUBLISHABLE" | "REVISE_MAJOR" | "REJECT", "executiveSummary": "...", "truthStatement": "...", "actionItems": [], "fatal": boolean, "noveltyClassification": [], "reasons": [] }
+        `);
+
+        const verdictData = await fetchWithRetry('/api/gemini', {
+            method: 'POST',
+            body: JSON.stringify({ role: 'JOURNAL_REVIEWER_SIMULATOR', sessionId, prompt: verdictPrompt })
+        });
+
+        const verdictRaw = verdictData.content || "{}";
+        let verdictJson: any = {};
+        try {
+            let cleanJson = verdictRaw.replace(/```json/g, "").replace(/```/g, "");
+            const jsonMatch = cleanJson.match(/\{[\s\S]*\}/);
+            verdictJson = jsonMatch ? JSON.parse(jsonMatch[0]) : { verdict: "REJECT", fatal: true };
+        } catch (e) { }
+
+        // Strict Enum Guard
+        const ALLOWED_STATUSES = ["ACCEPTED", "REVISE", "REJECTED"];
+        let rawVerdict = (verdictJson.verdict || "REJECTED").toUpperCase();
+        if (rawVerdict === "REJECT") rawVerdict = "REJECTED";
+        if (rawVerdict === "ACCEPT") rawVerdict = "ACCEPTED";
+        const status = ALLOWED_STATUSES.includes(rawVerdict) ? rawVerdict : "REJECTED";
+
+        return {
+            ...claim,
+            status,
+            governanceLog: [
+                ...claim.governanceLog,
+                { role: 'THESIS_DESTROYER', content: attackText },
+                { role: 'METHODOLOGY_PROSECUTOR', content: methodText },
+                { role: 'LITERATURE_ADVERSARY', content: litText },
+                { role: 'FORMALISM_AUDITOR', content: formText },
+                { role: 'JOURNAL_REVIEWER_SIMULATOR', content: verdictRaw }
+            ],
+            noveltyClassification: verdictJson.noveltyClassification || [],
+            governanceMeta: {
+                auditedAt: new Date().toISOString(),
+                tokenEstimate: TOKEN_COSTS.AUDIT_SINGLE * 4
+            }
+        };
+    };
+
     // Step 2: Audit Single Claim
-    // This is the "Unit Test" phase.
     const runAdversaryOnClaim = async (claimId: string, currentSession: ArgusSession, onUpdate: (data: any) => void) => {
         setIsProcessing(true);
         setCurrentStep(`AUDITING_${claimId}`);
@@ -237,253 +353,18 @@ export function useGovernance() {
 
         try {
             if (tokenUsage + TOKEN_COSTS.AUDIT_SINGLE > MAX_BUDGET) {
-                addLog(`[SYSTEM] Governance budget exhausted (${MAX_BUDGET} T). Upgrade required.`);
+                addLog(`[SYSTEM] Governance budget exhausted.`);
                 setIsProcessing(false);
-                setCurrentStep('IDLE');
                 return;
             }
-
             setTokenUsage(prev => prev + TOKEN_COSTS.AUDIT_SINGLE);
-
             const claim = currentSession.data.claims.find((c: any) => c.id === claimId);
             if (!claim) throw new Error("Claim not found");
 
-            // 0. Compute Claim Hash & Check Cache
-            const claimHash = await computeHash(claim.statement);
+            const updatedClaim = await _auditClaimCore(claim, currentSession.data.originalText, currentSession.id);
+            addLog(`[JUDGE] Final disposition for ${claimId}: ${updatedClaim.status}`);
 
-            // Check if already audited and unchanged
-            // Optimization: Frozen `ACCEPTED` claims should not be re-audited unless text changes
-            if (claim.claimHash === claimHash && claim.status !== 'PENDING') {
-                addLog(`[ORCHESTRATOR] Claim unchanged. Using cached audit for ${claimId}.`);
-                setIsProcessing(false);
-                setCurrentStep('IDLE');
-                return;
-            }
-
-            // 1. The Prosecution Phase (Parallel Execution of Layers 2, 3, 4, 5)
-            // We launch the full adversarial stack against the claim.
-            addLog(`[ORCHESTRATOR] Launching 6-Layer Adversarial Swarm...`);
-
-            const attackPrompt = getRolePrompt('THESIS_DESTROYER', `CLAIM: "${claim.statement}"`);
-            const methodPrompt = getRolePrompt('METHODOLOGY_PROSECUTOR', `CLAIM: "${claim.statement}"
-FULL CONTEXT: ${currentSession.data.originalText.substring(0, 5000)}...`); // Give more context
-            const litPrompt = getRolePrompt('LITERATURE_ADVERSARY', `CLAIM: "${claim.statement}"`);
-            const formPrompt = getRolePrompt('FORMALISM_AUDITOR', `CLAIM: "${claim.statement}"`);
-
-            // Execute Swarm (Modified for V1.1 Async Chaining)
-            // 1. Fire fast agents AND the Draft Step of the slow agent in parallel
-            // This ensures we don't waste time waiting for the draft before starting others.
-
-            addLog(`[SWARM] Phase 1: Parallel Drafting & Fast Agents...`);
-
-            const results = await Promise.allSettled([
-                // A. Thesis Destroyer - STEP 1 (DRAFT)
-                fetchWithRetry('/api/gemini', {
-                    method: 'POST',
-                    body: JSON.stringify({
-                        role: 'THESIS_DESTROYER',
-                        sessionId: currentSession.id,
-                        prompt: attackPrompt,
-                        images: claim.visualEvidence || [],
-                        step: 'DRAFT' // [NEW] Explicit Step
-                    })
-                }),
-                // B. Methodology (Fast)
-                fetchWithRetry('/api/gemini', {
-                    method: 'POST',
-                    body: JSON.stringify({
-                        role: 'METHODOLOGY_PROSECUTOR',
-                        sessionId: currentSession.id,
-                        prompt: methodPrompt,
-                        images: claim.visualEvidence || []
-                    })
-                }),
-                // C. Literature (Fast)
-                fetchWithRetry('/api/gemini', {
-                    method: 'POST',
-                    body: JSON.stringify({
-                        role: 'LITERATURE_ADVERSARY',
-                        sessionId: currentSession.id,
-                        prompt: litPrompt,
-                        images: claim.visualEvidence || []
-                    })
-                }),
-                // D. Formalism (Fast)
-                fetchWithRetry('/api/gemini', {
-                    method: 'POST',
-                    body: JSON.stringify({
-                        role: 'FORMALISM_AUDITOR',
-                        sessionId: currentSession.id,
-                        prompt: formPrompt,
-                        images: claim.visualEvidence || []
-                    })
-                })
-            ]);
-
-            // Unpack Results (Robustly)
-            const attackDraftRes = results[0].status === 'fulfilled' ? results[0].value : { content: "Logic audit unavailable (Network Error).", nextStep: null };
-            const methodRes = results[1].status === 'fulfilled' ? results[1].value : { content: "Methodology audit bypassed (Timeout)." };
-            const litRes = results[2].status === 'fulfilled' ? results[2].value : { content: "Literature check bypassed (Timeout)." };
-            const formRes = results[3].status === 'fulfilled' ? results[3].value : { content: "Formalism check bypassed (Timeout)." };
-
-            // Log Failures if any
-            results.forEach((r, i) => {
-                if (r.status === 'rejected') {
-                    console.warn(`[PARTIAL FAILURE] Agent ${i} failed:`, r.reason);
-                    addLog(`[WARNING] Agent ${i} dropped out. Continuing audit...`);
-                }
-            });
-
-            // 2. Fire Refine Step (Sequential)
-            // We now take the draft and refine it. This breaks the 60s timeout into two ~20s chunks.
-            addLog(`[SWARM] Phase 2: Refining Logic (Deep Reflect)...`);
-            setCurrentStep(`AUDITING_${claimId}_REFINE`); // UI Hint
-
-            let attackText = attackDraftRes.content || "Logic attack failed.";
-
-            // Only refine if we got a valid draft and the API says so
-            if (attackDraftRes.nextStep === 'REFINE') {
-                const refineRes = await fetchWithRetry('/api/gemini', {
-                    method: 'POST',
-                    body: JSON.stringify({
-                        role: 'THESIS_DESTROYER',
-                        sessionId: currentSession.id,
-                        prompt: attackPrompt, // Standard prompt
-                        context: attackDraftRes.content, // Pass DRAFT as context
-                        images: claim.visualEvidence || [],
-                        step: 'REFINE' // [NEW] Explicit Step
-                    })
-                });
-                attackText = refineRes.content || attackText; // Upgrade content
-                addLog(`[SWARM] Refinement Complete.`);
-            }
-
-            const methodText = methodRes.content || "Methodology audit inactive.";
-            const litText = litRes.content || "Literature check inactive.";
-            const formText = formRes.content || "Formalism check inactive.";
-
-            addLog(`[SWARM] Agents returned data. Synthesizing verdict...`);
-
-            // 2. The Reviewer Simulator Judges (Layer 6 - ENHANCED)
-            // We feed the FULL aggregated prosecution dossier to the Judge.
-            const verdictPrompt = getRolePrompt('JOURNAL_REVIEWER_SIMULATOR', `
-                CLAIM: "${claim.statement}"
-                
-                *** PROSECUTION DOSSIER ***
-                
-                [LAYER 2: LOGIC & EPISTEMOLOGY]
-                ${attackText}
-                
-                [LAYER 3: METHODOLOGY & STATISTICS]
-                ${methodText}
-                
-                [LAYER 4: NOVELTY & PRIOR ART]
-                ${litText}
-                
-                [LAYER 5: FORMALISM & RIGOR]
-                ${formText}
-
-                *** INSTITUTIONAL CONTEXT ***
-                Candidate: ${currentSession.data.context.candidateName || "Anonymous"}
-                Degree: ${currentSession.data.context.degree || "N/A"}
-                Target Journal: ${currentSession.data.context.targetJournal || "General Academic"}
-                
-                ***************************
-                
-                TASK: Act as the Editor-in-Chief. Render a final verdict and a publication readiness score.
-                
-                OUTPUT FORMAT: Strict JSON Object
-                {
-                    "readinessScore": number, // 0-100
-                    "sixAdversaryScore": {
-                        "thesisClarity": number,
-                        "argumentRobustness": number,
-                        "methodologyRigor": number,
-                        "noveltyPositioning": number,
-                        "formalismPrecision": number,
-                        "overall": number
-                    },
-                    "verdict": "PUBLISHABLE" | "REVISE_MAJOR" | "REJECT",
-                    "executiveSummary": "Short 2-sentence summary.",
-                    "truthStatement": "Brutally honest one-sentence truth.",
-                    "actionItems": [
-                        { "priority": "HIGH" | "MED", "layer": "Methodology", "suggestion": "Specific fix required..." }
-                    ],
-                    "fatal": boolean,
-                    "noveltyClassification": ["Tag1", "Tag2"],
-                    "reasons": ["Reason 1", "Reason 2"]
-                }
-            `);
-
-            const verdictData = await fetchWithRetry('/api/gemini', {
-                method: 'POST',
-                body: JSON.stringify({
-                    // keys: REMOVED,
-                    role: 'JOURNAL_REVIEWER_SIMULATOR',
-                    sessionId: currentSession.id,
-                    prompt: verdictPrompt
-                })
-            });
-
-            const verdictRaw = verdictData.content || "{}";
-
-            // Robust JSON Parsing
-            let verdictJson: any = {};
-            try {
-                // Sanitize Markdown
-                let cleanJson = verdictRaw;
-                if (cleanJson.includes("```json")) {
-                    cleanJson = cleanJson.replace(/```json/g, "").replace(/```/g, "");
-                } else if (cleanJson.includes("```")) {
-                    cleanJson = cleanJson.replace(/```/g, "");
-                }
-
-                const jsonMatch = cleanJson.match(/\{[\s\S]*\}/);
-                verdictJson = jsonMatch ? JSON.parse(jsonMatch[0]) : { verdict: "REJECT", fatal: true, reasons: ["JSON Parse Failure"] };
-
-            } catch (e) {
-                console.error("Verdict Parse Error", e);
-                verdictJson = { verdict: "REJECT", fatal: true, reasons: ["System Error"] };
-            }
-
-            // Strict Enum Guard (Prevent Hallucinations)
-            const ALLOWED_STATUSES = ["ACCEPTED", "REVISE", "REJECTED"]; // Normalized
-            let rawVerdict = (verdictJson.verdict || "REJECTED").toUpperCase();
-
-            // Map "REJECT" -> "REJECTED" for consistency
-            if (rawVerdict === "REJECT") rawVerdict = "REJECTED";
-            if (rawVerdict === "ACCEPT") rawVerdict = "ACCEPTED";
-
-            const status = ALLOWED_STATUSES.includes(rawVerdict) ? rawVerdict : "REJECTED"; // Default safe fallback
-
-            addLog(`[JUDGE] Final disposition for ${claimId}: ${status}`);
-
-            // Update specific claim in session
-            const updatedClaims = currentSession.data.claims.map((c: any) => {
-                if (c.id === claimId) {
-                    return {
-                        ...c,
-                        status,
-                        claimHash, // Store hash for future caching
-                        governanceLog: [
-                            ...c.governanceLog,
-                            { role: 'THESIS_DESTROYER', content: attackText },
-                            { role: 'METHODOLOGY_PROSECUTOR', content: methodText },
-                            { role: 'LITERATURE_ADVERSARY', content: litText },
-                            { role: 'FORMALISM_AUDITOR', content: formText },
-                            { role: 'JOURNAL_REVIEWER_SIMULATOR', content: verdictRaw } // Store strict JSON output
-                        ],
-                        noveltyClassification: verdictJson.noveltyClassification || [], // Dynamic Tags
-                        governanceMeta: {
-                            auditedAt: new Date().toISOString(),
-                            modelUsed: 'gemini-2.0-flash-exp', // Or dynamic if we track it
-                            tokenEstimate: TOKEN_COSTS.AUDIT_SINGLE * 4 // Updated Estimate
-                        }
-                    };
-                }
-                return c;
-            });
-
+            const updatedClaims = currentSession.data.claims.map((c: any) => c.id === claimId ? updatedClaim : c);
             onUpdate({ ...currentSession.data, claims: updatedClaims });
 
         } catch (error: any) {
@@ -494,14 +375,70 @@ FULL CONTEXT: ${currentSession.data.originalText.substring(0, 5000)}...`); // Gi
         }
     };
 
+    // [NEW] Parallel Batch Audit
+    const runAdversariesOnAll = async (currentSession: ArgusSession, onUpdate: (data: any) => void) => {
+        setIsProcessing(true);
+        setCurrentStep('AUDITING_ALL');
+        const pendingClaims = currentSession.data.claims.filter((c: any) => c.status === 'PENDING');
+
+        addLog(`[ORCHESTRATOR] Launching Parallel Swarm on ${pendingClaims.length} claims...`);
+        addLog(`[SYSTEM] Concurrency Limit: 3 threads active.`);
+
+        if (pendingClaims.length === 0) {
+            setIsProcessing(false);
+            setCurrentStep('IDLE');
+            return;
+        }
+
+        try {
+            // Simple Chunking/Queue Simulation (Concurrency = 3)
+            let processedClaims = [...currentSession.data.claims];
+            const batchSize = 3;
+
+            for (let i = 0; i < pendingClaims.length; i += batchSize) {
+                const batch = pendingClaims.slice(i, i + batchSize);
+                addLog(`[SWARM] Processing Batch ${Math.ceil((i + 1) / batchSize)}/${Math.ceil(pendingClaims.length / batchSize)}...`);
+
+                const batchResults = await Promise.all(batch.map(async (claim: any) => {
+                    try {
+                        return await _auditClaimCore(claim, currentSession.data.originalText, currentSession.id);
+                    } catch (e: any) {
+                        console.error(`Claim ${claim.id} failed`, e);
+                        addLog(`[ERROR] Claim ${claim.id} failed: ${e.message}`);
+                        return claim; // Return original on fail
+                    }
+                }));
+
+                // Update Local State Map (Merge)
+                processedClaims = processedClaims.map((c: any) => {
+                    const match = batchResults.find((res: any) => res.id === c.id);
+                    return match || c;
+                });
+
+                // Incremental UI Update (Optional: Update per batch)
+                onUpdate({ ...currentSession.data, claims: processedClaims });
+                setTokenUsage(prev => prev + (batch.length * TOKEN_COSTS.AUDIT_SINGLE));
+            }
+
+            addLog(`[ORCHESTRATOR] All audits complete.`);
+
+        } catch (e: any) {
+            addLog(`[CRITICAL] Batch audit failed: ${e.message}`);
+        } finally {
+            setIsProcessing(false);
+            setCurrentStep('IDLE');
+        }
+    };
+
     return {
         logs,
         isProcessing,
-        setIsProcessing, // Expose for external control (PDF parsing)
+        setIsProcessing,
         currentStep,
-        setCurrentStep, // Expose for external control
+        setCurrentStep,
         tokenUsage,
         extractClaims,
-        runAdversaryOnClaim
+        runAdversaryOnClaim,
+        runAdversariesOnAll // Exported
     };
 }
