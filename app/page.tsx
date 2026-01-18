@@ -104,9 +104,6 @@ export default function Home() {
                 <Link href="/argus_audit_manuscript.pdf" target="_blank" className="inline-flex items-center gap-2 text-sm font-sans font-medium text-zinc-500 hover:text-zinc-900 border-b border-zinc-200 hover:border-zinc-900 pb-0.5 transition-all">
                   <BookOpen className="h-4 w-4" /> View Sample Audit Report (PDF)
                 </Link>
-                <p className="text-xs text-zinc-400 font-mono tracking-wide">
-                  Top 25% of Papers Verified by ARGUS-Thesis<br />are Accepted without Revisions.
-                </p>
               </div>
 
               <div className="flex items-center gap-6 text-xs text-zinc-400 font-sans tracking-wide uppercase">
