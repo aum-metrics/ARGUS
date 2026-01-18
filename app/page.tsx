@@ -110,7 +110,7 @@ export default function Home() {
               </div>
 
               <div className="flex items-center gap-6 text-xs text-zinc-400 font-sans tracking-wide uppercase">
-                <span className="flex items-center gap-1.5"><Lock className="h-3.5 w-3.5" /> Ephemeral Privacy</span>
+                <span className="flex items-center gap-1.5"><Lock className="h-3.5 w-3.5" /> AI-Powered Analysis</span>
                 <span className="w-1 h-1 rounded-full bg-zinc-300"></span>
                 <span className="flex items-center gap-1.5"><ShieldCheck className="h-3.5 w-3.5" /> Verifiable Artifacts</span>
               </div>
@@ -187,18 +187,18 @@ export default function Home() {
             {/* 2. System Properties (Privacy etc) */}
             <div className="grid md:grid-cols-2 gap-12 items-center max-w-5xl mx-auto">
               <div>
-                <h3 className="text-3xl font-bold font-serif text-zinc-900 mb-4">Zero-Retention Protocol.</h3>
+                <h3 className="text-3xl font-bold font-serif text-zinc-900 mb-4">Powered by Google Gemini 2.5</h3>
                 <p className="text-lg text-zinc-500 font-serif leading-relaxed mb-6">
-                  Your intellectual property is ephemeral. The system processes the signal in volatile memory and purposefully destroys the session data post-audit.
+                  Your thesis is analyzed using Google's most advanced AI. We never store your manuscript in our database—analysis happens in secure, ephemeral sessions and is discarded immediately after.
                 </p>
                 <ul className="space-y-4 font-sans text-sm">
                   <li className="flex items-center gap-3 text-zinc-700">
                     <div className="w-6 h-6 rounded-full bg-green-50 flex items-center justify-center text-green-600"><Lock className="w-3.5 h-3.5" /></div>
-                    <span>No database persistence of manuscript text.</span>
+                    <span>No database storage of your manuscript text.</span>
                   </li>
                   <li className="flex items-center gap-3 text-zinc-700">
                     <div className="w-6 h-6 rounded-full bg-green-50 flex items-center justify-center text-green-600"><ShieldCheck className="w-3.5 h-3.5" /></div>
-                    <span>Cryptographically signed Audit Artifacts.</span>
+                    <span>AI-powered adversarial critique in minutes.</span>
                   </li>
                 </ul>
               </div>
