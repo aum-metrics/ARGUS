@@ -341,8 +341,75 @@ export function useGovernance() {
             governanceMeta: {
                 auditedAt: new Date().toISOString(),
                 tokenEstimate: TOKEN_COSTS.AUDIT_SINGLE * 4
+            },
+            score: verdictJson.readinessScore || 0
+        };
+    };
+
+    // Helper: Recalculate Session Score & Status
+    const _calculateSessionStats = (claims: any[]) => {
+        const completedClaims = claims.filter((c: any) => c.status !== 'PENDING');
+
+        // Default Stats
+        const stats = {
+            score: 0,
+            status: 'PENDING',
+            report: {
+                readinessScore: 0,
+                sixAdversaryScore: {
+                    thesisClarity: 0,
+                    argumentRobustness: 0,
+                    methodologyRigor: 0,
+                    noveltyPositioning: 0,
+                    formalismPrecision: 0,
+                    overall: 0
+                }
             }
         };
+
+        if (completedClaims.length === 0) return stats;
+
+        // Calculate Averages
+        let totalReadiness = 0;
+        let totalSix = { thesisClarity: 0, argumentRobustness: 0, methodologyRigor: 0, noveltyPositioning: 0, formalismPrecision: 0, overall: 0 };
+
+        // We need to parse per-claim logs again or rely on claim.score
+        // For 'sixAdversaryScore', we need to look into governanceLog
+        completedClaims.forEach((c: any) => {
+            totalReadiness += (c.score || 0);
+
+            // Try to extract detailed scores if available
+            const reviewerLog = c.governanceLog.find((l: any) => l.role === 'JOURNAL_REVIEWER_SIMULATOR');
+            if (reviewerLog) {
+                try {
+                    const json = JSON.parse(reviewerLog.content.replace(/```json/g, "").replace(/```/g, "").match(/\{[\s\S]*\}/)?.[0] || "{}");
+                    if (json.sixAdversaryScore) {
+                        totalSix.thesisClarity += json.sixAdversaryScore.thesisClarity || 0;
+                        totalSix.argumentRobustness += json.sixAdversaryScore.argumentRobustness || 0;
+                        totalSix.methodologyRigor += json.sixAdversaryScore.methodologyRigor || 0;
+                        totalSix.noveltyPositioning += json.sixAdversaryScore.noveltyPositioning || 0;
+                        totalSix.formalismPrecision += json.sixAdversaryScore.formalismPrecision || 0;
+                        totalSix.overall += json.sixAdversaryScore.overall || 0;
+                    }
+                } catch (e) { }
+            }
+        });
+
+        stats.score = Math.round(totalReadiness / completedClaims.length);
+        stats.report.readinessScore = stats.score;
+        stats.report.sixAdversaryScore = {
+            thesisClarity: Math.round(totalSix.thesisClarity / completedClaims.length),
+            argumentRobustness: Math.round(totalSix.argumentRobustness / completedClaims.length),
+            methodologyRigor: Math.round(totalSix.methodologyRigor / completedClaims.length),
+            noveltyPositioning: Math.round(totalSix.noveltyPositioning / completedClaims.length),
+            formalismPrecision: Math.round(totalSix.formalismPrecision / completedClaims.length),
+            overall: Math.round(totalSix.overall / completedClaims.length)
+        };
+
+        const allComplete = claims.every((c: any) => c.status !== 'PENDING');
+        stats.status = allComplete ? 'COMPLETED' : 'AUDITING';
+
+        return stats;
     };
 
     // Step 2: Audit Single Claim
@@ -365,7 +432,14 @@ export function useGovernance() {
             addLog(`[JUDGE] Final disposition for ${claimId}: ${updatedClaim.status}`);
 
             const updatedClaims = currentSession.data.claims.map((c: any) => c.id === claimId ? updatedClaim : c);
-            onUpdate({ ...currentSession.data, claims: updatedClaims });
+            const stats = _calculateSessionStats(updatedClaims);
+
+            onUpdate({
+                ...currentSession.data,
+                claims: updatedClaims,
+                score: stats.score,
+                report: { ...currentSession.data.report, ...stats.report }
+            });
 
         } catch (error: any) {
             addLog(`[ERROR] Audit failed: ${error.message}`);
@@ -415,8 +489,16 @@ export function useGovernance() {
                     return match || c;
                 });
 
-                // Incremental UI Update (Optional: Update per batch)
-                onUpdate({ ...currentSession.data, claims: processedClaims });
+                // Calculate incremental score
+                const stats = _calculateSessionStats(processedClaims);
+
+                // Incremental UI Update
+                onUpdate({
+                    ...currentSession.data,
+                    claims: processedClaims,
+                    score: stats.score,
+                    report: { ...currentSession.data.report, ...stats.report }
+                });
                 setTokenUsage(prev => prev + (batch.length * TOKEN_COSTS.AUDIT_SINGLE));
             }
 
