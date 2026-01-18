@@ -7,43 +7,7 @@ export default function FlyersPage() {
     return (
         <div className="min-h-screen bg-zinc-100 p-8 space-y-16">
 
-            {/* DESIGN 1: THE CHALLENGE (Red/Black) */}
-            <div id="flyer-fear" className="w-[794px] h-[1123px] bg-zinc-900 mx-auto relative overflow-hidden flex flex-col items-center justify-center text-center shadow-2xl p-16 border-8 border-zinc-900">
-                {/* Background Texture */}
-                <div className="absolute inset-0 z-0 opacity-20" style={{ backgroundImage: "radial-gradient(#3f3f46 1px, transparent 1px)", backgroundSize: "24px 24px" }}></div>
 
-                <div className="z-10 relative space-y-8 flex flex-col items-center">
-                    {/* LOGO INTEGRATION */}
-                    <div className="w-32 h-32 rounded-lg overflow-hidden border-4 border-white/10 mb-8 mx-auto">
-                        <img src="/logo.jpg" alt="ARGUS Logo" className="w-full h-full object-contain" />
-                    </div>
-
-                    <h1 className="text-8xl font-black text-white leading-none tracking-tighter">
-                        REJECTED?
-                    </h1>
-
-                    <div className="h-1 w-32 bg-red-600 mx-auto"></div>
-
-                    <p className="text-3xl font-serif text-zinc-400 max-w-2xl leading-snug">
-                        <span className="text-white font-bold">Research is hard.</span><br />
-                        Ensure your <span className="text-red-500">logic is sound</span> before submission.
-                    </p>
-
-                    <div className="pt-12">
-                        <p className="text-zinc-500 uppercase tracking-widest text-sm mb-4">Don't let oversight delay your tenure.</p>
-                        <div className="text-4xl font-bold text-white bg-zinc-800 py-4 px-12 rounded-full border border-zinc-700">
-                            ARGUS-Thesis
-                        </div>
-                        <p className="text-zinc-600 mt-4 font-mono text-sm">Adversarial Pre-Flight Check.</p>
-                    </div>
-                </div>
-
-                {/* Footer */}
-                <div className="absolute bottom-12 w-full flex justify-between px-16 text-zinc-700 text-xs tracking-[0.2em]">
-                    <span>SYSTEM V2.0 // ADVERSARIAL GOVERNANCE</span>
-                    <span className="font-mono lowercase tracking-normal">help@argus-thesis.com</span>
-                </div>
-            </div>
 
             {/* DESIGN 2: THE SOLUTION (Clean/White) */}
             <div id="flyer-solution" className="w-[794px] h-[1123px] bg-white mx-auto relative overflow-hidden flex flex-col p-16 shadow-2xl border border-zinc-200">
@@ -104,8 +68,18 @@ export default function FlyersPage() {
                 </div>
             </div>
 
-            {/* DESIGN 3: THE INSTITUTION (Blue/Academic) */}
+            {/* DESIGN 2: FOR LAB DIRECTORS (Blue/Academic) */}
             <div id="flyer-institution" className="w-[794px] h-[1123px] bg-slate-900 mx-auto relative overflow-hidden flex flex-col p-16 shadow-2xl border-t-8 border-indigo-500">
+                {/* Logo in top-right corner */}
+                <div className="absolute top-8 right-8 flex items-center gap-4 z-20">
+                    <div className="h-16 w-16 rounded-lg overflow-hidden border-2 border-white/20">
+                        <img src="/logo.jpg" alt="ARGUS Logo" className="w-full h-full object-contain" />
+                    </div>
+                    <div className="text-3xl font-bold text-white tracking-tighter">
+                        ARGUS-Thesis
+                    </div>
+                </div>
+
                 <div className="absolute top-0 right-0 p-16 opacity-10">
                     <Network className="w-96 h-96 text-indigo-300" />
                 </div>
@@ -158,16 +132,6 @@ export default function FlyersPage() {
                                 <img src="/qr-code.png" alt="QR Code" className="w-full h-full object-contain" />
                             </div>
                             <p className="text-indigo-400 text-[10px] font-mono">argus-thesis.com</p>
-                        </div>
-
-                        {/* Logo Block */}
-                        <div className="flex items-center gap-4">
-                            <div className="h-12 w-12 rounded-lg overflow-hidden opacity-80">
-                                <img src="/logo.jpg" alt="ARGUS Logo" className="w-full h-full object-contain" />
-                            </div>
-                            <div className="text-4xl font-bold text-white tracking-tighter">
-                                ARGUS-Thesis
-                            </div>
                         </div>
                     </div>
                 </div>
