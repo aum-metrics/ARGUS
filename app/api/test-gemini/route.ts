@@ -26,7 +26,7 @@ export async function GET(req: NextRequest) {
 
         // Test the API
         const genAI = new GoogleGenerativeAI(apiKey);
-        const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash-latest' });
+        const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
 
         const result = await model.generateContent('Say "OK" if you can read this.');
         const response = await result.response;
