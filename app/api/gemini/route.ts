@@ -148,10 +148,10 @@ export async function POST(req: Request) {
         } else {
             // 2. Role-Based Switching (Text Only)
             const ROLE_TO_MODEL: Record<string, string> = {
-                'THESIS_CONSTRUCTOR': MODELS.VISION,    // Needs Vision cap if images exist, else strong text
-                'THESIS_DESTROYER': MODELS.REASONING,   // CRITICAL: Needs 1.5 Pro for proper logic attacks
-                'JOURNAL_REVIEWER_SIMULATOR': MODELS.REASONING,
-                'SUPPORT_AGENT': MODELS.FAST,           // Chatbot stays fast
+                'THESIS_CONSTRUCTOR': MODELS.FAST,       // Fast extraction
+                'THESIS_DESTROYER': MODELS.FAST,         // Changed from REASONING for 3x speed boost
+                'JOURNAL_REVIEWER_SIMULATOR': MODELS.FAST,
+                'SUPPORT_AGENT': MODELS.FAST,
                 'DEFAULT': MODELS.FAST
             };
             selectedModel = ROLE_TO_MODEL[role] || MODELS.FAST;
@@ -248,70 +248,19 @@ export async function POST(req: Request) {
         let text = "";
 
         // -----------------------------------------------------
-        // INTELLIGENCE V2.0: REFLECTOR LOOP (Atomic Steps)
+        // INTELLIGENCE V2.0: REFLECTOR LOOP (DISABLED FOR PERFORMANCE)
         // -----------------------------------------------------
-        const { step = 'FULL', context = '' } = body;
+        // Reflector loop disabled to improve performance (2x speedup)
+        // Now using one-shot generation for all roles
 
-        // STEP 1: DRAFT (Fast, Aggressive)
-        if (role === 'THESIS_DESTROYER' && selectedModel === MODELS.REASONING && step === 'DRAFT') {
-            try {
-                const draftResult = await model.generateContent(parts);
-                const draftResponse = await draftResult.response;
-                text = draftResponse.text();
-            } catch (e: any) {
-                console.warn("Gemini Safety Block (Draft):", e.message);
-                text = JSON.stringify({ content: "Critique bloqué par les filtres de sécurité." }); // French/English fallback
-            }
-
-            // Add metadata for frontend to know this is a partial result
-            return NextResponse.json({
-                content: text,
-                nextStep: 'REFINE',
-                meta: 'DRAFT_COMPLETE'
-            });
-        }
-
-        // STEP 2: REFINE (Critique & Polish)
-        else if (role === 'THESIS_DESTROYER' && selectedModel === MODELS.REASONING && step === 'REFINE') {
-
-            // We need the previous draft to critique
-            const draftText = context || prompt; // Fallback to prompt if no context (should not happen)
-
-            const reflectionPrompt = `
-             CRITIC_ROLE: You are the Senior Editor of specific scientific journal.
-             TASK: Review the following "Attack Critique" drafted by a junior reviewer.
-             
-             DRAFT ATTACK:
-             ${draftText}
-             
-             CRITERIA:
-             1. Are the attacks logical? Remove any ad-hominem or tone issues.
-             2. Are the counter-claims specific? Ensure no generic "this is vague" complaints without proof.
-             3. Is the JSON format valid?
-             
-             ACTION: rewriting the critique to be sharper, kinder, and more rigorous. Output ONLY the final JSON.
-             `;
-
-            try {
-                const refineResult = await model.generateContent(reflectionPrompt);
-                const refineResponse = await refineResult.response;
-                text = refineResponse.text();
-            } catch (e: any) {
-                console.warn("Gemini Safety Block (Refine):", e.message);
-                text = draftText; // Fallback to draft if refinement is blocked
-            }
-        }
-
-        // DEFAULT: STANDARD ONE-SHOT
-        else {
-            try {
-                const result = await model.generateContent(parts);
-                const response = await result.response;
-                text = response.text();
-            } catch (e: any) {
-                console.warn("Gemini Safety Block (Standard):", e.message);
-                text = JSON.stringify({ error: "Response blocked by AI Safety Filters." });
-            }
+        // STANDARD ONE-SHOT GENERATION (Always used now)
+        try {
+            const result = await model.generateContent(parts);
+            const response = await result.response;
+            text = response.text();
+        } catch (e: any) {
+            console.warn("Gemini Safety Block:", e.message);
+            text = JSON.stringify({ error: "Response blocked by AI Safety Filters." });
         }
 
         // -----------------------------------------------------
