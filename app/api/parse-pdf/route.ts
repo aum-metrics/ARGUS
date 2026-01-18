@@ -45,7 +45,7 @@ export async function POST(req: NextRequest) {
             // Initialize Gemini AI (same as /api/gemini)
             const genAI = new GoogleGenerativeAI(geminiApiKey);
             const model = genAI.getGenerativeModel({
-                model: 'gemini-1.5-flash' // Fast and cost-effective for PDF extraction
+                model: 'gemini-2.5-flash' // Fast and cost-effective for PDF extraction
             });
 
             // Create request with PDF
