@@ -76,7 +76,7 @@ async function ensureUser(email: string, password: string, fullName: string) {
     if (error) {
         if (error.message.includes("already registered") || error.message.includes("already exists")) {
             const { data: users } = await supabase.auth.admin.listUsers();
-            const u = users.users.find(x => x.email === email);
+            const u = users.users.find((x: any) => x.email === email);
             if (!u) throw new Error(`User ${email} exists but not found in list?`);
             userId = u.id;
             // Reset password just in case

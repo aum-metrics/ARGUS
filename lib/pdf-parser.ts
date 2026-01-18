@@ -5,15 +5,14 @@
 
 'use client';
 
-import * as pdfjsLib from 'pdfjs-dist';
-
-// Configure worker - use CDN for Next.js compatibility
-if (typeof window !== 'undefined') {
-    pdfjsLib.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.js`;
-}
-
 export async function extractTextFromPDF(file: File): Promise<string> {
     try {
+        // Dynamic import to avoid SSR issues
+        const pdfjsLib = await import('pdfjs-dist');
+
+        // Configure worker using CDN
+        pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js`;
+
         const arrayBuffer = await file.arrayBuffer();
         const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
 
@@ -29,7 +28,13 @@ export async function extractTextFromPDF(file: File): Promise<string> {
             fullText += pageText + '\n\n';
         }
 
-        return fullText.trim();
+        const result = fullText.trim();
+
+        if (result.length < 100) {
+            throw new Error('Extracted text too short. PDF might be scanned or encrypted.');
+        }
+
+        return result;
     } catch (error: any) {
         throw new Error(`Failed to extract PDF text: ${error.message}`);
     }

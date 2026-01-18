@@ -26,7 +26,7 @@ async function seedSuperAdmin() {
         const { data: { users }, error: listError } = await supabase.auth.admin.listUsers();
         if (listError) throw listError;
 
-        let userId = users.find(u => u.email === ADMIN_EMAIL)?.id;
+        let userId = users.find((u: any) => u.email === ADMIN_EMAIL)?.id;
 
         if (userId) {
             console.log(`ℹ️  User ${ADMIN_EMAIL} already exists. Updating password...`);

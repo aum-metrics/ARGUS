@@ -23,7 +23,7 @@ async function fixProfiles() {
 
     // 1. Find user
     const { data: { users } } = await supabase.auth.admin.listUsers();
-    const user = users?.find(u => u.email === 'sambath@me.com');
+    const user = users?.find((u: any) => u.email === 'sambath@me.com');
 
     if (!user) {
         console.log('❌ User not found');

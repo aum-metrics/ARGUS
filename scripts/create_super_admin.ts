@@ -28,7 +28,9 @@ async function createSuperAdmin() {
             console.log("User exists. Fetching...");
             // We can't easily fetch by email with admin api without listUsers
             const { data: users } = await supabase.auth.admin.listUsers();
-            userId = users.users.find(u => u.email === email)?.id;
+            if (users && users.users) {
+                userId = users.users.find((u: any) => u.email === email)?.id;
+            }
         } else {
             throw createError;
         }

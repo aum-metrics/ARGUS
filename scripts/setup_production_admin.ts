@@ -27,7 +27,7 @@ async function createSuperAdmin() {
         // 1. Check if admin already exists
         console.log('1️⃣  Checking if admin exists...');
         const { data: existingUsers } = await supabase.auth.admin.listUsers();
-        const adminExists = existingUsers?.users.find(u => u.email === ADMIN_EMAIL);
+        const adminExists = existingUsers?.users.find((u: any) => u.email === ADMIN_EMAIL);
 
         if (adminExists) {
             console.log('✅ Admin user already exists:', adminExists.id);

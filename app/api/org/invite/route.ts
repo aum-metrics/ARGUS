@@ -47,7 +47,7 @@ export async function POST(req: Request) {
         const { data: { users }, error: listError } = await supabaseAdmin.auth.admin.listUsers()
         if (listError) throw listError
 
-        let targetUser = users.find(u => u.email?.toLowerCase() === email.toLowerCase())
+        let targetUser = users?.find((u: any) => u.email?.toLowerCase() === email.toLowerCase())
         let createdNew = false;
         const tempPassword = "TempPassword123!"
 

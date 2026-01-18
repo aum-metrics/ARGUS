@@ -22,7 +22,7 @@ async function debugCredits() {
 
     // 1. Find user
     const { data: { users }, error: usersError } = await supabase.auth.admin.listUsers();
-    const user = users?.find(u => u.email === 'sambath@me.com');
+    const user = users?.find((u: any) => u.email === 'sambath@me.com');
 
     if (!user) {
         console.log('❌ User not found: sambath@me.com');

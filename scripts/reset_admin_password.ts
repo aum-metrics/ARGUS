@@ -42,7 +42,7 @@ async function resetAdminPassword() {
         // 1. Find the user
         console.log('\n1️⃣  Finding user...');
         const { data: { users } } = await supabase.auth.admin.listUsers();
-        const adminUser = users.find(u => u.email === adminEmail);
+        const adminUser = users.find((u: any) => u.email === adminEmail);
 
         if (!adminUser) {
             console.error(`❌ User ${adminEmail} not found`);

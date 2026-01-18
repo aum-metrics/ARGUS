@@ -453,7 +453,8 @@ export default function ArgusDashboard() {
 
                                 {/* INGESTION TABS */}
                                 <Tabs defaultValue="text" className="w-full">
-                                    <TabsList className="grid w-full grid-cols-2 mb-4">
+                                    <TabsList className="grid w-full grid-cols-3 mb-4">
+                                        <TabsTrigger value="pdf" disabled={isProcessing}>Upload PDF</TabsTrigger>
                                         <TabsTrigger value="text" disabled={isProcessing}>Paste Text</TabsTrigger>
                                         <TabsTrigger value="url" disabled={true} title="Coming Soon">Fetch URL</TabsTrigger>
                                     </TabsList>

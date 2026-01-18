@@ -63,7 +63,7 @@ async function setup() {
                 throw listError
             }
 
-            const user = existingUsers.users.find(u => u.email === email)
+            const user = existingUsers.users.find((u: any) => u.email === email)
             if (!user) throw new Error('Could not find existing user')
             userId = user.id
             console.log('Found existing user ID:', userId)
