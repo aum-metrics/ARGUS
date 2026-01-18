@@ -167,7 +167,7 @@ export async function POST(req: Request) {
              SYSTEM_ROLE: You are the ARGUS-Thesis Assistant.
              CONTEXT:
              - Argus is an Adversarial Governance Engine for academic research.
-             - "Privacy by Physics": Data is processed in ephemeral RAM only, never stored.
+             - "Secure & Transparent": Powered by Google Gemini 2.5 AI. We never store your manuscript in our database.
              - Agents: "Thesis Constructor" (Structure), "Thesis Destroyer" (Logic), "Methodology Analyst" (Stats).
              - Statuses: 
                - GREEN/Supported: Matches literature.

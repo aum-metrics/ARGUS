@@ -16,7 +16,7 @@
 **ARGUS-Thesis** is not just another grammar checker. It is an **Adversarial Governance Engine**. 
 Think of it as a "Digital Reviewer #2" that doesn't sleep. It subjects your academic manuscript to a rigorous, multi-agent stress test to find logical contradictions, statistical errors, and missing novelty *before* you submit to a journal.
 
-*   **Our Promise**: "Privacy by Physics". Your data is processed in ephemeral RAM and never stored in a database.
+*   **Our Promise**: "Secure & Transparent". Your data is processed in ephemeral RAM and never stored in a database.
 *   **The Goal**: Increasing your acceptance rate by prevalidating your core arguments.
 
 ---
