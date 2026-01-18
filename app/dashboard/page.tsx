@@ -384,7 +384,7 @@ export default function ArgusDashboard() {
             <main className="flex-1 container mx-auto px-4 py-8 md:py-12 space-y-8">
 
                 {/* 1. INPUT & SCANNER */}
-                <div className="grid gap-6 lg:grid-cols-3">
+                <div className="grid gap-6 lg:grid-cols-2">
                     <div className="lg:col-span-1 space-y-6">
                         <Card className="bg-white border-zinc-200 shadow-sm relative overflow-hidden">
                             {isProcessing && currentStep === 'SCANNING' && (
@@ -452,9 +452,8 @@ export default function ArgusDashboard() {
                                 </div>
 
                                 {/* INGESTION TABS */}
-                                <Tabs defaultValue="pdf" className="w-full">
-                                    <TabsList className="grid w-full grid-cols-3 mb-4">
-                                        <TabsTrigger value="pdf" disabled={isProcessing}>Upload PDF</TabsTrigger>
+                                <Tabs defaultValue="text" className="w-full">
+                                    <TabsList className="grid w-full grid-cols-2 mb-4">
                                         <TabsTrigger value="text" disabled={isProcessing}>Paste Text</TabsTrigger>
                                         <TabsTrigger value="url" disabled={true} title="Coming Soon">Fetch URL</TabsTrigger>
                                     </TabsList>
