@@ -1,9 +1,10 @@
 /**
- * PDF Parsing using Google Document AI
- * Cloud-based solution that works in serverless environments
+ * PDF Parsing using Google Gemini AI SDK
+ * Uses the same SDK as /api/gemini for consistency
  */
 
 import { NextRequest, NextResponse } from 'next/server';
+import { GoogleGenerativeAI } from '@google/generative-ai';
 
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
@@ -25,11 +26,7 @@ export async function POST(req: NextRequest) {
 
         console.log(`[API] Processing: ${file.name} (${file.size} bytes)`);
 
-        // Convert to base64 for API
-        const arrayBuffer = await file.arrayBuffer();
-        const base64 = Buffer.from(arrayBuffer).toString('base64');
-
-        // Option 1: Use Google Gemini API (you already have GEMINI_API_KEY)
+        // Check for API key
         const geminiApiKey = process.env.GEMINI_API_KEY;
 
         if (!geminiApiKey) {
@@ -41,57 +38,59 @@ export async function POST(req: NextRequest) {
         }
 
         try {
-            // Use Gemini to extract text from PDF
-            const response = await fetch(
-                `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${geminiApiKey}`,
+            // Convert to base64
+            const arrayBuffer = await file.arrayBuffer();
+            const base64 = Buffer.from(arrayBuffer).toString('base64');
+
+            // Initialize Gemini AI (same as /api/gemini)
+            const genAI = new GoogleGenerativeAI(geminiApiKey);
+            const model = genAI.getGenerativeModel({
+                model: 'gemini-1.5-flash' // Fast and cost-effective for PDF extraction
+            });
+
+            // Create request with PDF
+            const result = await model.generateContent([
                 {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        contents: [{
-                            parts: [
-                                {
-                                    text: "Extract all text from this PDF document. Return only the extracted text, no commentary."
-                                },
-                                {
-                                    inline_data: {
-                                        mime_type: "application/pdf",
-                                        data: base64
-                                    }
-                                }
-                            ]
-                        }]
-                    })
+                    text: "Extract all text from this PDF document. Return only the extracted text content, no commentary or formatting. Preserve paragraph breaks."
+                },
+                {
+                    inlineData: {
+                        mimeType: "application/pdf",
+                        data: base64
+                    }
                 }
-            );
+            ]);
 
-            if (!response.ok) {
-                const error = await response.text();
-                console.error("[API] Gemini API error:", error);
-                throw new Error(`Gemini API failed: ${response.status}`);
-            }
-
-            const result = await response.json();
-            const text = result.candidates?.[0]?.content?.parts?.[0]?.text;
+            const response = await result.response;
+            const text = response.text();
 
             if (!text || text.trim().length < 50) {
                 console.warn("[API] Insufficient text extracted");
                 return NextResponse.json({
-                    error: "Could not extract enough text from PDF. Please paste text manually.",
+                    error: "Could not extract enough text from PDF. The PDF might be scanned images or encrypted. Please paste text manually.",
                     fallback: true
                 }, { status: 400 });
             }
 
-            console.log(`[API] Extracted ${text.length} characters`);
+            console.log(`[API] Successfully extracted ${text.length} characters`);
 
             return NextResponse.json({
                 text: text.trim(),
                 characterCount: text.length,
-                method: 'gemini-api'
+                method: 'gemini-sdk'
             });
 
         } catch (apiError: any) {
             console.error("[API] PDF extraction failed:", apiError.message);
+
+            // Check for specific error types
+            if (apiError.message?.includes('quota')) {
+                return NextResponse.json({
+                    error: "API quota exceeded. Please try again later or paste text manually.",
+                    fallback: true
+                }, { status: 429 });
+            }
+
             return NextResponse.json({
                 error: "Failed to extract text from PDF. Please paste text manually.",
                 fallback: true
