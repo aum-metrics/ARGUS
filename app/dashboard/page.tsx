@@ -46,19 +46,24 @@ export default function ArgusDashboard() {
 
     // [NEW] PERSISTENCE SYNC HELPER
     const syncSession = async (newSession: ArgusSession) => {
-        // Optimistic Update
-        setSession(newSession);
+        try {
+            // Optimistic Update
+            setSession(newSession);
 
-        // Background Save (Debounced in real app, atomic here for safety)
-        if (userId) { // Ensure user is logged in
-            const { error } = await supabase.from('sessions').upsert({
-                id: newSession.id,
-                user_id: userId,
-                data: newSession,
-                updated_at: new Date().toISOString()
-            }, { onConflict: 'id' });
+            // Background Save (Debounced in real app, atomic here for safety)
+            if (userId) { // Ensure user is logged in
+                const { error } = await supabase.from('sessions').upsert({
+                    id: newSession.id,
+                    user_id: userId,
+                    data: newSession,
+                    updated_at: new Date().toISOString()
+                }, { onConflict: 'id' });
 
-            if (error) console.error("Sync Failed", error);
+                if (error) console.error("Sync Failed", error);
+            }
+        } catch (e: any) {
+            console.error("Critical Sync Error (likely payload too large)", e);
+            // Non-fatal, user continues in-memory
         }
     };
     useEffect(() => {
