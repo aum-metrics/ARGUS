@@ -462,6 +462,25 @@ export default function ArgusDashboard() {
                                                 disabled={session.data.claims.length > 0}
                                             />
                                         </div>
+                                        <div className="col-span-2 space-y-1">
+                                            <label className="text-xs uppercase text-zinc-500 font-bold">Study Type</label>
+                                            <select
+                                                className="w-full text-sm p-2 border border-zinc-200 rounded font-mono focus:outline-none focus:border-zinc-400 bg-white"
+                                                value={session.data.context?.studyType || 'full'}
+                                                onChange={(e) => syncSession({
+                                                    ...session,
+                                                    data: { ...session.data, context: { ...session.data.context, studyType: e.target.value } }
+                                                })}
+                                                disabled={session.data.claims.length > 0}
+                                            >
+                                                <option value="pilot">Pilot Study (N&lt;30)</option>
+                                                <option value="full">Full Study (N≥30)</option>
+                                                <option value="meta">Meta-Analysis</option>
+                                            </select>
+                                            <p className="text-xs text-zinc-500 italic">
+                                                Pilot studies are evaluated on <strong>methodology rigor</strong>, not sample size.
+                                            </p>
+                                        </div>
                                     </div>
                                 </div>
 
@@ -1000,6 +1019,27 @@ export default function ArgusDashboard() {
                                                 </div>
                                             </div>
 
+                                            {/* SCORE EXPLAINER FOR LOW SCORES */}
+                                            {(session.data.report?.readinessScore || 0) < 50 && (
+                                                <div className="w-full max-w-md bg-blue-50 border border-blue-200 rounded-lg p-4 space-y-2">
+                                                    <div className="flex items-start gap-2">
+                                                        <AlertTriangle className="h-4 w-4 text-blue-600 mt-0.5" />
+                                                        <div className="space-y-1">
+                                                            <h4 className="text-xs font-bold text-blue-800">Why is my score low?</h4>
+                                                            <p className="text-xs text-blue-700 leading-relaxed">
+                                                                ARGUS is calibrated to <strong>Nature/Science standards</strong>.
+                                                                A score of 25-50 means your work is <strong>thesis-ready</strong> but needs
+                                                                scoping adjustments for top-tier publication. This is normal for pilot studies.
+                                                            </p>
+                                                            <p className="text-xs text-blue-600 font-bold mt-2">
+                                                                Next Step: Review the "Scope Mismatch" tags and adjust your claims
+                                                                from "Fundamental Crisis" to "Preliminary Evidence."
+                                                            </p>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            )}
+
                                             {/* 6-ADVERSARY SCOREBOARD (V2.0) */}
                                             {session.data.report && session.data.report.sixAdversaryScore ? (
                                                 <div className="w-56 space-y-3 font-mono">
@@ -1081,6 +1121,29 @@ export default function ArgusDashboard() {
                                                 </div>
                                             ) : (
                                                 <div className="bg-zinc-50 p-4 text-xs text-zinc-400">Report details pending generation...</div>
+                                            )}
+
+                                            {/* EXAMPLE TRANSFORMATIONS */}
+                                            {(session.data.report?.readinessScore || 0) < 50 && (
+                                                <div className="bg-green-50 border border-green-200 rounded-lg p-4 space-y-3">
+                                                    <h4 className="text-xs font-bold text-green-800 flex items-center gap-2">
+                                                        <CheckCircle2 className="h-3 w-3" /> How to Fix This
+                                                    </h4>
+                                                    <div className="space-y-2">
+                                                        <div>
+                                                            <div className="text-xs text-red-600 line-through mb-1">
+                                                                ❌ "LLMs pose a fundamental crisis to scientific communication"
+                                                            </div>
+                                                            <div className="text-xs text-green-700 font-bold">
+                                                                ✅ "Preliminary evidence (N=10) suggests LLMs may introduce specific
+                                                                vulnerabilities in high-complexity reasoning tasks"
+                                                            </div>
+                                                        </div>
+                                                        <p className="text-xs text-zinc-600 italic bg-white p-2 rounded border border-green-100">
+                                                            This scoping change would increase your score by ~30 points.
+                                                        </p>
+                                                    </div>
+                                                </div>
                                             )}
 
                                             {/* ACTION ITEMS PREVIEW */}

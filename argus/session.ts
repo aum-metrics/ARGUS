@@ -42,6 +42,7 @@ export interface ArgusSession {
             candidateName?: string;
             degree?: string; // "PhD", "Masters"
             targetJournal?: string; // "Nature", "ICLR"
+            studyType?: string; // "pilot", "full", "meta"
             orgId?: string;
             originalFilename?: string; // [NEW] Audit Requirement
         };
