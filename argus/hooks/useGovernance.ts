@@ -245,7 +245,24 @@ export function useGovernance() {
                     }
                 }
 
-                // Fallback to original regex if smart parse failed (for simple cases)
+                // 3. Regex Fallback (The Savior for Bad Quotes)
+                if (claims.length === 0) {
+                    // Match objects: { "id": "...", "statement": "...", "evidenceIndices": [...] }
+                    const regex = /"id"\s*:\s*"([^"]+)"[\s\S]*?"statement"\s*:\s*"([\s\S]*?)"\s*,\s*"evidenceIndices"\s*:\s*\[(.*?)\]/g;
+                    let match;
+                    while ((match = regex.exec(cleanText)) !== null) {
+                        const id = match[1];
+                        const statement = match[2];
+                        const evidenceRaw = match[3];
+                        let evidenceIndices: any[] = [];
+                        if (evidenceRaw && evidenceRaw.trim()) {
+                            evidenceIndices = evidenceRaw.split(',').map((s: string) => parseInt(s.trim())).filter((n: number) => !isNaN(n));
+                        }
+                        claims.push({ id, statement, evidenceIndices });
+                    }
+                }
+
+                // 4. Fallback to original regex if smart parse failed (for simple cases)
                 if (claims.length === 0) {
                     const jsonMatch = cleanText.match(/\[[\s\S]*\]/);
                     if (jsonMatch) {
