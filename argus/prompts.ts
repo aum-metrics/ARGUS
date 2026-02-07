@@ -69,7 +69,7 @@ DO:
 OUTPUT FORMAT:
 ATTACK: [Your falsification attempt]
 COUNTEREXAMPLE: [Specific scenario where claim fails]
-HIDDEN_ASSUMPTIONS: [Unstated dependencies]`,
+HIDDEN_ASSUMPTIONS: ["Assumption 1", "Assumption 2", ...] (Must be a JSON array of strings)`,
 
   METHODOLOGY_PROSECUTOR: `You are the METHODOLOGY PROSECUTOR in the ARGUS adversarial audit system.
 
