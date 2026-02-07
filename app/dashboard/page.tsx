@@ -505,14 +505,17 @@ export default function ArgusDashboard() {
 
                                                         try {
                                                             // Dynamic import PDF.js to avoid SSR issues
-                                                            const { extractTextFromPDF } = await import('@/lib/pdf-parser');
-                                                            const text = await extractTextFromPDF(file);
+                                                            const { parsePDF } = await import('@/lib/pdf-parser');
+                                                            const { text, images } = await parsePDF(file);
 
-                                                            if (text.length < 100) {
-                                                                throw new Error('Extracted text too short. PDF might be scanned or encrypted.');
+                                                            if (text.length < 100 && images.length === 0) {
+                                                                throw new Error('Extracted content too minimal. PDF might be scanned or encrypted.');
                                                             }
 
                                                             setPaperInput(text);
+                                                            if (images.length > 0) {
+                                                                setPaperImages(images);
+                                                            }
 
                                                             // Capture Filename for Audit
                                                             syncSession({
@@ -526,7 +529,7 @@ export default function ArgusDashboard() {
                                                                 }
                                                             });
 
-                                                            alert(`PDF Parsed Successfully! Extracted ${text.length} characters instantly.`);
+                                                            alert(`PDF Parsed Successfully! Extracted ${text.length} chars and ${images.length} page images.`);
 
                                                         } catch (err: any) {
                                                             console.error(err);

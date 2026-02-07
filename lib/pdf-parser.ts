@@ -33,7 +33,7 @@ function loadPdfJsScript(): Promise<void> {
     });
 }
 
-export async function extractTextFromPDF(file: File): Promise<string> {
+export async function parsePDF(file: File): Promise<{ text: string, images: string[] }> {
     try {
         await loadPdfJsScript();
 
@@ -41,27 +41,55 @@ export async function extractTextFromPDF(file: File): Promise<string> {
         const pdf = await window.pdfjsLib.getDocument({ data: arrayBuffer }).promise;
 
         let fullText = '';
+        const images: string[] = [];
         const totalPages = pdf.numPages;
 
-        // Extract text from each page
+        // Limit image extraction to first 10 pages to prevent memory issues
+        const maxImagePages = Math.min(totalPages, 10);
+
+        // Extract text and render pages to images
         for (let i = 1; i <= totalPages; i++) {
             const page = await pdf.getPage(i);
+
+            // 1. Text Extraction
             const textContent = await page.getTextContent();
             const pageText = textContent.items
                 .map((item: any) => item.str)
                 .join(' ');
-
-            // Add page number marker/separator if needed, or just newlines
             fullText += pageText + '\n\n';
+
+            // 2. Image Rendering (for multimodal analysis)
+            if (i <= maxImagePages) {
+                try {
+                    const viewport = page.getViewport({ scale: 1.5 }); // 1.5x scale for legible formulas
+                    const canvas = document.createElement('canvas');
+                    const context = canvas.getContext('2d');
+                    canvas.height = viewport.height;
+                    canvas.width = viewport.width;
+
+                    if (context) {
+                        await page.render({
+                            canvasContext: context,
+                            viewport: viewport
+                        }).promise;
+
+                        // Convert to lightweight JPEG
+                        const dataUrl = canvas.toDataURL('image/jpeg', 0.8);
+                        images.push(dataUrl);
+                    }
+                } catch (imgErr) {
+                    console.warn(`Failed to render page ${i} as image:`, imgErr);
+                }
+            }
         }
 
-        const result = fullText.trim();
+        const resultText = fullText.trim();
 
-        if (result.length < 50) {
-            throw new Error('Extracted text too short. PDF might be scanned image or encrypted.');
+        if (resultText.length < 50 && images.length === 0) {
+            throw new Error('Extracted content too minimal. PDF might be encrypted or empty.');
         }
 
-        return result;
+        return { text: resultText, images };
     } catch (error: any) {
         console.error("PDF Parsing Error:", error);
         throw new Error(`PDF Parsing Failed: ${error.message}`);
