@@ -194,7 +194,11 @@ export default function ArgusDashboard() {
     // Persistence Effect: Save on every update
     useEffect(() => {
         if (session) {
-            localStorage.setItem("argus_session", JSON.stringify(session));
+            try {
+                localStorage.setItem("argus_session", JSON.stringify(session));
+            } catch (e) {
+                console.warn("Session too large for LocalStorage (likely due to images). Autosave skipped.", e);
+            }
         }
     }, [session]);
 
