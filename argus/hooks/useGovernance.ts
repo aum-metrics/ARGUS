@@ -355,10 +355,10 @@ export function useGovernance() {
             })
         ]);
 
-        const attackDraftRes = results[0].status === 'fulfilled' ? results[0].value : { content: "Logic audit unavailable.", nextStep: null };
-        const methodRes = results[1].status === 'fulfilled' ? results[1].value : { content: "Methodology audit bypassed." };
-        const litRes = results[2].status === 'fulfilled' ? results[2].value : { content: "Literature check bypassed." };
-        const formRes = results[3].status === 'fulfilled' ? results[3].value : { content: "Formalism check bypassed." };
+        const attackDraftRes = results[0].status === 'fulfilled' ? (results[0].value || {}) : { content: "Logic audit unavailable.", nextStep: null };
+        const methodRes = results[1].status === 'fulfilled' ? (results[1].value || {}) : { content: "Methodology audit bypassed." };
+        const litRes = results[2].status === 'fulfilled' ? (results[2].value || {}) : { content: "Literature check bypassed." };
+        const formRes = results[3].status === 'fulfilled' ? (results[3].value || {}) : { content: "Formalism check bypassed." };
 
         // Optimization: Step 2 Refine (Sequential to Step 1A)
         let attackText = attackDraftRes.content || "Logic attack failed.";
@@ -479,7 +479,8 @@ export function useGovernance() {
             const reviewerLog = c.governanceLog.find((l: any) => l.role === 'JOURNAL_REVIEWER_SIMULATOR');
             if (reviewerLog) {
                 try {
-                    const json = JSON.parse(reviewerLog.content.replace(/```json/g, "").replace(/```/g, "").match(/\{[\s\S]*\}/)?.[0] || "{}");
+                    const cleanContent = (reviewerLog.content || "").replace(/```json/g, "").replace(/```/g, "");
+                    const json = JSON.parse(cleanContent.match(/\{[\s\S]*\}/)?.[0] || "{}");
                     if (json.sixAdversaryScore) {
                         totalSix.thesisClarity += json.sixAdversaryScore.thesisClarity || 0;
                         totalSix.argumentRobustness += json.sixAdversaryScore.argumentRobustness || 0;

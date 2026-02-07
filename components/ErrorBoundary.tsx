@@ -49,13 +49,17 @@ export class ErrorBoundary extends Component<Props, State> {
                             We encountered an unexpected error. Don't worry, your data is safe.
                         </p>
 
-                        {process.env.NODE_ENV === 'development' && this.state.error && (
-                            <div className="mb-6 p-4 bg-zinc-100 rounded-lg text-left">
-                                <p className="text-xs font-mono text-zinc-700 break-all">
-                                    {this.state.error.message}
-                                </p>
-                            </div>
-                        )}
+                        <div className="mb-6 p-4 bg-zinc-100 rounded-lg text-left overflow-auto max-h-48">
+                            <p className="text-xs font-mono text-red-600 font-bold mb-1">Error Details:</p>
+                            <p className="text-xs font-mono text-zinc-700 break-all">
+                                {this.state.error?.message || "Unknown error"}
+                            </p>
+                            {this.state.error?.stack && (
+                                <pre className="mt-2 text-[10px] text-zinc-500 whitespace-pre-wrap">
+                                    {this.state.error.stack.split('\n').slice(0, 3).join('\n')}
+                                </pre>
+                            )}
+                        </div>
 
                         <Button
                             onClick={() => window.location.reload()}
