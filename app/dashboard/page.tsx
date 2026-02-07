@@ -44,26 +44,39 @@ export default function ArgusDashboard() {
     const [showOnboarding, setShowOnboarding] = useState(false); // Onboarding state
     const supabase = createClient()
 
-    // [NEW] PERSISTENCE SYNC HELPER
     const syncSession = async (newSession: ArgusSession) => {
         try {
-            // Optimistic Update
+            // 1. Optimistic Update (Keep Full Data Locally)
             setSession(newSession);
 
-            // Background Save (Debounced in real app, atomic here for safety)
-            if (userId) { // Ensure user is logged in
+            // 2. Prepare Lightweight Payload for Cloud (Strip Images)
+            if (userId) {
+                const lightweightSession = {
+                    ...newSession,
+                    data: {
+                        ...newSession.data,
+                        // Strip raw PDF page images
+                        // Note: We might want to keep URL references if we had storage, 
+                        // but for now we just don't sync the massive base64 blobs.
+                        // The user will re-parse if they reload.
+                        claims: newSession.data.claims.map(c => ({
+                            ...c,
+                            visualEvidence: [] // Don't sync evidence images to DB
+                        }))
+                    }
+                };
+
                 const { error } = await supabase.from('sessions').upsert({
                     id: newSession.id,
                     user_id: userId,
-                    data: newSession,
+                    data: lightweightSession, // Send Diet Version
                     updated_at: new Date().toISOString()
                 }, { onConflict: 'id' });
 
                 if (error) console.error("Sync Failed", error);
             }
         } catch (e: any) {
-            console.error("Critical Sync Error (likely payload too large)", e);
-            // Non-fatal, user continues in-memory
+            console.error("Critical Sync Error", e);
         }
     };
     useEffect(() => {
