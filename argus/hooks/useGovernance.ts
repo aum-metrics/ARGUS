@@ -171,18 +171,87 @@ export function useGovernance() {
 
             try {
                 // 1. Tidy Markdown
-                if (text.includes("```json")) {
-                    text = text.replace(/```json/g, "").replace(/```/g, "");
-                } else if (text.includes("```")) {
-                    text = text.replace(/```/g, "");
+                let cleanText = text;
+                const codeBlockRegex = /```(?:json)?\s*([\s\S]*?)```/i;
+                const match = text.match(codeBlockRegex);
+                if (match) {
+                    cleanText = match[1];
                 }
 
-                // 2. Extract Array
-                const jsonMatch = text.match(/\[[\s\S]*\]/);
-                const jsonString = jsonMatch ? jsonMatch[0] : text;
+                // 2. Smart JSON Extraction (Bracket Aware)
+                let startIndex = cleanText.indexOf('[');
+                if (startIndex !== -1) {
+                    let cursor = startIndex;
+                    let attempts = 0;
 
-                claims = JSON.parse(jsonString);
+                    while (cursor !== -1 && attempts < 5 && claims.length === 0) {
+                        let balance = 0;
+                        let endIndex = -1;
+                        let insideString = false;
+                        let escape = false;
 
+                        for (let i = cursor; i < cleanText.length; i++) {
+                            const char = cleanText[i];
+
+                            if (escape) {
+                                escape = false;
+                                continue;
+                            }
+                            if (char === '\\') {
+                                escape = true;
+                                continue;
+                            }
+                            if (char === '"') {
+                                insideString = !insideString;
+                                continue;
+                            }
+
+                            if (!insideString) {
+                                if (char === '[') balance++;
+                                if (char === ']') {
+                                    balance--;
+                                    if (balance === 0) {
+                                        endIndex = i;
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+
+                        if (endIndex !== -1) {
+                            const candidate = cleanText.substring(cursor, endIndex + 1);
+                            try {
+                                const parsed = JSON.parse(candidate);
+                                if (Array.isArray(parsed) && parsed.length > 0) {
+                                    claims = parsed;
+                                }
+                            } catch (e) {
+                                // Retry with newline fix
+                                try {
+                                    const fixed = candidate.replace(/\n/g, "\\n");
+                                    const parsedFixed = JSON.parse(fixed);
+                                    if (Array.isArray(parsedFixed) && parsedFixed.length > 0) {
+                                        claims = parsedFixed;
+                                    }
+                                } catch (e2) { }
+                            }
+                        }
+
+                        // Move to next '[' if failed or not array
+                        if (claims.length === 0) {
+                            cursor = cleanText.indexOf('[', cursor + 1);
+                            attempts++;
+                        }
+                    }
+                }
+
+                // Fallback to original regex if smart parse failed (for simple cases)
+                if (claims.length === 0) {
+                    const jsonMatch = cleanText.match(/\[[\s\S]*\]/);
+                    if (jsonMatch) {
+                        claims = JSON.parse(jsonMatch[0]);
+                    }
+                }
             } catch (jsonErr) {
                 console.error("JSON PARSE ERROR:", jsonErr);
                 console.error("RAW TEXT:", text);
