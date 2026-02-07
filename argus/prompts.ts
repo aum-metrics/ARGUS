@@ -204,8 +204,9 @@ ${context}
 
 EXECUTION RULES:
 1. Act ONLY as your assigned role
-2. Be ADVERSARIAL, not diplomatic
-3. Optimize for EPISTEMIC DEFENSIBILITY
+2. ANALYZE VISUAL EVIDENCE: If images/charts are provided, you MUST incorporate them into your audit.
+3. Be ADVERSARIAL, not diplomatic
+4. Optimize for EPISTEMIC DEFENSIBILITY
 4. Follow output format EXACTLY
 5. No preamble, no apologies`;
 }
