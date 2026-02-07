@@ -562,41 +562,39 @@ export function useGovernance() {
         }
 
         try {
-            // Simple Chunking/Queue Simulation (Concurrency = 3)
+            // Sequential Processing (Concurrency = 1) for Stability
+            // We reduced this from 3 to 1 because 15 heavy context calls were triggering 429s.
             let processedClaims = [...currentSession.data.claims];
-            const batchSize = 3;
+            const delay = (ms: number) => new Promise(res => setTimeout(res, ms));
 
-            for (let i = 0; i < pendingClaims.length; i += batchSize) {
-                const batch = pendingClaims.slice(i, i + batchSize);
-                addLog(`[SWARM] Processing Batch ${Math.ceil((i + 1) / batchSize)}/${Math.ceil(pendingClaims.length / batchSize)}...`);
+            for (let i = 0; i < pendingClaims.length; i++) {
+                const claim = pendingClaims[i];
+                addLog(`[SWARM] Processing Claim ${i + 1}/${pendingClaims.length}: ${claim.id}...`);
 
-                const batchResults = await Promise.all(batch.map(async (claim: any) => {
-                    try {
-                        return await _auditClaimCore(claim, currentSession.data.originalText, currentSession.id);
-                    } catch (e: any) {
-                        console.error(`Claim ${claim.id} failed`, e);
-                        addLog(`[ERROR] Claim ${claim.id} failed: ${e.message}`);
-                        return claim; // Return original on fail
-                    }
-                }));
+                try {
+                    const result = await _auditClaimCore(claim, currentSession.data.originalText, currentSession.id);
 
-                // Update Local State Map (Merge)
-                processedClaims = processedClaims.map((c: any) => {
-                    const match = batchResults.find((res: any) => res.id === c.id);
-                    return match || c;
-                });
+                    // Update Local State Map (Merge)
+                    processedClaims = processedClaims.map((c: any) => c.id === result.id ? result : c);
 
-                // Calculate incremental score
-                const stats = _calculateSessionStats(processedClaims);
+                    // Progressive UI update
+                    const stats = _calculateSessionStats(processedClaims);
+                    onUpdate({
+                        ...currentSession.data,
+                        claims: processedClaims,
+                        score: stats.score,
+                        report: { ...currentSession.data.report, ...stats.report }
+                    });
+                    setTokenUsage(prev => prev + TOKEN_COSTS.AUDIT_SINGLE);
 
-                // Incremental UI Update
-                onUpdate({
-                    ...currentSession.data,
-                    claims: processedClaims,
-                    score: stats.score,
-                    report: { ...currentSession.data.report, ...stats.report }
-                });
-                setTokenUsage(prev => prev + (batch.length * TOKEN_COSTS.AUDIT_SINGLE));
+                    // Rate Limit Backoff
+                    await delay(1000);
+
+                } catch (e: any) {
+                    console.error(`Claim ${claim.id} failed`, e);
+                    addLog(`[ERROR] Claim ${claim.id} failed: ${e.message}`);
+                    // Continue to next claim
+                }
             }
 
             addLog(`[ORCHESTRATOR] All audits complete.`);
