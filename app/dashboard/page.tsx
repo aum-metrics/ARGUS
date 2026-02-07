@@ -1298,7 +1298,7 @@ export default function ArgusDashboard() {
                                                                 )}
 
                                                                 {/* 3. HIDDEN ASSUMPTIONS */}
-                                                                {parsed.HIDDEN_ASSUMPTIONS && parsed.HIDDEN_ASSUMPTIONS.length > 0 && (
+                                                                {parsed.HIDDEN_ASSUMPTIONS && Array.isArray(parsed.HIDDEN_ASSUMPTIONS) && parsed.HIDDEN_ASSUMPTIONS.length > 0 && (
                                                                     <div>
                                                                         <div className="text-[10px] font-bold text-zinc-400 uppercase mb-2">Exposed Hidden Assumptions</div>
                                                                         <ul className="space-y-1.5">
