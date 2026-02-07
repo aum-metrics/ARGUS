@@ -1298,19 +1298,34 @@ export default function ArgusDashboard() {
                                                                 )}
 
                                                                 {/* 3. HIDDEN ASSUMPTIONS */}
-                                                                {parsed.HIDDEN_ASSUMPTIONS && Array.isArray(parsed.HIDDEN_ASSUMPTIONS) && parsed.HIDDEN_ASSUMPTIONS.length > 0 && (
-                                                                    <div>
-                                                                        <div className="text-[10px] font-bold text-zinc-400 uppercase mb-2">Exposed Hidden Assumptions</div>
-                                                                        <ul className="space-y-1.5">
-                                                                            {parsed.HIDDEN_ASSUMPTIONS.map((assumption: string, i: number) => (
-                                                                                <li key={i} className="flex gap-2 items-start text-xs text-zinc-500">
-                                                                                    <span className="text-red-300 font-mono mt-0.5">•</span>
-                                                                                    <span>{assumption}</span>
-                                                                                </li>
-                                                                            ))}
-                                                                        </ul>
-                                                                    </div>
-                                                                )}
+                                                                {(() => {
+                                                                    // Sanitizer: Convert legacy object format to string array
+                                                                    let assumptions: string[] = [];
+                                                                    if (parsed.HIDDEN_ASSUMPTIONS) {
+                                                                        if (Array.isArray(parsed.HIDDEN_ASSUMPTIONS)) {
+                                                                            assumptions = parsed.HIDDEN_ASSUMPTIONS.map((a: any) =>
+                                                                                typeof a === 'string' ? a : (a.scenario || a.description || JSON.stringify(a))
+                                                                            );
+                                                                        } else if (typeof parsed.HIDDEN_ASSUMPTIONS === 'object') {
+                                                                            // Legacy single object format
+                                                                            assumptions = [parsed.HIDDEN_ASSUMPTIONS.scenario || parsed.HIDDEN_ASSUMPTIONS.description || JSON.stringify(parsed.HIDDEN_ASSUMPTIONS)];
+                                                                        }
+                                                                    }
+
+                                                                    return assumptions.length > 0 ? (
+                                                                        <div>
+                                                                            <div className="text-[10px] font-bold text-zinc-400 uppercase mb-2">Exposed Hidden Assumptions</div>
+                                                                            <ul className="space-y-1.5">
+                                                                                {assumptions.map((assumption: string, i: number) => (
+                                                                                    <li key={i} className="flex gap-2 items-start text-xs text-zinc-500">
+                                                                                        <span className="text-red-300 font-mono mt-0.5">•</span>
+                                                                                        <span>{assumption}</span>
+                                                                                    </li>
+                                                                                ))}
+                                                                            </ul>
+                                                                        </div>
+                                                                    ) : null;
+                                                                })()}
                                                             </div>
                                                         </div>
                                                     ) : (
