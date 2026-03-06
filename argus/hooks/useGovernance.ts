@@ -330,10 +330,11 @@ export function useGovernance() {
     // ------------------------------------------------------------------
     const _auditClaimCore = async (claim: any, contextText: string, sessionId: string) => {
         // 1. Prosecution Phase
-        const attackPrompt = getRolePrompt('THESIS_DESTROYER', `CLAIM: "${claim.statement}"`);
-        const methodPrompt = getRolePrompt('METHODOLOGY_PROSECUTOR', `CLAIM: "${claim.statement}"\nFULL CONTEXT: ${contextText.substring(0, 5000)}...`);
-        const litPrompt = getRolePrompt('LITERATURE_ADVERSARY', `CLAIM: "${claim.statement}"`);
-        const formPrompt = getRolePrompt('FORMALISM_AUDITOR', `CLAIM: "${claim.statement}"`);
+        // Passing full context to all adversaries to avoid false negatives on later sections
+        const attackPrompt = getRolePrompt('THESIS_DESTROYER', `CLAIM: "${claim.statement}"\nFULL CONTEXT: ${contextText}`);
+        const methodPrompt = getRolePrompt('METHODOLOGY_PROSECUTOR', `CLAIM: "${claim.statement}"\nFULL CONTEXT: ${contextText}`);
+        const litPrompt = getRolePrompt('LITERATURE_ADVERSARY', `CLAIM: "${claim.statement}"\nFULL CONTEXT: ${contextText}`);
+        const formPrompt = getRolePrompt('FORMALISM_AUDITOR', `CLAIM: "${claim.statement}"\nFULL CONTEXT: ${contextText}`);
 
         // Parallel Execution of Layers
         const results = await Promise.allSettled([

@@ -94,8 +94,13 @@ ATTACK VECTORS:
 4. Question generalizability
 5. Expose design flaws
 
+ANTI-HALLUCINATION PROTOCOL (CRITICAL!):
+- Before claiming a methodology component (e.g., sample frame, choice of brand, time frame, coding procedure) is "missing", you MUST diligently search the FULL CONTEXT.
+- If it is present in the text, DO NOT claim it is missing.
+- If you critique an element, you MUST quote the text verbatim to show what you are critiquing.
+
 OUTPUT FORMAT:
-METHODOLOGICAL_FLAWS: [List of design issues]
+METHODOLOGICAL_FLAWS: [List of design issues, containing verbatim quotes where applicable]
 CONFOUNDS: [Uncontrolled variables]
 REPLICABILITY_SCORE: [1-10]
 CRITICAL_WEAKNESS: [Most severe flaw]`,
