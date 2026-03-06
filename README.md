@@ -1,13 +1,13 @@
-# ARGUS | Adversarial Research Governance System (V2.0)
+# ARGUS | Adversarial Research Governance System (V3.0)
 
 > **Pre-flight validator for high-impact research papers.**  
-> *Calibrated for researchers at top universities.*
+> *Calibrated for researchers at top universities and R&D labs.*
 
 ![Argus Banner](./public/logo.jpg)
 
-## System Overview
+## 🛡️ System Overview
 
-**ARGUS** is not a chatbot. It is a **deterministic adversarial compiler** for academic manuscripts. It treats a research paper as code, compiling it against strict logical axioms and novelty requirements before it reaches a human peer reviewer.
+**ARGUS** is a **deterministic adversarial compiler** for academic manuscripts. It treats a research paper as code, compiling it against strict logical axioms and novelty requirements before it reaches a human peer reviewer.
 
 By simulating the scrutiny of 6 distinct adversarial agents (The Critic, The Statistician, The Reviewer, etc.), Argus helps researchers:
 1.  **Reduce Desk Rejections** by identifying fatal logical flaws early.
@@ -16,81 +16,80 @@ By simulating the scrutiny of 6 distinct adversarial agents (The Critic, The Sta
 
 ---
 
-## 🏗 System Architecture (V2.0)
+## 🏗️ Dual-Purpose Architecture
 
-The system operates on a **"Hybrid Protocol"** designed for privacy and depth:
+This codebase serves two primary functions:
 
-1.  **Ephemeral Memory (RAM-Only)**: Manuscripts are parsed in-memory and cryptographically zeroed after the session. No data is trained on.
-2.  **The 6-Agent Swarm**:
-    *   **Thesis Constructor**: Extracts the AST (Abstract Syntax Tree) of claims.
-    *   **Thesis Critic**: Attacks weak premises.
-    *   **Methodology Analyst**: Checks for p-hacking and sampling bias.
-    *   **Literature Reviewer**: Scans for similarity (Novelty checks).
-    *   **Formalism Auditor**: Enforces mathematical/definition rigor.
-    *   **The Synthesizer**: Aggregates a final "Publication Readiness Score".
-3.  **Institutional Payment Gate**: Supports both "BYOK" (Bring Your Own Key) for individuals and "Managed Compute" for departments.
+### 1. The ARGUS Platform (Next.js Application)
+A production-ready web application providing a user-friendly interface for researchers to upload manuscripts, track audit progress, and manage organization-level credits.
+- **Location**: `app/`, `components/`, `lib/`, `supabase/`
+
+### 2. The Thesis Research Pipeline (Validation Framework)
+An extensive suite of scripts and data used for "Brutal Hardening" and validating the epistemic defense capabilities of the multi-agent swarm. This pipeline was used for the MS-LJMU Thesis.
+- **Location**: `scripts/`, `data/validation/`
 
 ---
 
 ## 🛠 Tech Stack
 
 *   **Frontend**: Next.js 16 (React 19), Tailwind CSS v4, Lucide React.
-*   **Backend**: Next.js API Routes (Edge/Serverless).
-*   **Database**: Supabase (PostgreSQL) + Row Level Security (RLS).
-*   **AI Engine**: Google Gemini 2.0 Flash (Experimental) / Pro.
-*   **Payments**: Razorpay / Stripe Compatible.
-*   **Infrastructure**: Docker (Standalone) / Vercel.
+*   **Backend**: Next.js API Routes, Supabase (PostgreSQL + RLS).
+*   **AI Engine**: Google Gemini 1.5 Pro/Flash (Primary), OpenAI (Fallback).
+*   **Payment & Auth**: Razorpay Integration, Supabase Auth (SSO/Magic Link).
+*   **Validation**: Playwright (E2E), Custom TypeScript/Python Research Pipeline.
 
 ---
 
 ## 🚀 Getting Started
 
-### Option A: Docker (Recommended for Enterprise)
+### Local Development (Platform)
 
-```bash
-docker build -t argus-v2 .
-docker run -p 3000:3000 argus-v2
-```
-
-### Option B: Local Dev
-
-1.  **Clone the Repository**
+1.  **Clone & Install**
     ```bash
-    git clone https://github.com/your-org/argus.git
-    cd argus
-    ```
-
-2.  **Install Dependencies**
-    ```bash
+    git clone https://github.com/aum-metrics/ARGUS.git
+    cd ARGUS
     npm install
     ```
 
-3.  **Environment Setup**
-    Copy the example env file and fill in your keys:
+2.  **Environment Setup**
     ```bash
     cp env.example .env.local
+    # Fill in GEMINI_API_KEY, SUPABASE_URL, etc.
     ```
 
-4.  **Database Migration**
-    Run the SQL scripts located in `supabase/consolidated_schema.sql` in your Supabase SQL Editor.
-
-5.  **Run Locally**
+3.  **Run Dev Server**
     ```bash
     npm run dev
     ```
-    Access the system at `http://localhost:3000`.
+
+### Research Pipeline (Scripts)
+
+To run the validation pipeline or utility scripts:
+```bash
+# Example: Run system verification
+npx tsx scripts/verify_system.ts
+
+# Example: Process validation papers
+npx tsx scripts/process_validation_papers.ts
+```
 
 ---
 
-## 🔐 Security & Compliance
+## 🔐 Security & "Privacy by Physics"
 
-*   **Zero-Retention Policy**: We expressly do NOT store user manuscripts.
-*   **GDPR/CCPA**: Users own their profile data and can request full deletion via the "Data Self-Destruct" feature in the dashboard.
-*   **Audit Trails**: All payments and session initiations are logged in an immutable `audit_logs` ledger for compliance.
+*   **Zero-Retention Policy**: Manuscripts are processed in ephemeral RAM and never stored in the database.
+*   **Audit Trails**: Metadata-only logging for billing and compliance.
+*   **GDPR/CCPA**: Complete data self-destruct features for user profiles.
 
 ---
 
-## 📄 License
+## 📄 Documentation
 
-Proprietary / Enterprise License.
-Copyright © 2026 ARGUS Governance. All Rights Reserved.
+For deep technical details, refer to:
+- [ARCHITECTURE.md](file:///Users/sambath/Documents/CODE/coding/MultiAIThesis/ARCHITECTURE.md) - High-level system design.
+- [tech_specs.md](file:///Users/sambath/Documents/CODE/coding/MultiAIThesis/tech_specs.md) - Detailed component and agent specifications.
+- [USER_GUIDE.md](file:///Users/sambath/Documents/CODE/coding/MultiAIThesis/USER_GUIDE.md) - Platform usage instructions.
+
+---
+
+**© 2026 ARGUS Governance. All Rights Reserved.**
